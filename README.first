@@ -1,0 +1,10 @@
+This library uses WebKit style for indentation and format.
+It is advisable to auto-format your code before you check-in any changes.
+
+First install clang-format if you don't already have it:
+$ sudo apt-get install clang-format
+
+You can use clang-format utility with WebKit syle option:
+$ clang-format -i -style=WebKit src/*
+
+You can apply clang-format to a single file or a folder..
