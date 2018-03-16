@@ -1,12 +1,6 @@
 #ifndef DBUS_H
 #define DBUS_H
 
-// C++ Standard elements, used throughout
-#include <boost/any.hpp>
-#include <boost/thread/recursive_mutex.hpp>
-#include <string>
-#include <vector>
-
 // Core elements and types
 #include "dbus_log.h"
 #include "dbus_platform.h"
