@@ -11,8 +11,7 @@
 #include "dbus_messageprotocol.h"
 #include "dbus_messagestream.h"
 
-DBus::MessageProtocol::MessageProtocol(Transport& transport)
-    : m_Transport(transport)
+DBus::MessageProtocol::MessageProtocol()
 {
     setMethodCallHandler(std::bind(&MessageProtocol::onReceiveMethodCall, this, std::placeholders::_1));
     setMethodReturnHandler(std::bind(&MessageProtocol::onReceiveMethodReturn, this, std::placeholders::_1));

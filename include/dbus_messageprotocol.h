@@ -5,8 +5,6 @@
 
 namespace DBus {
 
-class Transport;
-
 class UnmarshallingData {
 public:
     uint8_t c;
@@ -20,7 +18,7 @@ public:
 
 class MessageProtocol {
 public:
-    MessageProtocol(Transport& transport);
+    MessageProtocol();
 
     void reset();
     void setMethodCallHandler(const Message::CallbackFunctionMethodCall& callback);
@@ -47,7 +45,6 @@ private:
     };
 
     size_t m_State;
-    Transport& m_Transport;
     // TODO:?? Move the handler into a separate message class? We can't get 2 interspersed message so it's a
     // 1:1 relationship between protocol handler and its message, but it might be useful elsewhere.
     DBus::Type::Struct m_HeaderStruct;
