@@ -63,9 +63,9 @@ public:
     } ReleaseNameReplyOut;
 
 private:
+    MessageProtocol m_MessageProtocol;
     Transport m_Transport;
     AuthenticationProtocol m_AuthenticationProtocol;
-    MessageProtocol m_MessageProtocol;
 
     struct CallbackPair {
         CallbackPair(const Message::CallbackFunctionMethodReturn& s, const Message::CallbackFunctionError& f)
