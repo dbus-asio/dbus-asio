@@ -16,13 +16,14 @@ DBus::Transport::Transport(const std::string& path)
     , m_QuitThread(false)
     , m_Thread(std::bind(&Transport::ThreadFunction, this))
 {
-
-    m_Thread.detach();
-
     setOctetHandler(std::bind(&Transport::onReceiveOctet, this, std::placeholders::_1));
 }
 
-DBus::Transport::~Transport() { m_QuitThread = true; }
+DBus::Transport::~Transport()
+{
+    m_QuitThread = true;
+    m_Thread.join();
+}
 
 void DBus::Transport::onAuthComplete()
 {
