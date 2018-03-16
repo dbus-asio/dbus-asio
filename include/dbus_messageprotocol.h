@@ -1,6 +1,8 @@
 #ifndef DBUS_MESSAGEPROTOCOL
 #define DBUS_MESSAGEPROTOCOL
 
+#include "dbus_type_struct.h"
+
 namespace DBus {
 
 class Transport;

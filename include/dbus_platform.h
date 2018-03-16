@@ -1,6 +1,9 @@
 #ifndef DBUS_PLATFORM_H
 #define DBUS_PLATFORM_H
 
+#include <cstdint>
+#include <string>
+
 namespace DBus {
 namespace Platform {
     // TODO: Is this abstraction truly needed?

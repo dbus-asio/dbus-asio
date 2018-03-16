@@ -1,6 +1,9 @@
 #ifndef DBUS_MATCHRULE
 #define DBUS_MATCHRULE
 
+#include "dbus_message.h"
+#include <string>
+
 namespace DBus {
 
 class MatchRule {

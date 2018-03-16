@@ -1,6 +1,9 @@
 #ifndef DBUS_INTROSPECTABLE_H
 #define DBUS_INTROSPECTABLE_H
 
+#include <string>
+#include <vector>
+
 namespace DBus {
 namespace Introspectable {
     class Interface;

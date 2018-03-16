@@ -1,5 +1,3 @@
-#include <boost/thread/recursive_mutex.hpp>
-
 #include "dbus_auth.h"
 #include "dbus_log.h"
 #include "dbus_platform.h"

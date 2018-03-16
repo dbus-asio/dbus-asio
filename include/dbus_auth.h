@@ -1,6 +1,8 @@
 #ifndef DBUS_AUTH_H
 #define DBUS_AUTH_H
 
+#include <boost/thread/recursive_mutex.hpp>
+
 namespace DBus {
 class Transport;
 

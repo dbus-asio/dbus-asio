@@ -1,6 +1,8 @@
 #ifndef DBUS_NATIVE
 #define DBUS_NATIVE
 
+#include "dbus_transport.h"
+
 namespace DBus {
 
 class Native {

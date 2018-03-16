@@ -1,6 +1,8 @@
 #ifndef DBUS_TYPE_OBJECTPATH_H
 #define DBUS_TYPE_OBJECTPATH_H
 
+#include "dbus_type_string.h"
+
 namespace DBus {
 class MessageStream;
 
