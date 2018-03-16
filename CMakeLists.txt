@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.7.1)
 
+include(GNUInstallDirs)
+
 project(dbus-asio VERSION 1.0.0)
 
 set(HEADER_FILES
@@ -74,16 +76,25 @@ add_library(dbus-asio SHARED
 	src/dbus_validation.cpp
 )
 
-find_package(Boost REQUIRED)
+find_package(Boost COMPONENTS system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
-target_link_libraries (dbus-asio "${Boost_LIBRARIES}")
+set (PRIVATE_LIBS ${Boost_LIBRARIES})
 link_directories(${Boost_LIBRARY_DIRS})
+target_link_libraries (dbus-asio ${PRIVATE_LIBS})
 
 set_target_properties(dbus-asio PROPERTIES
 	VERSION ${PROJECT_VERSION}
 	SOVERSION 1
 	PUBLIC_HEADER "${HEADER_FILES}")
 
+foreach(LIB ${PRIVATE_LIBS})
+	get_filename_component(BARE_LIB ${LIB} NAME)
+	set(PLATFORM_LIBS "${PLATFORM_LIBS} -l${BARE_LIB}")
+endforeach()
+
+set(PLATFORM_LIBS "${PLATFORM_LIBS} -ldbus-asio")
+
+message(${PLATFORM_LIBS})
 configure_file(dbus-asio.pc.in dbus-asio.pc @ONLY)
 
 target_include_directories(dbus-asio PUBLIC include)
