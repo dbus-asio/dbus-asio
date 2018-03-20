@@ -76,11 +76,16 @@ add_library(dbus-asio SHARED
 	src/dbus_validation.cpp
 )
 
+# DBUS DEPENDENCIES
 find_package(Boost COMPONENTS system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 set (PRIVATE_LIBS ${Boost_LIBRARIES})
 link_directories(${Boost_LIBRARY_DIRS})
 target_link_libraries (dbus-asio ${PRIVATE_LIBS})
+
+# PTHREAD DEPENDENCIES
+find_package (Threads REQUIRED)
+set (PRIVATE_LIBS "${PRIVATE_LIBS} ${CMAKE_THREAD_LIBS_INIT}")
 
 set_target_properties(dbus-asio PROPERTIES
 	VERSION ${PROJECT_VERSION}
