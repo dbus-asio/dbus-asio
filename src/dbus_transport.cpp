@@ -22,6 +22,11 @@ DBus::Transport::Transport(const std::string& path)
 DBus::Transport::~Transport()
 {
     m_QuitThread = true;
+    boost::system::error_code ec;
+    m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
+    if (ec) {
+        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Socket shutdown failed: \"%s\"\n", ec.message());
+    }
     m_Thread.join();
 }
 
