@@ -107,8 +107,8 @@ target_include_directories(dbus-asio PUBLIC include)
 add_subdirectory(example)
 
 install(TARGETS dbus-asio
-	LIBRARY DESTINATION lib
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	PUBLIC_HEADER DESTINATION include/libdbus-asio)
 
 install(FILES ${CMAKE_BINARY_DIR}/dbus-asio.pc
-	DESTINATION lib/pkgconfig)
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
