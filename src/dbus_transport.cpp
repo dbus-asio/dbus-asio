@@ -7,6 +7,9 @@
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <chrono>
+
+using namespace std::chrono_literals;
 
 DBus::Transport::Transport(const std::string& path)
     : m_Busname(path)
@@ -17,6 +20,11 @@ DBus::Transport::Transport(const std::string& path)
     , m_Thread(std::bind(&Transport::ThreadFunction, this))
 {
     setOctetHandler(std::bind(&Transport::onReceiveOctet, this, std::placeholders::_1));
+    std::unique_lock<std::mutex> lk(m_StartUpMutex);
+    if (!m_StartUpCondition.wait_for(lk, 5000ms, [this](){return m_ReadyToReceive;})) {
+        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Transport thread start failed");
+        abort();
+    }
 }
 
 DBus::Transport::~Transport()
@@ -112,6 +120,8 @@ void DBus::Transport::ThreadFunction()
     sendOctetDirect('\0');
 
     m_ReadyToReceive = true;
+
+    m_StartUpCondition.notify_one();
 
     while (!m_QuitThread) {
         try {

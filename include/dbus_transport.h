@@ -1,6 +1,7 @@
 #ifndef DBUS_TRANSPORT_H
 #define DBUS_TRANSPORT_H
 
+#include <condition_variable>
 #include <thread>
 
 #include <boost/asio.hpp>
@@ -52,6 +53,8 @@ protected:
 
     volatile bool m_QuitThread;
     std::thread m_Thread;
+    std::mutex m_StartUpMutex;
+    std::condition_variable m_StartUpCondition;
     mutable boost::recursive_mutex m_SendMutex;
     mutable boost::recursive_mutex m_CallbackMutex;
     std::vector<std::string> m_BufferedMessages;
