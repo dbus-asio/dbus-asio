@@ -5,38 +5,38 @@ include(GNUInstallDirs)
 project(dbus-asio VERSION 1.0.0)
 
 set(HEADER_FILES
-	include/dbus_auth.h
-	include/dbus.h
-	include/dbus_introspectable.h
-	include/dbus_log.h
-	include/dbus_matchrule.h
-	include/dbus_message.h
-	include/dbus_messageprotocol.h
-	include/dbus_messagestream.h
-	include/dbus_native.h
-	include/dbus_platform.h
-	include/dbus_transport.h
-	include/dbus_type_array.h
-	include/dbus_type_base.h
-	include/dbus_type_boolean.h
-	include/dbus_type_byte.h
-	include/dbus_type_dictentry.h
-	include/dbus_type_double.h
-	include/dbus_type.h
-	include/dbus_type_helpers.h
-	include/dbus_type_int16.h
-	include/dbus_type_int32.h
-	include/dbus_type_int64.h
-	include/dbus_type_objectpath.h
-	include/dbus_type_signature.h
-	include/dbus_type_string.h
-	include/dbus_type_struct.h
-	include/dbus_type_uint16.h
-	include/dbus_type_uint32.h
-	include/dbus_type_uint64.h
-	include/dbus_type_variant.h
-	include/dbus_utils.h
-	include/dbus_validation.h
+	src/dbus_auth.h
+	src/dbus.h
+	src/dbus_introspectable.h
+	src/dbus_log.h
+	src/dbus_matchrule.h
+	src/dbus_message.h
+	src/dbus_messageprotocol.h
+	src/dbus_messagestream.h
+	src/dbus_native.h
+	src/dbus_platform.h
+	src/dbus_transport.h
+	src/dbus_type_array.h
+	src/dbus_type_base.h
+	src/dbus_type_boolean.h
+	src/dbus_type_byte.h
+	src/dbus_type_dictentry.h
+	src/dbus_type_double.h
+	src/dbus_type.h
+	src/dbus_type_helpers.h
+	src/dbus_type_int16.h
+	src/dbus_type_int32.h
+	src/dbus_type_int64.h
+	src/dbus_type_objectpath.h
+	src/dbus_type_signature.h
+	src/dbus_type_string.h
+	src/dbus_type_struct.h
+	src/dbus_type_uint16.h
+	src/dbus_type_uint32.h
+	src/dbus_type_uint64.h
+	src/dbus_type_variant.h
+	src/dbus_utils.h
+	src/dbus_validation.h
 )
 
 add_library(dbus-asio SHARED
@@ -102,7 +102,7 @@ set(PLATFORM_LIBS "${PLATFORM_LIBS} -ldbus-asio")
 message(${PLATFORM_LIBS})
 configure_file(dbus-asio.pc.in dbus-asio.pc @ONLY)
 
-target_include_directories(dbus-asio PUBLIC include)
+target_include_directories(dbus-asio PUBLIC src)
 
 add_subdirectory(example)
 
