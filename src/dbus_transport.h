@@ -31,7 +31,6 @@ public:
     void setOctetHandler(const ReceiveOctetCallbackFunction& callback);
     void onReceiveOctet(uint8_t c);
     void onAuthComplete();
-    void pumpMessageQueue();
     void addToMessageQueue(const std::string& data);
 
     std::string getStats() const;

@@ -42,22 +42,13 @@ DBus::Transport::~Transport()
 void DBus::Transport::onAuthComplete()
 {
     DBus::Log::write(DBus::Log::INFO, "DBus :: Transport :: Authorisation has completed.\n");
-    m_ReadyToSend = true;
-    pumpMessageQueue();
-}
-
-void DBus::Transport::pumpMessageQueue()
-{
-    DBus::Log::write(DBus::Log::INFO, "DBus :: Transport :: pumpMessageQueue of %d messages.\n", m_BufferedMessages.size());
     boost::recursive_mutex::scoped_lock guard(m_SendMutex);
-
-    if (m_ReadyToSend) {
-        for (auto msg : m_BufferedMessages) {
-            sendString(msg);
-            ++m_Stats.count_messagespumped;
-        }
-        m_BufferedMessages.clear();
+    for (auto msg : m_BufferedMessages) {
+        sendStringDirect(msg);
+        ++m_Stats.count_messagespumped;
     }
+    m_BufferedMessages.clear();
+    m_ReadyToSend = true;
 }
 
 void DBus::Transport::addToMessageQueue(const std::string& data)
@@ -88,6 +79,8 @@ void DBus::Transport::sendOctetDirect(uint8_t data)
 
 void DBus::Transport::sendStringDirect(const std::string& data)
 {
+    DBus::Log::write(DBus::Log::TRACE, "DBus :: SENDDIRECT: %s\n", data.c_str());
+    DBus::Log::writeHex(DBus::Log::TRACE, "DBus :: SENDDIRECT: \n", data);
     boost::recursive_mutex::scoped_lock guard(m_SendMutex);
 
     //    boost::asio::async_write(*s, boost::asio::buffer(&converted_number, sizeof(converted_number)),  boost::bind(&Client::doNothing,this));
