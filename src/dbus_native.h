@@ -63,10 +63,6 @@ public:
     } ReleaseNameReplyOut;
 
 private:
-    MessageProtocol m_MessageProtocol;
-    Transport m_Transport;
-    AuthenticationProtocol m_AuthenticationProtocol;
-
     struct CallbackPair {
         CallbackPair(const Message::CallbackFunctionMethodReturn& s, const Message::CallbackFunctionError& f)
             : success(s)
@@ -102,6 +98,10 @@ private:
 
     mutable boost::recursive_mutex m_RulesMapMutex;
     std::map<std::string, MatchRule> m_RulesMap;
+
+    std::unique_ptr<MessageProtocol> m_MessageProtocol;
+    std::shared_ptr<Transport> m_Transport;
+    std::unique_ptr<AuthenticationProtocol> m_AuthenticationProtocol;
 
 public:
     static std::string DBusDaemon;

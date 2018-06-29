@@ -17,7 +17,7 @@ AGREE   ---->
         <---  BEGIN
 */
 
-DBus::AuthenticationProtocol::AuthenticationProtocol(Transport& transport)
+DBus::AuthenticationProtocol::AuthenticationProtocol(std::shared_ptr<Transport>& transport)
     : m_Transport(transport)
     , m_LastOctetSeen(0)
 {
@@ -131,7 +131,7 @@ void DBus::AuthenticationProtocol::sendNegotiateUnixFD() { sendWire(std::string(
 void DBus::AuthenticationProtocol::sendBegin()
 {
     sendWire(std::string("BEGIN\r\n"));
-    m_Transport.onAuthComplete();
+    m_Transport->onAuthComplete();
 }
 
 void DBus::AuthenticationProtocol::sendData(std::string& data)
@@ -143,7 +143,7 @@ void DBus::AuthenticationProtocol::sendData(std::string& data)
     sendWire(packet);
 }
 
-void DBus::AuthenticationProtocol::sendWire(const std::string& data) { m_Transport.sendStringDirect(data); }
+void DBus::AuthenticationProtocol::sendWire(const std::string& data) { m_Transport->sendStringDirect(data); }
 
 // Return true once we have completed the auth state
 bool DBus::AuthenticationProtocol::onCommand(const std::string& command)

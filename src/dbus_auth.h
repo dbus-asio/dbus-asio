@@ -14,7 +14,7 @@ public:
         AUTH_NEGOTIATE_UNIX_FD,
     } AuthRequired;
 
-    AuthenticationProtocol(Transport& transport);
+    AuthenticationProtocol(std::shared_ptr<Transport>& transport);
 
     void reset();
     void sendAuthListMethods();
@@ -40,7 +40,7 @@ protected:
     bool onCommand(const std::string& command);
 
 private:
-    Transport& m_Transport;
+    std::shared_ptr<Transport> m_Transport;
     uint8_t m_LastOctetSeen;
     std::string m_CurrentCommand;
     AuthenticationProtocol::AuthRequired m_AuthType;
