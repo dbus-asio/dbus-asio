@@ -81,11 +81,12 @@ find_package(Boost COMPONENTS system REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 set (PRIVATE_LIBS ${Boost_LIBRARIES})
 link_directories(${Boost_LIBRARY_DIRS})
-target_link_libraries (dbus-asio ${PRIVATE_LIBS})
 
 # PTHREAD DEPENDENCIES
 find_package (Threads REQUIRED)
 set (PRIVATE_LIBS "${PRIVATE_LIBS} ${CMAKE_THREAD_LIBS_INIT}")
+
+target_link_libraries (dbus-asio ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 set_target_properties(dbus-asio PROPERTIES
 	VERSION ${PROJECT_VERSION}
@@ -104,7 +105,10 @@ configure_file(dbus-asio.pc.in dbus-asio.pc @ONLY)
 
 target_include_directories(dbus-asio PUBLIC src)
 
+enable_testing()
+
 add_subdirectory(example)
+add_subdirectory(tests)
 
 install(TARGETS dbus-asio
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
