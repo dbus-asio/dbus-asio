@@ -1,4 +1,5 @@
 #include "dbus.h"
+#include <iostream>
 
 bool gInterrupted = false;
 

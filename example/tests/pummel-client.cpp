@@ -1,6 +1,7 @@
 #include "dbus.h"
 #include <chrono>
 #include <mutex>
+#include <iostream>
 
 // Invoke:
 //    pummel-client [stubname] [iterations_per_thread] [threads]
