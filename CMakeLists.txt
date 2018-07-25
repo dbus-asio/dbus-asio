@@ -116,3 +116,6 @@ install(TARGETS dbus-asio
 
 install(FILES ${CMAKE_BINARY_DIR}/dbus-asio.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
+
+install(FILES dbus-asio-config.cmake
+	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dbus-asio/)
