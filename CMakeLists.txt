@@ -107,7 +107,10 @@ target_include_directories(dbus-asio PUBLIC src)
 
 enable_testing()
 
-add_subdirectory(example)
+option(ENABLE_EXAMPLES "Build example projects" OFF)
+if (ENABLE_EXAMPLES)
+	add_subdirectory(example)
+endif(ENABLE_EXAMPLES)
 add_subdirectory(tests)
 
 install(TARGETS dbus-asio
