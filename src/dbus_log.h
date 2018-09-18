@@ -32,10 +32,7 @@ public:
 
         va_list ap;
         va_start(ap, msg);
-        char buffer[999];
-
-        vsnprintf(buffer, sizeof(buffer), msg, ap);
-        printf(buffer);
+        vfprintf(stderr, msg, ap);
         flush();
 
         va_end(ap);
@@ -68,7 +65,7 @@ public:
 
     static void flush()
     {
-        fflush(stdout);
+        fflush(stderr);
     }
 
     static void setLevel(size_t lowest_visible_level)
