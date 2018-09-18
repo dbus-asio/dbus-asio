@@ -24,7 +24,7 @@ public:
     ~Transport();
 
     void sendString(const std::string& data);
-    void handle_write_output(const boost::system::error_code& error);
+    void handle_write_output(std::shared_ptr<std::string> buf_written, const boost::system::error_code& error, std::size_t bytes_transferred);
 
     void ThreadFunction();
 
@@ -45,7 +45,6 @@ protected:
     bool m_ReadyToReceive;
     boost::asio::io_service m_io_service;
     boost::asio::local::stream_protocol::socket m_socket;
-    //boost::asio::ip::tcp::acceptor m_acceptor;
 
     uint8_t m_DataBuffer[1];
     ReceiveOctetCallbackFunction m_ReceiveOctetCallback;

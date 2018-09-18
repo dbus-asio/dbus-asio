@@ -17,11 +17,11 @@ DBus::Transport::Transport(const std::string& path)
     , m_ReadyToReceive(false)
     , m_socket(m_io_service)
     , m_QuitThread(false)
-    , m_Thread(std::bind(&Transport::ThreadFunction, this))
 {
     setOctetHandler(std::bind(&Transport::onReceiveOctet, this, std::placeholders::_1));
     std::unique_lock<std::mutex> lk(m_StartUpMutex);
-    if (!m_StartUpCondition.wait_for(lk, 5000ms, [this](){return m_ReadyToReceive;})) {
+    m_Thread = std::thread(std::bind(&Transport::ThreadFunction, this));
+    if (!m_StartUpCondition.wait_for(lk, 5000ms, [this]() { return m_ReadyToReceive; })) {
         DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Transport thread start failed");
         abort();
     }
@@ -29,12 +29,18 @@ DBus::Transport::Transport(const std::string& path)
 
 DBus::Transport::~Transport()
 {
-    m_ReadyToSend = false;
-    m_QuitThread = true;
+    {
+        boost::recursive_mutex::scoped_lock guard(m_SendMutex);
+        m_ReadyToSend = false;
+    }
     boost::system::error_code ec;
     m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
     if (ec) {
-        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Socket shutdown failed: \"%s\"\n", ec.message());
+        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Socket shutdown failed: (%d) \"%s\"\n", ec.value(), ec.message());
+    }
+    {
+        boost::recursive_mutex::scoped_lock guard(m_SendMutex);
+        m_QuitThread = true;
     }
     m_Thread.join();
 }
@@ -64,6 +70,7 @@ void DBus::Transport::sendString(const std::string& data)
     DBus::Log::write(DBus::Log::TRACE, "DBus :: SEND: %s\n", data.c_str());
     DBus::Log::writeHex(DBus::Log::TRACE, "DBus :: DATA: ", data);
 
+    boost::recursive_mutex::scoped_lock guard(m_SendMutex);
     if (m_ReadyToSend) {
         sendStringDirect(data);
     } else {
@@ -74,7 +81,9 @@ void DBus::Transport::sendString(const std::string& data)
 void DBus::Transport::sendOctetDirect(uint8_t data)
 {
     boost::recursive_mutex::scoped_lock guard(m_SendMutex);
-    boost::asio::async_write(m_socket, boost::asio::buffer(&data, 1), boost::bind(&Transport::handle_write_output, this, boost::asio::placeholders::error));
+    std::shared_ptr<std::string> buf(new std::string());
+    buf.get()->push_back(static_cast<char>(data));
+    boost::asio::async_write(m_socket, boost::asio::buffer(*buf.get()), boost::bind(&Transport::handle_write_output, this, buf, _1, _2));
 }
 
 void DBus::Transport::sendStringDirect(const std::string& data)
@@ -83,20 +92,20 @@ void DBus::Transport::sendStringDirect(const std::string& data)
     DBus::Log::writeHex(DBus::Log::TRACE, "DBus :: SENDDIRECT: \n", data);
     boost::recursive_mutex::scoped_lock guard(m_SendMutex);
 
-    //    boost::asio::async_write(*s, boost::asio::buffer(&converted_number, sizeof(converted_number)),  boost::bind(&Client::doNothing,this));
-
-    boost::asio::async_write(m_socket, boost::asio::buffer(data.data(), data.length()),
-        boost::bind(&Transport::handle_write_output, this, boost::asio::placeholders::error));
+    // We don't know when the write will complete, so we copy the buffer
+    std::shared_ptr<std::string> buf(new std::string(data));
+    boost::asio::async_write(m_socket, boost::asio::buffer(*buf.get()),
+        boost::bind(&Transport::handle_write_output, this, buf, _1, _2));
     ++m_Stats.count_messagessent;
     m_Stats.bytes_sent += data.length();
 }
 
-void DBus::Transport::handle_write_output(const boost::system::error_code& error)
+void DBus::Transport::handle_write_output(std::shared_ptr<std::string> buf_written, const boost::system::error_code& error, std::size_t bytes_transferred)
 {
-    if (!error.value()) {
+    buf_written.reset();
+    if (error) {
         DBus::Log::write(DBus::Log::ERROR, "DBus :: ERROR in async_write : %s\n", error.message().c_str());
     }
-    DBus::Log::write(DBus::Log::ERROR, "DBus :: From async_write : %s\n", error.message().c_str());
 }
 
 void DBus::Transport::ThreadFunction()
@@ -104,18 +113,21 @@ void DBus::Transport::ThreadFunction()
 
     Log::write(Log::INFO, "DBus :: Transport thread starting up\n");
 
+    // We use a second thread for the io context until further notice
+    std::unique_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(m_io_service));
+    std::thread io_service_thread(boost::bind(&boost::asio::io_service::run, &m_io_service));
+
     m_socket.connect(m_Busname.c_str());
 
-    // TODO: Q. Is this still needed?
-    while (!m_socket.is_open()) {
-    }
-    // Even for protocols that don't need NUL passed first, we must pass it. Otherwise,
-    // there'll be a 'connection reset by peer' sent to us.
+    // The "special credentials passing NUL byte" is required, even for protocols that
+    // can send credentials without needing one. Otherwise, the server may disconnect us.
     sendOctetDirect('\0');
 
-    m_ReadyToReceive = true;
-
-    m_StartUpCondition.notify_one();
+    {
+        std::unique_lock<std::mutex> lk(m_StartUpMutex);
+        m_ReadyToReceive = true;
+        m_StartUpCondition.notify_one();
+    }
 
     while (!m_QuitThread) {
         try {
@@ -126,21 +138,31 @@ void DBus::Transport::ThreadFunction()
                 m_ReceiveOctetCallback(m_DataBuffer[0]);
             }
         } catch (const boost::system::system_error& e) {
-            Log::write(Log::ERROR, "DBus :: End of file exception\n");
+            // If we have an unexpected close, it might be because we sent something
+            // the other end did not like.  If we've sent a shutdown, this is unremarkable.
+            if (e.code() == boost::asio::error::eof) {
+                if (!m_QuitThread) {
+                    Log::write(Log::ERROR, "DBus :: Connection closed\n");
+                }
+            } else {
+                Log::write(Log::ERROR, "DBus :: Transport error. %s (%d)\n", e.what());
+            }
             break;
         } catch (const std::exception& e) {
-            // e.g. "read: End of file"
-            // Note: this occurs when the master closes down the port because we've sent bad data.
-            Log::write(Log::ERROR, "DBus :: Transport Exception. %s\n", e.what());
-            // Log::write(Log::ERROR, "DBus :: Transport Exception. %s\n", e.type());
+            Log::write(Log::ERROR, "DBus :: Transport error. %s\n", e.what());
             break;
         }
     }
 
     Log::write(Log::INFO, "DBus :: Transport thread closing down\n");
+    work.reset();
+    io_service_thread.join();
 
     boost::system::error_code ec;
     m_socket.close(ec);
+    if (ec) {
+        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Socket close failed: (%d) \"%s\"\n", ec.value(), ec.message());
+    }
 }
 
 void DBus::Transport::setOctetHandler(const ReceiveOctetCallbackFunction& callback)
