@@ -72,7 +72,7 @@ protected:
     mutable boost::recursive_mutex m_CallbackMutex;
     std::vector<std::string> m_BufferedMessages;
     volatile bool m_QuitThread;
-    std::thread m_Thread;
+    boost::thread m_Thread;
 
 private:
     struct Stats {

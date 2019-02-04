@@ -37,7 +37,7 @@ DBus::Transport::Transport(const std::string& path)
 {
     setOctetHandler(std::bind(&Transport::onReceiveOctet, this, std::placeholders::_1));
     std::unique_lock<std::mutex> lk(m_StartUpMutex);
-    m_Thread = std::thread(std::bind(&Transport::ThreadFunction, this));
+    m_Thread = boost::thread(std::bind(&Transport::ThreadFunction, this));
     if (!m_StartUpCondition.wait_for(lk, 5000ms, [this]() { return m_ReadyToReceive; })) {
         DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Transport thread start failed");
         abort();
@@ -59,7 +59,17 @@ DBus::Transport::~Transport()
         boost::recursive_mutex::scoped_lock guard(m_SendMutex);
         m_QuitThread = true;
     }
-    m_Thread.join();
+    try {
+        if (!m_Thread.try_join_for(boost::chrono::seconds(30))) {
+            DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Transport thread cannot join\n");
+            abort();
+        }
+    }
+    catch (const std::exception& e)
+    {
+        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Transport thread cannot join. Exception: %s\n", e.what());
+        abort();
+    }
 }
 
 void DBus::Transport::onAuthComplete()
@@ -132,7 +142,7 @@ void DBus::Transport::ThreadFunction()
 
     // We use a second thread for the io context until further notice
     std::unique_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(m_io_service));
-    std::thread io_service_thread(boost::bind(&boost::asio::io_service::run, &m_io_service));
+    boost::thread io_service_thread(boost::bind(&boost::asio::io_service::run, &m_io_service));
 
     m_socket.connect(m_Busname.c_str());
 
@@ -173,7 +183,10 @@ void DBus::Transport::ThreadFunction()
 
     Log::write(Log::INFO, "DBus :: Transport thread closing down\n");
     work.reset();
-    io_service_thread.join();
+    if (!io_service_thread.try_join_for(boost::chrono::seconds(30))) {
+        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: IO service thread cannot join\n");
+        abort();
+    }
 
     boost::system::error_code ec;
     m_socket.close(ec);
