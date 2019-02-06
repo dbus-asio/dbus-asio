@@ -74,6 +74,9 @@ protected:
     volatile bool m_QuitThread;
     boost::thread m_Thread;
 
+    boost::thread m_io_service_thread;
+    std::unique_ptr<boost::asio::io_service::work> m_io_service_work;
+
 private:
     struct Stats {
         size_t count_messagessent;

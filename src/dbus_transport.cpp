@@ -37,6 +37,10 @@ DBus::Transport::Transport(const std::string& path)
 {
     setOctetHandler(std::bind(&Transport::onReceiveOctet, this, std::placeholders::_1));
     std::unique_lock<std::mutex> lk(m_StartUpMutex);
+    // We use a second thread for the io context until further notice
+    m_io_service_work.reset (new boost::asio::io_service::work (m_io_service));
+    m_io_service_thread = boost::thread (boost::bind (&boost::asio::io_service::run, &m_io_service));
+
     m_Thread = boost::thread(std::bind(&Transport::ThreadFunction, this));
     if (!m_StartUpCondition.wait_for(lk, 5000ms, [this]() { return m_ReadyToReceive; })) {
         DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Transport thread start failed");
@@ -50,6 +54,14 @@ DBus::Transport::~Transport()
         boost::recursive_mutex::scoped_lock guard(m_SendMutex);
         m_ReadyToSend = false;
     }
+
+    // Wait for pending async_writes to complete
+    m_io_service_work.reset();
+    if (!m_io_service_thread.try_join_for(boost::chrono::seconds(30))) {
+        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: IO service thread cannot join\n");
+        abort();
+    }
+
     boost::system::error_code ec;
     m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
     if (ec) {
@@ -140,10 +152,6 @@ void DBus::Transport::ThreadFunction()
 
     Log::write(Log::INFO, "DBus :: Transport thread starting up\n");
 
-    // We use a second thread for the io context until further notice
-    std::unique_ptr<boost::asio::io_service::work> work(new boost::asio::io_service::work(m_io_service));
-    boost::thread io_service_thread(boost::bind(&boost::asio::io_service::run, &m_io_service));
-
     m_socket.connect(m_Busname.c_str());
 
     // The "special credentials passing NUL byte" is required, even for protocols that
@@ -182,11 +190,6 @@ void DBus::Transport::ThreadFunction()
     }
 
     Log::write(Log::INFO, "DBus :: Transport thread closing down\n");
-    work.reset();
-    if (!io_service_thread.try_join_for(boost::chrono::seconds(30))) {
-        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: IO service thread cannot join\n");
-        abort();
-    }
 
     boost::system::error_code ec;
     m_socket.close(ec);
