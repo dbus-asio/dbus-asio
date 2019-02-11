@@ -63,7 +63,7 @@ DBus::Transport::~Transport()
     }
 
     boost::system::error_code ec;
-    m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_send, ec);
+    m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
     if (ec) {
         DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Socket shutdown failed: (%d) \"%s\"\n", ec.value(), ec.message());
     }
