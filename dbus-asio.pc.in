@@ -4,7 +4,7 @@ libdir=${exec_prefix}/@CMAKE_INSTALL_LIBDIR@
 includedir=${prefix}/@CMAKE_INSTALL_INCLUDEDIR@/libdbus-asio
 
 Name: @PROJECT_NAME@
-Description: "Brightsign DBUS Library"
+Description: "D-Bus ASIO Library"
 Version: @PROJECT_VERSION@
 
 Requires:
