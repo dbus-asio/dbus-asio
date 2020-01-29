@@ -123,4 +123,9 @@ void DBus::Native::callRemoveMatch(const std::string& rule)
     Message::MethodCall method(id, inparams, DBus::Message::Header::FLAGS_NO_REPLY_EXPECTED);
 
     sendMethodCall(DBus::Native::DBusDaemon, method);
+
+    {
+        boost::recursive_mutex::scoped_lock guard(m_RulesMapMutex);
+        m_RulesMap.erase(rule);
+    }
 }
