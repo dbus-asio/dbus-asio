@@ -49,6 +49,7 @@ public:
     // Message Bus Messages (see dbus_native_messages.cpp for implementation)
     // Q. Move elsewhere? (because of the myriad flag definitions these need)
     void callHello(const Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
+    void callGetConnectionUnixUser(const std::string& name, const DBus::Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
     void callRequestName(const std::string& name, uint32_t flags, const Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
     void callReleaseName(const std::string& name, const Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
     void callListQueuedOwners(const std::string& bus_name, const Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);

@@ -43,6 +43,15 @@ void DBus::Native::callHello(const DBus::Message::CallbackFunctionMethodReturn& 
     sendMethodCall(DBus::Native::DBusDaemon, method, success, failure);
 }
 
+void DBus::Native::callGetConnectionUnixUser(const std::string& name, const DBus::Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure)
+{
+    Message::MethodCallIdentifier id(MESSAGE_BUS_OBJECT, MESSAGE_BUS_INTERFACE, "GetConnectionUnixUser");
+    Message::MethodCallParametersIn inparams(name);
+    Message::MethodCall method(id, inparams);
+
+    sendMethodCall(DBus::Native::DBusDaemon, method, success, failure);
+}
+
 void DBus::Native::callRequestName(const std::string& name, uint32_t flags, const DBus::Message::CallbackFunctionMethodReturn& success,
     const Message::CallbackFunctionError& failure)
 {
