@@ -16,6 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <boost/thread/recursive_mutex.hpp>
+#include <sys/prctl.h>
 
 #include "dbus_auth.h"
 #include "dbus_log.h"
@@ -149,6 +150,7 @@ void DBus::Transport::handle_write_output(std::shared_ptr<std::string> buf_writt
 
 void DBus::Transport::ThreadFunction()
 {
+    prctl(PR_SET_NAME, "DBus::Transport", 0, 0, 0, 0);
 
     Log::write(Log::INFO, "DBus :: Transport thread starting up\n");
 
