@@ -85,7 +85,6 @@ link_directories(${Boost_LIBRARY_DIRS})
 
 # PTHREAD DEPENDENCIES
 find_package (Threads REQUIRED)
-set (PRIVATE_LIBS "${PRIVATE_LIBS} ${CMAKE_THREAD_LIBS_INIT}")
 
 target_link_libraries (dbus-asio ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
@@ -96,7 +95,9 @@ set_target_properties(dbus-asio PROPERTIES
 
 foreach(LIB ${PRIVATE_LIBS})
 	get_filename_component(BARE_LIB ${LIB} NAME)
-	set(PLATFORM_LIBS "${PLATFORM_LIBS} -l${BARE_LIB}")
+	string(REGEX REPLACE ".so$" "" BARE_LIB "${BARE_LIB}")
+	string(REGEX REPLACE "^lib" "-l" BARE_LIB "${BARE_LIB}")
+	set(PLATFORM_LIBS "${PLATFORM_LIBS} ${BARE_LIB}")
 endforeach()
 
 set(PLATFORM_LIBS "${PLATFORM_LIBS} -ldbus-asio")
