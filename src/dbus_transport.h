@@ -42,6 +42,7 @@ public:
 
     void sendString(const std::string& data);
     void handle_write_output(std::shared_ptr<std::string> buf_written, const boost::system::error_code& error, std::size_t bytes_transferred);
+    void handle_read_data(const boost::system::error_code& error, std::size_t bytes_transferred);
 
     void ThreadFunction();
 
@@ -59,23 +60,19 @@ protected:
 
     std::string m_Busname;
     bool m_ReadyToSend;
-    bool m_ReadyToReceive;
     boost::asio::io_service m_io_service;
     boost::asio::local::stream_protocol::socket m_socket;
 
-    uint8_t m_DataBuffer[1];
+    const static size_t BufferSize = 256;
+    uint8_t m_DataBuffer[BufferSize];
     ReceiveOctetCallbackFunction m_ReceiveOctetCallback;
 
-    std::mutex m_StartUpMutex;
-    std::condition_variable m_StartUpCondition;
     mutable boost::recursive_mutex m_SendMutex;
     mutable boost::recursive_mutex m_CallbackMutex;
     std::vector<std::string> m_BufferedMessages;
-    volatile bool m_QuitThread;
-    boost::thread m_Thread;
+    std::atomic<bool> m_ShuttingDown;
 
     boost::thread m_io_service_thread;
-    std::unique_ptr<boost::asio::io_service::work> m_io_service_work;
 
 private:
     struct Stats {
