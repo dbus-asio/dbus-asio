@@ -32,55 +32,73 @@ using namespace std::chrono_literals;
 DBus::Transport::Transport(const std::string& path)
     : m_Busname(path)
     , m_ReadyToSend(false)
-    , m_ReadyToReceive(false)
     , m_socket(m_io_service)
-    , m_QuitThread(false)
+    , m_ShuttingDown(false)
 {
     setOctetHandler(std::bind(&Transport::onReceiveOctet, this, std::placeholders::_1));
-    std::unique_lock<std::mutex> lk(m_StartUpMutex);
-    // We use a second thread for the io context until further notice
-    m_io_service_work.reset (new boost::asio::io_service::work (m_io_service));
-    m_io_service_thread = boost::thread (boost::bind (&boost::asio::io_service::run, &m_io_service));
 
-    m_Thread = boost::thread(std::bind(&Transport::ThreadFunction, this));
-    if (!m_StartUpCondition.wait_for(lk, 5000ms, [this]() { return m_ReadyToReceive; })) {
-        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Transport thread start failed");
-        abort();
+    m_socket.connect(m_Busname.c_str());
+
+    // The "special credentials passing NUL byte" is required, even for protocols that
+    // can send credentials without needing one. Otherwise, the server may disconnect us.
+    sendOctetDirect('\0');
+
+    m_socket.async_read_some(boost::asio::buffer(m_DataBuffer, BufferSize),
+                             boost::bind(&Transport::handle_read_data, this, _1, _2));
+
+    // We use a second thread for the io context until further notice
+    m_io_service_thread = boost::thread (boost::bind (&boost::asio::io_service::run, &m_io_service));
+}
+
+void DBus::Transport::handle_read_data(const boost::system::error_code& error, std::size_t bytes_transferred)
+{
+    boost::recursive_mutex::scoped_lock guard(m_CallbackMutex);
+    for (size_t i = 0; i < bytes_transferred; i++)
+    {
+        ++m_Stats.bytes_read;
+        m_ReceiveOctetCallback(m_DataBuffer[i]);
     }
+
+    if (error)
+    {
+        if (error.category() == boost::asio::error::misc_category
+            && error.value() == boost::asio::error::misc_errors::eof)
+        {
+            if (!m_ShuttingDown)
+                Log::write(Log::ERROR, "DBus :: Transport received slightly unexpected end of stream\n");
+        }
+        else
+            Log::write(Log::ERROR, "DBus :: Transport error. %s (%d)\n", error.message().c_str(), error.value());
+    }
+    else
+        m_socket.async_read_some(boost::asio::buffer(m_DataBuffer, BufferSize),
+                                 boost::bind(&Transport::handle_read_data, this, _1, _2));
 }
 
 DBus::Transport::~Transport()
 {
+    // EOF on read is now expected
+    m_ShuttingDown = true;
+
     {
         boost::recursive_mutex::scoped_lock guard(m_SendMutex);
         m_ReadyToSend = false;
     }
 
-    // Wait for pending async_writes to complete
-    m_io_service_work.reset();
-    if (!m_io_service_thread.try_join_for(boost::chrono::seconds(30))) {
-        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: IO service thread cannot join\n");
-        abort();
-    }
-
-    boost::system::error_code ec;
-    m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
-    if (ec) {
-        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Socket shutdown failed: (%d) \"%s\"\n", ec.value(), ec.message());
-    }
     {
-        boost::recursive_mutex::scoped_lock guard(m_SendMutex);
-        m_QuitThread = true;
-    }
-    try {
-        if (!m_Thread.try_join_for(boost::chrono::seconds(30))) {
-            DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Transport thread cannot join\n");
-            abort();
+        // Take the callback mutex so that we don't call m_socket.shutdown() at the same time
+        // as handle_read_data() is calling async_read_some() on the same object
+        boost::recursive_mutex::scoped_lock guard(m_CallbackMutex);
+        boost::system::error_code ec;
+        m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
+        if (ec) {
+            DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Socket shutdown failed: (%d) \"%s\"\n", ec.value(), ec.message());
         }
     }
-    catch (const std::exception& e)
-    {
-        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Transport thread cannot join. Exception: %s\n", e.what());
+
+    // Wait for pending async_writes to complete
+    if (!m_io_service_thread.try_join_for(boost::chrono::seconds(30))) {
+        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: IO service thread cannot join\n");
         abort();
     }
 }
@@ -145,58 +163,6 @@ void DBus::Transport::handle_write_output(std::shared_ptr<std::string> buf_writt
     buf_written.reset();
     if (error) {
         DBus::Log::write(DBus::Log::ERROR, "DBus :: ERROR in async_write : %s\n", error.message().c_str());
-    }
-}
-
-void DBus::Transport::ThreadFunction()
-{
-    prctl(PR_SET_NAME, "DBus::Transport", 0, 0, 0, 0);
-
-    Log::write(Log::INFO, "DBus :: Transport thread starting up\n");
-
-    m_socket.connect(m_Busname.c_str());
-
-    // The "special credentials passing NUL byte" is required, even for protocols that
-    // can send credentials without needing one. Otherwise, the server may disconnect us.
-    sendOctetDirect('\0');
-
-    {
-        std::unique_lock<std::mutex> lk(m_StartUpMutex);
-        m_ReadyToReceive = true;
-        m_StartUpCondition.notify_one();
-    }
-
-    while (!m_QuitThread) {
-        try {
-            boost::asio::read(m_socket, boost::asio::buffer(m_DataBuffer, 1));
-            ++m_Stats.bytes_read;
-            {
-                boost::recursive_mutex::scoped_lock guard(m_CallbackMutex);
-                m_ReceiveOctetCallback(m_DataBuffer[0]);
-            }
-        } catch (const boost::system::system_error& e) {
-            // If we have an unexpected close, it might be because we sent something
-            // the other end did not like.  If we've sent a shutdown, this is unremarkable.
-            if (e.code() == boost::asio::error::eof) {
-                if (!m_QuitThread) {
-                    Log::write(Log::ERROR, "DBus :: Connection closed\n");
-                }
-            } else {
-                Log::write(Log::ERROR, "DBus :: Transport error. %s (%d)\n", e.what());
-            }
-            break;
-        } catch (const std::exception& e) {
-            Log::write(Log::ERROR, "DBus :: Transport error. %s\n", e.what());
-            break;
-        }
-    }
-
-    Log::write(Log::INFO, "DBus :: Transport thread closing down\n");
-
-    boost::system::error_code ec;
-    m_socket.close(ec);
-    if (ec) {
-        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Socket close failed: (%d) \"%s\"\n", ec.value(), ec.message());
     }
 }
 
