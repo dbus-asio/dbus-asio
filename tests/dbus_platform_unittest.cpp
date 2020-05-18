@@ -27,6 +27,22 @@ TEST_CASE("get session bus")
     {
         REQUIRE(getSystemBus("unix:path=/socket/path") == "/socket/path");
     }
+
+    SECTION( "DBUS_SESSION_BUS_ADDRESS is an abstract socket path" )
+    {
+        std::string expected_path;
+        expected_path.push_back('\0');
+        expected_path.append("/tmp/dbus-ZV5ypNeDH1");
+        REQUIRE(getSystemBus("unix:abstract=/tmp/dbus-ZV5ypNeDH1,guid=d7e42c8f4eb686eb7711a78f5ec27480") == expected_path);
+    }
+
+    SECTION( "DBUS_SESSION_BUS_ADDRESS is an abstract socket path without a guid" )
+    {
+        std::string expected_path;
+        expected_path.push_back('\0');
+        expected_path.append("/tmp/dbus-ZV5ypNeDH1");
+        REQUIRE(getSystemBus("unix:abstract=/tmp/dbus-ZV5ypNeDH1") == expected_path);
+    }
 }
 
 TEST_CASE("get system bus")
@@ -49,6 +65,22 @@ TEST_CASE("get system bus")
     SECTION( "DBUS_SYSTEM_BUS_ADDRESS is prefixed with a unix:path" )
     {
         REQUIRE(getSessionBus("unix:path=/socket/path") == "/socket/path");
+    }
+
+    SECTION( "DBUS_SYSTEM_BUS_ADDRESS is an abstract socket path" )
+    {
+        std::string expected_path;
+        expected_path.push_back('\0');
+        expected_path.append("/tmp/dbus-ZV5ypNeDH1");
+        REQUIRE(getSessionBus("unix:abstract=/tmp/dbus-ZV5ypNeDH1,guid=d7e42c8f4eb686eb7711a78f5ec27480") == expected_path);
+    }
+
+    SECTION( "DBUS_SYSTEM_BUS_ADDRESS is an abstract socket path without a guid" )
+    {
+        std::string expected_path;
+        expected_path.push_back('\0');
+        expected_path.append("/tmp/dbus-ZV5ypNeDH1");
+        REQUIRE(getSessionBus("unix:abstract=/tmp/dbus-ZV5ypNeDH1") == expected_path);
     }
 }
 

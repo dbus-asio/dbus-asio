@@ -37,7 +37,7 @@ DBus::Transport::Transport(const std::string& path)
 {
     setOctetHandler(std::bind(&Transport::onReceiveOctet, this, std::placeholders::_1));
 
-    m_socket.connect(m_Busname.c_str());
+    m_socket.connect(m_Busname);
 
     // The "special credentials passing NUL byte" is required, even for protocols that
     // can send credentials without needing one. Otherwise, the server may disconnect us.

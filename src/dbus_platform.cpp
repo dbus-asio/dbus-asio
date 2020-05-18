@@ -21,15 +21,33 @@
 namespace {
 
 const static std::string UNIX_PATH_PREFIX("unix:path=");
+const static std::string UNIX_ABSTRACT_PATH_PREFIX("unix:abstract=");
 
-void getUnixPath(const char* bus, std::string& path)
+std::string getAbstractPath(const std::string& path)
 {
-    if (bus) {
-        path = bus;
-        if (path.find(UNIX_PATH_PREFIX) == 0) {
-            path = path.substr(UNIX_PATH_PREFIX.size());
+    if (path.find(UNIX_ABSTRACT_PATH_PREFIX) == 0) {
+        std::string abstract_path;
+        abstract_path.push_back('\0');
+        abstract_path += path.substr(UNIX_ABSTRACT_PATH_PREFIX.size());
+
+        const size_t guid_part_pos(abstract_path.find(",guid="));
+        if (guid_part_pos != std::string::npos) {
+            abstract_path = abstract_path.substr(0, guid_part_pos);
         }
+        return abstract_path;
     }
+    return path;
+}
+
+std::string getPath(const char* bus)
+{
+    std::string path(bus);
+    if (path.find(UNIX_PATH_PREFIX) == 0) {
+        return path.substr(UNIX_PATH_PREFIX.size());
+    } else {
+        return getAbstractPath(bus);
+    }
+    return path;
 }
 
 } // anonymous namespace
@@ -40,16 +58,18 @@ uint32_t DBus::Platform::getUID() { return getuid(); }
 
 std::string DBus::Platform::getSystemBus(const char* dbus_system_bus_address)
 {
-    std::string path("/var/run/dbus/system_bus_socket");
-    getUnixPath(dbus_system_bus_address, path);
-    return path;
+    if (dbus_system_bus_address) {
+        return getPath(dbus_system_bus_address);
+    }
+    return "/var/run/dbus/system_bus_socket";
 }
 
 std::string DBus::Platform::getSessionBus(const char* dbus_session_bus_address)
 {
-    std::string path;
-    getUnixPath(dbus_session_bus_address, path);
-    return path;
+    if (dbus_session_bus_address) {
+        return getPath(dbus_session_bus_address);
+    }
+    return "";
 }
 
 std::string DBus::Platform::getSystemBus()
