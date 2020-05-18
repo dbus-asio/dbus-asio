@@ -30,6 +30,9 @@ namespace Platform {
     uint32_t getPID();
     uint32_t getUID();
 
+    std::string getSystemBus(const char* dbus_system_bus_address);
+    std::string getSessionBus(const char* dbus_session_bus_address);
+
     std::string getSystemBus();
     std::string getSessionBus();
 }
