@@ -6,3 +6,7 @@ add_test(NAME run_dbus_asio_test COMMAND dbus_asio_test)
 add_executable(dbus_platform_unittest dbus_platform_unittest.cpp)
 target_link_libraries(dbus_platform_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_platform_unittest COMMAND dbus_platform_unittest)
+
+add_executable(dbus_validation_unittest dbus_validation_unittest.cpp)
+target_link_libraries(dbus_validation_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_validation_unittest COMMAND dbus_validation_unittest)
