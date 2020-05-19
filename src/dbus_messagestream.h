@@ -19,7 +19,6 @@
 #define DBUS_MESSAGESTREAM_H
 
 #include "dbus_utils.h"
-#include "dbus_validation.h"
 #include <byteswap.h>
 
 namespace DBus {
@@ -163,8 +162,6 @@ public:
 
     void writeSignature(const std::string& str)
     {
-        DBus::Validation::throwOnInvalidSignature(str);
-
         // The same as STRING except the length is a single byte (thus signatures have a maximum length of 255)
         writeByte(str.length());
         // and the content must be a valid signature (see above).

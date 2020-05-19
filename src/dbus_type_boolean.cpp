@@ -57,7 +57,6 @@ bool DBus::Type::Boolean::unmarshall(const UnmarshallingData& data)
 
     if (++m_Unmarshalling.count == 4) {
         m_Value = doSwap32(m_Value) ? true : false;
-        DBus::Validation::throwOnInvalidBoolean(m_Value);
         return true;
     }
     return false;

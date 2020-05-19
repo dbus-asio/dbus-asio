@@ -28,6 +28,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messagestream.h"
+#include "dbus_validation.h"
 
 /*
 Structs and dict entries are marshalled in the same way as their contents, but their
@@ -85,18 +86,7 @@ bool DBus::Type::DictEntry::unmarshall(const UnmarshallingData& data)
     m_Unmarshalling.areWeSkippingPadding = false;
     if (m_Unmarshalling.count == 0) {
         std::string signature(getSignature());
-
-        // (The signature in our implementation always contains the {braces} so we consider the
-        // types to begin at the [1] entry
-
-        // The first single complete type (the "key") must be a basic type rather than a container type.
-        Validation::throwOnInvalidBasicType(signature.substr(1, 1));
-
-        // The value must be a single complete types. This method returns false if multiple complete types
-        // are provided, which also fulfills the requirement that:
-        // "It must not accept dict entries with zero, one, or more than two fields"
-        Validation::throwOnInvalidSingleCompleteType(signature.substr(2, signature.size() - 3));
-
+        DBus::Validation::throwOnInvalidBasicType(signature.substr(1, 1));
         m_Value.first = Type::create(std::string(1, getSignature()[1]));
     }
 

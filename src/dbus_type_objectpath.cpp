@@ -27,7 +27,6 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messagestream.h"
-#include "dbus_validation.h"
 
 const std::string DBus::Type::ObjectPath::s_StaticTypeCode("o");
 
@@ -41,8 +40,6 @@ DBus::Type::ObjectPath::ObjectPath(const std::string& v)
 
 void DBus::Type::ObjectPath::marshall(MessageStream& stream) const
 {
-    Validation::throwOnInvalidObjectPath(m_Value);
-
     // Exactly the same as STRING except the content must be a valid object path (see above).
     Type::String::marshall(stream);
 }
