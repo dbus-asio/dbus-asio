@@ -7,6 +7,10 @@ add_executable(dbus_platform_unittest dbus_platform_unittest.cpp)
 target_link_libraries(dbus_platform_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_platform_unittest COMMAND dbus_platform_unittest)
 
+add_executable(dbus_messagestream_unittest dbus_messagestream_unittest.cpp)
+target_link_libraries(dbus_messagestream_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME dbus_messagestream_unittest COMMAND dbus_messagestream_unittest)
+
 add_executable(dbus_validation_unittest dbus_validation_unittest.cpp)
 target_link_libraries(dbus_validation_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_validation_unittest COMMAND dbus_validation_unittest)

@@ -44,7 +44,7 @@ public:
 
     void writeInt16(int16_t value)
     {
-        pad4();
+        pad2();
 
         if (__BYTE_ORDER == __LITTLE_ENDIAN) {
             value = __bswap_16(value);
