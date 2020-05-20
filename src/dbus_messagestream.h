@@ -45,89 +45,37 @@ public:
     void writeInt16(int16_t value)
     {
         pad2();
-
-        if (__BYTE_ORDER == __LITTLE_ENDIAN) {
-            value = __bswap_16(value);
-        }
-
-        data.push_back((value & 0xff00) >> 8);
-        data.push_back((value & 0x00ff) >> 0);
+        data.append((char*)&value, sizeof(int16_t));
     }
 
     void writeUint16(uint16_t value)
     {
         pad2();
-
-        if (__BYTE_ORDER == __LITTLE_ENDIAN) {
-            value = __bswap_16(value);
-        }
-
-        data.push_back((value & 0xff00) >> 8);
-        data.push_back((value & 0x00ff) >> 0);
+        data.append((char*)&value, sizeof(uint16_t));
     }
 
     void writeInt32(int32_t value)
     {
         pad4();
-
-        if (__BYTE_ORDER == __LITTLE_ENDIAN) {
-            value = bswap_32(value);
-        }
-
-        data.push_back((uint8_t)((value & 0xff000000) >> 24));
-        data.push_back((uint8_t)((value & 0x00ff0000) >> 16));
-        data.push_back((uint8_t)((value & 0x0000ff00) >> 8));
-        data.push_back((uint8_t)((value & 0x000000ff) >> 0));
+        data.append((char*)&value, sizeof(int32_t));
     }
 
     void writeUint32(uint32_t value)
     {
         pad4();
-
-        if (__BYTE_ORDER == __LITTLE_ENDIAN) {
-            value = bswap_32(value);
-        }
-
-        data.push_back((uint8_t)((value & 0xff000000) >> 24));
-        data.push_back((uint8_t)((value & 0x00ff0000) >> 16));
-        data.push_back((uint8_t)((value & 0x0000ff00) >> 8));
-        data.push_back((uint8_t)((value & 0x000000ff) >> 0));
+        data.append((char*)&value, sizeof(uint32_t));
     }
 
     void writeInt64(int64_t value)
     {
         pad8();
-
-        if (__BYTE_ORDER == __LITTLE_ENDIAN) {
-            value = bswap_64(value);
-        }
-
-        data.push_back((uint8_t)((value & 0xff00000000000000) >> 56));
-        data.push_back((uint8_t)((value & 0x00ff000000000000) >> 48));
-        data.push_back((uint8_t)((value & 0x0000ff0000000000) >> 40));
-        data.push_back((uint8_t)((value & 0x000000ff00000000) >> 32));
-        data.push_back((uint8_t)((value & 0x00000000ff000000) >> 24));
-        data.push_back((uint8_t)((value & 0x0000000000ff0000) >> 16));
-        data.push_back((uint8_t)((value & 0x000000000000ff00) >> 8));
-        data.push_back((uint8_t)((value & 0x00000000000000ff) >> 0));
+        data.append((char*)&value, sizeof(int64_t));
     }
 
     void writeUint64(uint64_t value)
     {
         pad8();
-
-        if (__BYTE_ORDER == __LITTLE_ENDIAN) {
-            value = bswap_64(value);
-        }
-
-        data.push_back((uint8_t)((value & 0xff00000000000000) >> 56));
-        data.push_back((uint8_t)((value & 0x00ff000000000000) >> 48));
-        data.push_back((uint8_t)((value & 0x0000ff0000000000) >> 40));
-        data.push_back((uint8_t)((value & 0x000000ff00000000) >> 32));
-        data.push_back((uint8_t)((value & 0x00000000ff000000) >> 24));
-        data.push_back((uint8_t)((value & 0x0000000000ff0000) >> 16));
-        data.push_back((uint8_t)((value & 0x000000000000ff00) >> 8));
-        data.push_back((uint8_t)((value & 0x00000000000000ff) >> 0));
+        data.append((char*)&value, sizeof(uint64_t));
     }
 
     void writeDouble(double value)
@@ -171,11 +119,7 @@ public:
 
     void pad(size_t padding)
     {
-        size_t required = DBus::Utils::getPadding(padding, data.length());
-
-        for (size_t i = 0; i < required; ++i) {
-            writeByte(0);
-        }
+        data.append(DBus::Utils::getPadding(padding, data.length()), 0);
     }
 
     void pad2()
