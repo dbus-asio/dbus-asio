@@ -1,8 +1,8 @@
-#define CATCH_CONFIG_MAIN  // This tells Catch to provide a main() - only do this in one cpp file
-#include <catch2/catch.hpp>
 
+#include <catch2/catch.hpp>
 #include "dbus_platform.h"
 #include <stdlib.h>
+#include <unistd.h>
 
 namespace DBus { namespace Platform { namespace test {
 
