@@ -113,9 +113,7 @@ std::string DBus::Message::Base::marshallMessage(const DBus::Type::Array& array)
 
     // 1st BYTE
     // Endianness flag; ASCII 'l' for little-endian or ASCII 'B' for big-endian. Both header and body are in this endianness.
-    // We write everything in little endian, regardless of the machines architecture, and swap the bytes
-    // when written, if appropriate.
-    header.writeByte('l');
+    header.writeByte(__BYTE_ORDER == __LITTLE_ENDIAN ? 'l' : 'B');
 
     // 2nd BYTE
     // Message type. Unknown types must be ignored. Currently-defined types are described below.
