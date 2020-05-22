@@ -20,10 +20,10 @@
 
 bool DBus::Type::Base::isSwapRequired() const
 {
-    if (__BYTE_ORDER == __LITTLE_ENDIAN && m_isLittleEndian) {
+    if (__BYTE_ORDER == __LITTLE_ENDIAN && !m_isLittleEndian) {
         return true;
     }
-    if (__BYTE_ORDER == __BIG_ENDIAN && !m_isLittleEndian) {
+    if (__BYTE_ORDER == __BIG_ENDIAN && m_isLittleEndian) {
         return true;
     }
     return false;

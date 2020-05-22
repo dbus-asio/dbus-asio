@@ -52,12 +52,8 @@ bool DBus::Type::Double::unmarshall(const UnmarshallingData& data)
     }
     m_Unmarshalling.areWeSkippingPadding = false;
 
-    m_Unmarshalling.value <<= 8;
-    m_Unmarshalling.value += data.c;
-
+    *((uint8_t*)&m_Value + m_Unmarshalling.count) = data.c;
     if (++m_Unmarshalling.count == 8) {
-        m_Unmarshalling.value = bswap_64(m_Unmarshalling.value);
-        m_Value = *(double*)&m_Unmarshalling.value;
         return true;
     }
     return false;

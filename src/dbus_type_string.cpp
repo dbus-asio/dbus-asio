@@ -56,8 +56,7 @@ bool DBus::Type::String::unmarshall(const UnmarshallingData& data)
 
     // Read in 4 bytes describing the strings length
     if (m_Unmarshalling.count < 4) {
-        m_Unmarshalling.size <<= 8;
-        m_Unmarshalling.size += data.c;
+        *((uint8_t*)&m_Unmarshalling.size + m_Unmarshalling.count) = data.c;
         if (++m_Unmarshalling.count == 4) {
             m_Unmarshalling.size = doSwap32(m_Unmarshalling.size);
         }

@@ -52,9 +52,7 @@ bool DBus::Type::Int16::unmarshall(const UnmarshallingData& data)
     }
     m_Unmarshalling.areWeSkippingPadding = false;
 
-    m_Value <<= 8;
-    m_Value += data.c;
-
+    *((uint8_t*)&m_Value + m_Unmarshalling.count) = data.c;
     if (++m_Unmarshalling.count == 2) {
         m_Value = doSwap16(m_Value);
         return true;
