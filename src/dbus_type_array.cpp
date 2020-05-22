@@ -90,10 +90,9 @@ bool DBus::Type::Array::unmarshall(const UnmarshallingData& data)
     // b) others. i.e. I pass data onto the current generic type within me
 
     // First four bytes are the size of the array in bytes
-    if (m_Unmarshalling.count++ < 4) {
-        m_Unmarshalling.array_size <<= 8;
-        m_Unmarshalling.array_size += data.c;
-        if (m_Unmarshalling.count == 4) {
+    if (m_Unmarshalling.count < 4) {
+        *((uint8_t*)&m_Unmarshalling.array_size + m_Unmarshalling.count) = data.c;
+        if (++m_Unmarshalling.count == 4) {
             m_Unmarshalling.createType = true;
             m_Unmarshalling.array_size = doSwap32(m_Unmarshalling.array_size);
             m_Unmarshalling.typeSignature = Type::extractSignature(getSignature(), 1);
@@ -108,6 +107,8 @@ bool DBus::Type::Array::unmarshall(const UnmarshallingData& data)
         // This handles the edge case when we've read the size, but there's
         // no data to read.
         return m_Unmarshalling.count == 4 && m_Unmarshalling.array_size == 0;
+    } else {
+        ++m_Unmarshalling.count;
     }
 
     if (m_Unmarshalling.createType) {
