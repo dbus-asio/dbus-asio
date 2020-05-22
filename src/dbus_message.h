@@ -22,7 +22,7 @@
 #include <boost/thread/recursive_mutex.hpp>
 
 namespace DBus {
-class MessageStream;
+class MessageOStream;
 
 namespace Message {
 
@@ -46,7 +46,7 @@ namespace Message {
     public:
         std::string getMarshallingSignature() const;
         size_t getParameterCount() const;
-        void marshallData(MessageStream& stream) const;
+        void marshallData(MessageOStream& stream) const;
 
         const Type::Generic& getParameter(size_t idx) const;
 

@@ -1,7 +1,7 @@
 #include <catch2/catch.hpp>
 #include "dbus_type_byte.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 namespace DBus { namespace test {
 
@@ -17,7 +17,7 @@ TEST_CASE("Unmarshall byte")
 
 TEST_CASE("Marshall and unmarshall byte")
 {
-    MessageStream stream;
+    MessageOStream stream;
     stream.writeByte(213);
 
     Type::Byte byte;

@@ -1,7 +1,7 @@
 #include "test_unmarshall.h"
 #include "dbus_type_double.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 namespace DBus { namespace test {
 
@@ -39,7 +39,7 @@ TEST_CASE("Unmarshall double big endian")
 
 TEST_CASE("Marshall and unmarshall double")
 {
-    MessageStream stream;
+    MessageOStream stream;
     double value = 1.2234;
     stream.writeDouble(value);
 

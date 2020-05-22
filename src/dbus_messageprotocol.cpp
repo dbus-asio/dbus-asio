@@ -26,7 +26,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 DBus::MessageProtocol::MessageProtocol()
 {

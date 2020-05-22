@@ -29,7 +29,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 const std::string DBus::Type::Array::s_StaticTypeCode("a");
 
@@ -49,7 +49,7 @@ size_t DBus::Type::Array::add(const DBus::Type::DictEntry& s)
 
 const std::vector<DBus::Type::Generic>& DBus::Type::Array::getContents() const { return contents; }
 
-void DBus::Type::Array::marshall(MessageStream& stream) const
+void DBus::Type::Array::marshall(MessageOStream& stream) const
 {
     const size_t sizePos = stream.size();
     stream.writeUint32(0);
@@ -63,7 +63,7 @@ void DBus::Type::Array::marshall(MessageStream& stream) const
     stream.data.replace(sizePos, 4, (char*)&contentsSize, sizeof(uint32_t));
 }
 
-void DBus::Type::Array::marshallContents(MessageStream& stream) const
+void DBus::Type::Array::marshallContents(MessageOStream& stream) const
 {
     for (size_t i = 0; i < contents.size(); ++i) {
         DBus::Type::marshallData(contents[i], stream);

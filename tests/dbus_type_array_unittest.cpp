@@ -2,9 +2,9 @@
 #include "dbus_type_array.h"
 #include "dbus_type_int32.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type.h"
-#include <iostream>
+#include <byteswap.h>
 
 namespace DBus { namespace test {
 
@@ -76,7 +76,7 @@ TEST_CASE("Marshall and unmarshall array of structs")
     array.setSignature("a(i)");
     array.add(struct1);
     array.add(struct2);
-    MessageStream stream;
+    MessageOStream stream;
     array.marshall(stream);
 
    TestUnmarshallFromStream(stream.data, __LITTLE_ENDIAN, -1, 24567);

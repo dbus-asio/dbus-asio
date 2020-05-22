@@ -29,7 +29,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 uint32_t DBus::Message::Base::m_SerialCounter = 1;
 boost::recursive_mutex DBus::Message::Base::m_SerialCounterMutex;
@@ -98,8 +98,8 @@ DBus::Type::Generic DBus::Message::getHeaderField(const DBus::Type::Struct& head
 
 std::string DBus::Message::Base::marshallMessage(const DBus::Type::Array& array) const
 {
-    MessageStream header;
-    MessageStream body;
+    MessageOStream header;
+    MessageOStream body;
 
     /*
             The signature of the header is:
@@ -141,7 +141,7 @@ std::string DBus::Message::Base::marshallMessage(const DBus::Type::Array& array)
     header.writeUint32(m_Header.serial);
 
     // Header fields length
-    MessageStream header_fields;
+    MessageOStream header_fields;
 
     // It appears, from studying the packet data, that the header field array is not marshalled with
     // the length of the array data in bytes, as suggested in the spec.
@@ -155,7 +155,7 @@ std::string DBus::Message::Base::marshallMessage(const DBus::Type::Array& array)
     // Both header & header_fields constitute the header, which must end of an 8 boundary.
     // (See the phrase: "The header ends after its alignment padding to an 8-boundary.")
     // Therefore we add the padding here.
-    MessageStream packet;
+    MessageOStream packet;
     packet.write(header);
     packet.write(header_fields);
 
@@ -178,7 +178,7 @@ std::string DBus::Message::MethodCallParameters::getMarshallingSignature() const
     return signature;
 }
 
-void DBus::Message::MethodCallParameters::marshallData(MessageStream& stream) const
+void DBus::Message::MethodCallParameters::marshallData(MessageOStream& stream) const
 {
     for (auto it : m_Contents.m_TypeList) {
         DBus::Type::marshallData(it, stream);

@@ -2,7 +2,7 @@
 #include "dbus_type_struct.h"
 #include "dbus_type_uint32.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include <byteswap.h>
 
 namespace DBus { namespace test {
@@ -58,7 +58,7 @@ TEST_CASE("Marshall and unmarshall struct")
     dbusStruct.add(uint1);
     dbusStruct.add(uint2);
 
-    MessageStream stream;
+    MessageOStream stream;
     dbusStruct.marshall(stream);
     TestUnmarshall(__LITTLE_ENDIAN, stream.data, 56, 78);
 }

@@ -41,7 +41,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 /*
 Structs and dict entries are marshalled in the same way as their contents, but their
@@ -90,7 +90,7 @@ void DBus::Type::Struct::clear()
     m_Unmarshalling.reset();
 }
 
-void DBus::Type::Struct::marshall(MessageStream& stream) const
+void DBus::Type::Struct::marshall(MessageOStream& stream) const
 {
 
     // A struct must start on an 8-byte boundary regardless of the type of the struct fields.

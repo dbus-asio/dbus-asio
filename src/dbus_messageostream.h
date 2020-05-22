@@ -15,15 +15,14 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef DBUS_MESSAGESTREAM_H
-#define DBUS_MESSAGESTREAM_H
+#ifndef DBUS_MESSAGEOSTREAM_H
+#define DBUS_MESSAGEOSTREAM_H
 
 #include "dbus_utils.h"
-#include <byteswap.h>
 
 namespace DBus {
 
-class MessageStream {
+class MessageOStream {
 public:
     std::string data;
 
@@ -89,7 +88,7 @@ public:
         data.append(str.data(), str.length());
     }
 
-    void write(const MessageStream& stream)
+    void write(const MessageOStream& stream)
     {
         data.append(stream.data.data(), stream.data.length());
     }

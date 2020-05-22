@@ -26,7 +26,7 @@
 #include "dbus_type_base.h"
 
 namespace DBus {
-class MessageStream;
+class MessageOStream;
 class UnmarshallingData;
 
 namespace Type {
@@ -50,7 +50,7 @@ namespace Type {
     // Generic type handling code
     DBus::Type::Generic create(const std::string& type, bool littleEndian);
 
-    void marshallData(const DBus::Type::Generic& any, MessageStream& stream);
+    void marshallData(const DBus::Type::Generic& any, MessageOStream& stream);
 
     bool unmarshallData(DBus::Type::Generic& result, const UnmarshallingData& data);
     Type::Generic unmarshallString(const std::string& data);

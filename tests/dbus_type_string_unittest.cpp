@@ -2,7 +2,7 @@
 #include "dbus_type_string.h"
 #include "dbus_type_int32.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type.h"
 #include <iostream>
 
@@ -60,7 +60,7 @@ TEST_CASE("Marshall and unmarshall string")
     const std::string str("An another string");
     Type::String dbusString(str);
 
-    MessageStream stream;
+    MessageOStream stream;
     dbusString.marshall(stream);
 
    TestUnmarshallFromStream(stream.data, __LITTLE_ENDIAN, str);

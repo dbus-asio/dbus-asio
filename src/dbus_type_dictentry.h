@@ -22,7 +22,7 @@
 
 namespace DBus {
 
-class MessageStream;
+class MessageOStream;
 class UnmarshallingData;
 
 namespace Type {
@@ -36,7 +36,7 @@ namespace Type {
 
         std::string getSignature() const;
         size_t getAlignment() const { return 8; }
-        void marshall(MessageStream& stream) const;
+        void marshall(MessageOStream& stream) const;
         bool unmarshall(const UnmarshallingData& data);
 
         std::string toString(const std::string& prefix = "") const;

@@ -2,7 +2,7 @@
 #include "dbus_type_variant.h"
 #include "dbus_type_uint32.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include <byteswap.h>
 
 namespace DBus { namespace test {
@@ -58,7 +58,7 @@ TEST_CASE("Marshall and unmarshall variant")
     Type::Uint32 dbusInt(42);
     Type::Variant variant(dbusInt);
 
-    MessageStream stream;
+    MessageOStream stream;
     variant.marshall(stream);
     TestUnmarshall(__LITTLE_ENDIAN, stream.data, 42);
 }

@@ -41,7 +41,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 //
 // Helper methods to extract navtive types from the opaque 'Generic' type
@@ -187,7 +187,7 @@ std::string DBus::Type::getMarshallingSignature(const DBus::Type::Generic& value
 
 // TODO: macro-in-a-macro to try and reduce duplicated list of types
 
-void DBus::Type::marshallData(const DBus::Type::Generic& value, MessageStream& stream)
+void DBus::Type::marshallData(const DBus::Type::Generic& value, MessageOStream& stream)
 {
     // It is possible to receive an empty value when dealing with void parameter lists.
     if (value.empty()) {
