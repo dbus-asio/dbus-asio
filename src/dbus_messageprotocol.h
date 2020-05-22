@@ -19,6 +19,7 @@
 #define DBUS_MESSAGEPROTOCOL
 
 #include "dbus_type_struct.h"
+#include "dbus_message.h"
 
 namespace DBus {
 

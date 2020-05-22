@@ -18,6 +18,9 @@
 #ifndef DBUS_TYPE_BASE_H
 #define DBUS_TYPE_BASE_H
 
+#include <boost/any.hpp>
+#include <vector>
+
 namespace DBus {
 
 namespace Type {
@@ -56,6 +59,7 @@ namespace Type {
         uint32_t doSwap32(uint32_t v) const;
         uint64_t doSwap64(uint64_t v) const;
         void setLittleEndian(bool isLittle) { m_isLittleEndian = isLittle; }
+        bool isLittleEndian() const { return m_isLittleEndian ; }
         size_t getAlignment() const { return 1; }
 
         void setSignature(const std::string& type);

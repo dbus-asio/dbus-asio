@@ -19,6 +19,7 @@
 #define DBUS_MESSAGE
 
 #include <functional>
+#include <boost/thread/recursive_mutex.hpp>
 
 namespace DBus {
 class MessageStream;

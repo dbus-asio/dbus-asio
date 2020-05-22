@@ -18,6 +18,8 @@
 #ifndef DBUS_TYPE_SIGNATURE_H
 #define DBUS_TYPE_SIGNATURE_H
 
+#include "dbus_type.h"
+
 namespace DBus {
 class UnmarshallingData;
 class MessageStream;

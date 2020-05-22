@@ -47,42 +47,24 @@ size_t DBus::Type::Array::add(const DBus::Type::DictEntry& s)
     return size();
 }
 
-// Type::extractSignature(getSignature(), 1);
-/*
-void DBus::Type::Array::etSignature(const std::string &type) {
-
-}
-*/
 const std::vector<DBus::Type::Generic>& DBus::Type::Array::getContents() const { return contents; }
 
 void DBus::Type::Array::marshall(MessageStream& stream) const
 {
-    stream.pad4(); // Needed for size in bytes (although in practise writeInt32 will add its own padding)
+    const size_t sizePos = stream.size();
+    stream.writeUint32(0);
 
-    // First, compute the stream data for the array, since we need to know its size
-    // in bytes for the first part.
-    MessageStream tmp_stream;
-    marshallContents(tmp_stream);
+    // Size does not include any padding to the first element
+    stream.pad(Type::getAlignment(Type::extractSignature(getSignature(), 1)));
 
-    if (tmp_stream.size() > 67108864) {
-        Log::write(Log::ERROR, "Array is too long (%d vs %d) to be sent.", tmp_stream.size(), 67108864);
-        throw std::out_of_range("Can not marshall arrays over 67108864 bytes");
-    }
-
-    // A UINT32 giving the length of the array data in bytes
-    stream.writeUint32(tmp_stream.size());
-
-    // followed by alignment padding to the alignment boundary of the array element type
-    stream.pad(Type::getAlignment(getSignature()));
-
-    // followed by each array element.
-    stream.write(tmp_stream);
+    const size_t contentsStartPos = stream.size();
+    marshallContents(stream);
+    const uint32_t contentsSize = stream.size() - contentsStartPos;
+    stream.data.replace(sizePos, 4, (char*)&contentsSize, sizeof(uint32_t));
 }
 
 void DBus::Type::Array::marshallContents(MessageStream& stream) const
 {
-
-    MessageStream tmp_stream;
     for (size_t i = 0; i < contents.size(); ++i) {
         DBus::Type::marshallData(contents[i], stream);
     }
@@ -131,7 +113,7 @@ bool DBus::Type::Array::unmarshall(const UnmarshallingData& data)
     if (m_Unmarshalling.createType) {
         m_Unmarshalling.createType = false;
 
-        contents.push_back(DBus::Type::create(m_Unmarshalling.typeSignature));
+        contents.push_back(DBus::Type::create(m_Unmarshalling.typeSignature, isLittleEndian()));
     }
 
     // Unmarshall the next character into the current data type
@@ -139,8 +121,6 @@ bool DBus::Type::Array::unmarshall(const UnmarshallingData& data)
     m_Unmarshalling.createType = DBus::Type::unmarshallData(current_type, data);
 
     if (m_Unmarshalling.createType) {
-
-        m_Unmarshalling.areWeSkippingPaddingForElement = true; // we reset this because we might need to pad the next element in the array
 
         if (m_Unmarshalling.count - 4 >= m_Unmarshalling.array_size) {
             DBus::Log::write(DBus::Log::TRACE, "Array element complete.\n");

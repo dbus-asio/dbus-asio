@@ -18,6 +18,8 @@
 #ifndef DBUS_TYPE_VARIANT_H
 #define DBUS_TYPE_VARIANT_H
 
+#include "dbus_type_signature.h"
+
 namespace DBus {
 class UnmarshallingData;
 class MessageStream;
@@ -25,6 +27,7 @@ class MessageStream;
 namespace Type {
     class ObjectPath;
     class String;
+    class Uint32;
 
     class Variant : public Base {
     public:

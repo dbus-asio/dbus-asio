@@ -48,7 +48,7 @@ namespace Type {
     const Type::Variant& refVariant(const Generic& v);
 
     // Generic type handling code
-    DBus::Type::Generic create(const std::string& type);
+    DBus::Type::Generic create(const std::string& type, bool littleEndian);
 
     void marshallData(const DBus::Type::Generic& any, MessageStream& stream);
 
