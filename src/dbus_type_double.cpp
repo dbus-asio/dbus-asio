@@ -26,7 +26,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Double::s_StaticTypeCode("d");
@@ -43,7 +43,7 @@ DBus::Type::Double::Double(double v)
     setSignature(s_StaticTypeCode);
 }
 
-void DBus::Type::Double::marshall(MessageStream& stream) const { stream.writeDouble(m_Value); }
+void DBus::Type::Double::marshall(MessageOStream& stream) const { stream.writeDouble(m_Value); }
 
 bool DBus::Type::Double::unmarshall(const UnmarshallingData& data)
 {

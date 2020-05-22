@@ -21,7 +21,7 @@
 #include "dbus_type_string.h"
 
 namespace DBus {
-class MessageStream;
+class MessageOStream;
 
 namespace Type {
 
@@ -31,7 +31,7 @@ namespace Type {
         ObjectPath(const std::string& v);
 
         std::string getSignature() const { return s_StaticTypeCode; }
-        void marshall(MessageStream& stream) const;
+        void marshall(MessageOStream& stream) const;
         static const std::string s_StaticTypeCode;
     };
 }

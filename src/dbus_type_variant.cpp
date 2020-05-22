@@ -34,7 +34,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 const std::string DBus::Type::Variant::s_StaticTypeCode("v");
 
@@ -71,7 +71,7 @@ DBus::Type::Variant::Variant(const DBus::Type::Uint32& v)
 
 const DBus::Type::Generic& DBus::Type::Variant::getValue() const { return m_Value; }
 
-void DBus::Type::Variant::marshall(MessageStream& stream) const
+void DBus::Type::Variant::marshall(MessageOStream& stream) const
 {
 
     // The marshalled SIGNATURE of a single complete type...

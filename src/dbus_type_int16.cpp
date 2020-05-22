@@ -26,7 +26,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Int16::s_StaticTypeCode("n");
@@ -43,7 +43,7 @@ DBus::Type::Int16::Int16(int16_t v)
     setSignature(s_StaticTypeCode);
 }
 
-void DBus::Type::Int16::marshall(MessageStream& stream) const { stream.writeInt16(m_Value); }
+void DBus::Type::Int16::marshall(MessageOStream& stream) const { stream.writeInt16(m_Value); }
 
 bool DBus::Type::Int16::unmarshall(const UnmarshallingData& data)
 {

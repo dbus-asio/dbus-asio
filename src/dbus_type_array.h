@@ -22,7 +22,7 @@
 
 namespace DBus {
 class UnmarshallingData;
-class MessageStream;
+class MessageOStream;
 
 namespace Type {
     class Struct;
@@ -36,8 +36,8 @@ namespace Type {
         size_t add(const DBus::Type::DictEntry& s);
 
         size_t getAlignment() const { return 4; }
-        void marshall(MessageStream& stream) const;
-        void marshallContents(MessageStream& stream) const;
+        void marshall(MessageOStream& stream) const;
+        void marshallContents(MessageOStream& stream) const;
         bool unmarshall(const UnmarshallingData& data);
 
         std::string getSignature() const;

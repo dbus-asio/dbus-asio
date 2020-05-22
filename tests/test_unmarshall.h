@@ -1,5 +1,5 @@
 #include <catch2/catch.hpp>
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_messageprotocol.h"
 #include <byteswap.h>
 #include <string>
@@ -58,7 +58,7 @@ void TestUnmarshall(unsigned byteOrder, T value, D &dbusType)
 }
 
 template<class T, class D>
-void TestUnmarshallFromStream(T value, D& dbusType, MessageStream& stream)
+void TestUnmarshallFromStream(T value, D& dbusType, MessageOStream& stream)
 {
     UnmarshallingData data;
     std::for_each(stream.data.begin(), stream.data.end(),

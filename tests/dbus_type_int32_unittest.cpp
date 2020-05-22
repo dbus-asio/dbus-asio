@@ -1,7 +1,7 @@
 #include "test_unmarshall.h"
 #include "dbus_type_int32.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 namespace DBus { namespace test {
 
@@ -22,7 +22,7 @@ TEST_CASE("Unmarshall int32 big endian")
 
 TEST_CASE("Marshall and unmarshall int32")
 {
-    MessageStream stream;
+    MessageOStream stream;
     int32_t value = -257978445;
     stream.writeInt32(value);
 

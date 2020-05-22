@@ -25,7 +25,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 const std::string DBus::Type::Signature::s_StaticTypeCode("g");
 
@@ -39,7 +39,7 @@ DBus::Type::Signature::Signature(const std::string& v)
 
 const std::string& DBus::Type::Signature::getValue() const { return m_Value; }
 
-void DBus::Type::Signature::marshall(MessageStream& stream) const
+void DBus::Type::Signature::marshall(MessageOStream& stream) const
 {
     // NOTE: We marshall out the 'g' to indicate a signature, but don't parse it on unmarshall
     stream.writeByte(1);

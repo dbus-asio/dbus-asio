@@ -1,11 +1,11 @@
 #include <catch2/catch.hpp>
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 namespace DBus { namespace test {
 
 TEST_CASE("Write byte")
 {
-    MessageStream stream;
+    MessageOStream stream;
 
     stream.writeByte((uint8_t)'A');
     REQUIRE(stream.data.size() == 1);
@@ -17,7 +17,7 @@ TEST_CASE("Write byte")
 }
 
 template <class T>
-void testType(T value, MessageStream& stream, std::function<void(T)> write)
+void testType(T value, MessageOStream& stream, std::function<void(T)> write)
 {
     for (auto i = 0; i < sizeof(T) + 1; ++i) {
         stream.data.clear();
@@ -45,63 +45,63 @@ void testType(T value, MessageStream& stream, std::function<void(T)> write)
 
 TEST_CASE("Write Int16")
 {
-    MessageStream stream;
-    std::function<void(int16_t)> func = std::bind(&MessageStream::writeInt16, &stream, std::placeholders::_1);
+    MessageOStream stream;
+    std::function<void(int16_t)> func = std::bind(&MessageOStream::writeInt16, &stream, std::placeholders::_1);
     testType<int16_t>(0x9876, stream, func);
 }
 TEST_CASE("Write Uint16")
 {
-    MessageStream stream;
-    std::function<void(uint16_t)> func = std::bind(&MessageStream::writeUint16, &stream, std::placeholders::_1);
+    MessageOStream stream;
+    std::function<void(uint16_t)> func = std::bind(&MessageOStream::writeUint16, &stream, std::placeholders::_1);
     testType<uint16_t>(0x1234, stream, func);
 }
 
 TEST_CASE("Write Int32")
 {
-    MessageStream stream;
-    std::function<void(int32_t)> func = std::bind(&MessageStream::writeInt32, &stream, std::placeholders::_1);
+    MessageOStream stream;
+    std::function<void(int32_t)> func = std::bind(&MessageOStream::writeInt32, &stream, std::placeholders::_1);
     testType<int32_t>(0x98765432, stream, func);
 }
 TEST_CASE("Write Uint32")
 {
-    MessageStream stream;
-    std::function<void(uint32_t)> func = std::bind(&MessageStream::writeUint32, &stream, std::placeholders::_1);
+    MessageOStream stream;
+    std::function<void(uint32_t)> func = std::bind(&MessageOStream::writeUint32, &stream, std::placeholders::_1);
     testType<uint32_t>(0x12345678, stream, func);
 }
 
 TEST_CASE("Write Int64")
 {
-    MessageStream stream;
-    std::function<void(int64_t)> func = std::bind(&MessageStream::writeInt64, &stream, std::placeholders::_1);
+    MessageOStream stream;
+    std::function<void(int64_t)> func = std::bind(&MessageOStream::writeInt64, &stream, std::placeholders::_1);
     testType<int64_t>(0x987654322345678UL, stream, func);
 }
 
 
 TEST_CASE("Write Uint64")
 {
-    MessageStream stream;
-    std::function<void(uint64_t)> func = std::bind(&MessageStream::writeUint64, &stream, std::placeholders::_1);
+    MessageOStream stream;
+    std::function<void(uint64_t)> func = std::bind(&MessageOStream::writeUint64, &stream, std::placeholders::_1);
     testType<uint64_t>(0x1234567887654321UL, stream, func);
 }
 
 TEST_CASE("Write double")
 {
-    MessageStream stream;
-    std::function<void(double)> func = std::bind(&MessageStream::writeDouble, &stream, std::placeholders::_1);
+    MessageOStream stream;
+    std::function<void(double)> func = std::bind(&MessageOStream::writeDouble, &stream, std::placeholders::_1);
     testType<double>(13.1416346335, stream, func);
 }
 
 TEST_CASE("Write boolean")
 {
-    MessageStream stream;
-    std::function<void(uint32_t)> func = std::bind(&MessageStream::writeBoolean, &stream, std::placeholders::_1);
+    MessageOStream stream;
+    std::function<void(uint32_t)> func = std::bind(&MessageOStream::writeBoolean, &stream, std::placeholders::_1);
     testType<uint32_t>(0, stream, func);
     testType<uint32_t>(1, stream, func);
 }
 
 TEST_CASE("Write string")
 {
-    MessageStream stream;
+    MessageOStream stream;
     std::string str("Text");
     stream.write(str);
     REQUIRE(stream.data == str);
@@ -112,11 +112,11 @@ TEST_CASE("Write string")
 
 TEST_CASE("Write a message stream")
 {
-    MessageStream stream;
+    MessageOStream stream;
     std::string str("Text");
     stream.write(str);
 
-    MessageStream stream2;
+    MessageOStream stream2;
     stream2.write(stream);
     REQUIRE(stream2.data == str);
 
@@ -126,7 +126,7 @@ TEST_CASE("Write a message stream")
 
 TEST_CASE("Write Dbus String")
 {
-    MessageStream stream;
+    MessageOStream stream;
     stream.writeByte(21);
 
     std::string str("Text");
@@ -150,7 +150,7 @@ TEST_CASE("Write Dbus String")
 
 TEST_CASE("Write Signature")
 {
-    MessageStream stream;
+    MessageOStream stream;
     stream.writeByte(21);
 
     std::string str("Text");
@@ -168,7 +168,7 @@ TEST_CASE("Write Signature")
 
 TEST_CASE("Padding")
 {
-    MessageStream stream;
+    MessageOStream stream;
     stream.writeByte(34);
     stream.pad2();
     REQUIRE(stream.size() == 2);

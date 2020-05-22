@@ -25,7 +25,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::String::s_StaticTypeCode("s");
@@ -38,7 +38,7 @@ DBus::Type::String::String(const std::string& v)
     setSignature(s_StaticTypeCode);
 }
 
-void DBus::Type::String::marshall(MessageStream& stream) const
+void DBus::Type::String::marshall(MessageOStream& stream) const
 {
     // A UINT32 indicating the string's length in bytes excluding its terminating nul,
     // followed by non-nul string data of the given length,

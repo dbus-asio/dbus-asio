@@ -1,7 +1,7 @@
 #include <catch2/catch.hpp>
 #include "dbus_type_signature.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type.h"
 #include <iostream>
 
@@ -55,7 +55,7 @@ TEST_CASE("Marshall and unmarshall signature")
     const std::string str("{ii}");
     Type::Signature dbusString(str);
 
-    MessageStream stream;
+    MessageOStream stream;
     dbusString.marshall(stream);
 
     // Marshalling adds additional signature to signal a signature!

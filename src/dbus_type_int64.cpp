@@ -26,7 +26,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Int64::s_StaticTypeCode("x");
@@ -43,7 +43,7 @@ DBus::Type::Int64::Int64(int64_t v)
     setSignature(s_StaticTypeCode);
 }
 
-void DBus::Type::Int64::marshall(MessageStream& stream) const { stream.writeInt64(m_Value); }
+void DBus::Type::Int64::marshall(MessageOStream& stream) const { stream.writeInt64(m_Value); }
 
 bool DBus::Type::Int64::unmarshall(const UnmarshallingData& data)
 {

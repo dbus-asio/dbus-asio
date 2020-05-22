@@ -27,7 +27,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_validation.h"
 
 /*
@@ -67,7 +67,7 @@ void DBus::Type::DictEntry::set(const DBus::Type::Generic& key, const DBus::Type
 
 std::string DBus::Type::DictEntry::getSignature() const { return m_Signature; }
 
-void DBus::Type::DictEntry::marshall(MessageStream& stream) const
+void DBus::Type::DictEntry::marshall(MessageOStream& stream) const
 {
 
     stream.pad8();

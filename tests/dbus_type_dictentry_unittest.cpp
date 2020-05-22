@@ -2,7 +2,7 @@
 #include "dbus_type_dictentry.h"
 #include "dbus_type_uint32.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include <byteswap.h>
 #include <iomanip>
 
@@ -64,7 +64,7 @@ TEST_CASE("Marshall and unmarshall dictionary entry")
     Type::Uint32 dbusIntValue(24);
     Type::DictEntry dictEntry(dbusIntKey, dbusIntValue);
 
-    MessageStream stream;
+    MessageOStream stream;
     dictEntry.marshall(stream);
     TestUnmarshall(__LITTLE_ENDIAN, stream.data, 42, 24);
 }

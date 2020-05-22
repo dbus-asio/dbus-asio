@@ -21,7 +21,7 @@
 #include "dbus_type_base.h"
 namespace DBus {
 class UnmarshallingData;
-class MessageStream;
+class MessageOStream;
 
 namespace Type {
 
@@ -33,7 +33,7 @@ namespace Type {
 
         std::string getSignature() const { return s_StaticTypeCode; }
 
-        void marshall(MessageStream& stream) const;
+        void marshall(MessageOStream& stream) const;
         bool unmarshall(const UnmarshallingData& data);
 
         std::string toString(const std::string& prefix = "") const;

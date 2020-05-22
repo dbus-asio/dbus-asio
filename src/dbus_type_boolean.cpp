@@ -26,7 +26,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Boolean::s_StaticTypeCode("b");
@@ -43,7 +43,7 @@ DBus::Type::Boolean::Boolean(uint32_t v)
     setSignature(s_StaticTypeCode);
 }
 
-void DBus::Type::Boolean::marshall(MessageStream& stream) const { stream.writeBoolean(m_Value ? true : false); }
+void DBus::Type::Boolean::marshall(MessageOStream& stream) const { stream.writeBoolean(m_Value ? true : false); }
 
 bool DBus::Type::Boolean::unmarshall(const UnmarshallingData& data)
 {

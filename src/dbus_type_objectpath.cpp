@@ -26,7 +26,7 @@
 
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
-#include "dbus_messagestream.h"
+#include "dbus_messageostream.h"
 
 const std::string DBus::Type::ObjectPath::s_StaticTypeCode("o");
 
@@ -38,7 +38,7 @@ DBus::Type::ObjectPath::ObjectPath(const std::string& v)
     setSignature(s_StaticTypeCode);
 }
 
-void DBus::Type::ObjectPath::marshall(MessageStream& stream) const
+void DBus::Type::ObjectPath::marshall(MessageOStream& stream) const
 {
     // Exactly the same as STRING except the content must be a valid object path (see above).
     Type::String::marshall(stream);

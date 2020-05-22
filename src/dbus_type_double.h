@@ -22,7 +22,7 @@
 
 namespace DBus {
 class UnmarshallingData;
-class MessageStream;
+class MessageOStream;
 
 namespace Type {
 
@@ -32,7 +32,7 @@ namespace Type {
         Double(double v);
 
         size_t getAlignment() const { return 8; }
-        void marshall(MessageStream& stream) const;
+        void marshall(MessageOStream& stream) const;
         bool unmarshall(const UnmarshallingData& data);
 
         std::string toString(const std::string& prefix = "") const;
@@ -47,13 +47,11 @@ namespace Type {
             Unmarshalling()
                 : areWeSkippingPadding(true)
                 , count(0)
-                , value(0)
-            {
+             {
             }
 
             bool areWeSkippingPadding;
             size_t count;
-            uint64_t value;
         } m_Unmarshalling;
     };
 }
