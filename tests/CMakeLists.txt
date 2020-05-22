@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.7.1)
 add_executable(dbus_asio_test dbus_asio_test.cpp)
 target_link_libraries(dbus_asio_test LINK_PRIVATE dbus-asio)
-add_test(NAME run_dbus_asio_test COMMAND dbus_asio_test)
 
 add_executable(dbus_platform_unittest dbus_platform_unittest.cpp test_main.cpp)
 target_link_libraries(dbus_platform_unittest LINK_PRIVATE dbus-asio)
@@ -30,3 +29,47 @@ add_test(NAME run_dbus_type_dictentry_unittest COMMAND dbus_type_dictentry_unitt
 add_executable(dbus_type_struct_unittest dbus_type_struct_unittest.cpp test_main.cpp)
 target_link_libraries(dbus_type_struct_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_struct_unittest COMMAND dbus_type_struct_unittest)
+
+add_executable(dbus_type_boolean_unittest dbus_type_boolean_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_boolean_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_boolean_unittest COMMAND dbus_type_boolean_unittest)
+
+add_executable(dbus_type_int16_unittest dbus_type_int16_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_int16_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_int16_unittest COMMAND dbus_type_int16_unittest)
+
+add_executable(dbus_type_uint16_unittest dbus_type_uint16_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_uint16_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_uint16_unittest COMMAND dbus_type_uint16_unittest)
+
+add_executable(dbus_type_int32_unittest dbus_type_int32_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_int32_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_int32_unittest COMMAND dbus_type_int32_unittest)
+
+add_executable(dbus_type_uint32_unittest dbus_type_uint32_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_uint32_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_uint32_unittest COMMAND dbus_type_uint32_unittest)
+
+add_executable(dbus_type_int64_unittest dbus_type_int64_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_int64_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_int64_unittest COMMAND dbus_type_int64_unittest)
+
+add_executable(dbus_type_uint64_unittest dbus_type_uint64_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_uint64_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_uint64_unittest COMMAND dbus_type_uint64_unittest)
+
+add_executable(dbus_type_double_unittest dbus_type_double_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_double_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_double_unittest COMMAND dbus_type_double_unittest)
+
+add_executable(dbus_type_string_unittest dbus_type_string_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_string_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_string_unittest COMMAND dbus_type_string_unittest)
+
+add_executable(dbus_type_byte_unittest dbus_type_byte_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_byte_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_byte_unittest COMMAND dbus_type_byte_unittest)
+
+add_executable(dbus_type_signature_unittest dbus_type_signature_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_signature_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_signature_unittest COMMAND dbus_type_signature_unittest)

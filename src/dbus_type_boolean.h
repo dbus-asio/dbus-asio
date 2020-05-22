@@ -18,6 +18,8 @@
 #ifndef DBUS_TYPE_BOOLEAN_H
 #define DBUS_TYPE_BOOLEAN_H
 
+#include "dbus_type_base.h"
+
 namespace DBus {
 class UnmarshallingData;
 class MessageStream;

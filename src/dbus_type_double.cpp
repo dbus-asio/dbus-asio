@@ -56,7 +56,7 @@ bool DBus::Type::Double::unmarshall(const UnmarshallingData& data)
     m_Unmarshalling.value += data.c;
 
     if (++m_Unmarshalling.count == 8) {
-        m_Unmarshalling.value = doSwap64(m_Unmarshalling.value);
+        m_Unmarshalling.value = bswap_64(m_Unmarshalling.value);
         m_Value = *(double*)&m_Unmarshalling.value;
         return true;
     }

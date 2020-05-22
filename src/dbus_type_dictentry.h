@@ -18,9 +18,12 @@
 #ifndef DBUS_TYPE_DICTENTRY_H
 #define DBUS_TYPE_DICTENTRY_H
 
-#include "dbus_type.h"
+#include "dbus_type_base.h"
 
 namespace DBus {
+
+class MessageStream;
+class UnmarshallingData;
 
 namespace Type {
 
