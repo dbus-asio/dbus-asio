@@ -80,8 +80,8 @@ public:
 
     void writeDouble(double value)
     {
-        uint64_t v = *(int64_t*)&value;
-        writeUint64(v);
+        pad8();
+        data.append((char*)&value, sizeof(double));
     }
 
     void write(const std::string& str)
