@@ -9,8 +9,24 @@ add_test(NAME run_dbus_platform_unittest COMMAND dbus_platform_unittest)
 
 add_executable(dbus_messagestream_unittest dbus_messagestream_unittest.cpp test_main.cpp)
 target_link_libraries(dbus_messagestream_unittest LINK_PRIVATE dbus-asio)
-add_test(NAME dbus_messagestream_unittest COMMAND dbus_messagestream_unittest)
+add_test(NAME run_dbus_messagestream_unittest COMMAND dbus_messagestream_unittest)
 
 add_executable(dbus_validation_unittest dbus_validation_unittest.cpp test_main.cpp)
 target_link_libraries(dbus_validation_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_validation_unittest COMMAND dbus_validation_unittest)
+
+add_executable(dbus_type_array_unittest dbus_type_array_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_array_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_array_unittest COMMAND dbus_type_array_unittest)
+
+add_executable(dbus_type_variant_unittest dbus_type_variant_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_variant_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_variant_unittest COMMAND dbus_type_variant_unittest)
+
+add_executable(dbus_type_dictentry_unittest dbus_type_dictentry_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_dictentry_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_dictentry_unittest COMMAND dbus_type_dictentry_unittest)
+
+add_executable(dbus_type_struct_unittest dbus_type_struct_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_struct_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_struct_unittest COMMAND dbus_type_struct_unittest)

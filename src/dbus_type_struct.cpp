@@ -113,7 +113,7 @@ bool DBus::Type::Struct::unmarshall(const UnmarshallingData& data)
         m_Unmarshalling.createNewType = false;
 
         m_Unmarshalling.signature = Type::extractSignature(m_Signature, m_Unmarshalling.signatureIndex);
-        m_Value.push_back(DBus::Type::create(m_Unmarshalling.signature));
+        m_Value.push_back(DBus::Type::create(m_Unmarshalling.signature, isLittleEndian()));
     }
 
     // Grab the data element in the process of being unmarshalled

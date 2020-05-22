@@ -18,6 +18,8 @@
 #ifndef DBUS_TYPE_STRUCT_H
 #define DBUS_TYPE_STRUCT_H
 
+#include "dbus_type.h"
+
 namespace DBus {
 class UnmarshallingData;
 class MessageStream;
@@ -35,6 +37,7 @@ namespace Type {
     class Double;
     class String;
     class Variant;
+    class Struct;
 
     class Struct : public Base {
     public:

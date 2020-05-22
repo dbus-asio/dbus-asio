@@ -90,7 +90,7 @@ bool DBus::Type::Variant::unmarshall(const UnmarshallingData& data)
 
     if (m_Unmarshalling.isReadingSignature) {
         if (m_Unmarshalling.signature.unmarshall(data)) {
-            m_Value = DBus::Type::create(m_Unmarshalling.signature.getValue());
+            m_Value = DBus::Type::create(m_Unmarshalling.signature.getValue(), isLittleEndian());
             setSignature(m_Unmarshalling.signature.getValue());
             //
             m_Unmarshalling.isReadingSignature = false;

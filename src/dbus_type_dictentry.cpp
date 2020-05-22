@@ -85,14 +85,14 @@ bool DBus::Type::DictEntry::unmarshall(const UnmarshallingData& data)
 
     m_Unmarshalling.areWeSkippingPadding = false;
     if (m_Unmarshalling.count == 0) {
-        std::string signature(getSignature());
-        DBus::Validation::throwOnInvalidBasicType(signature.substr(1, 1));
-        m_Value.first = Type::create(std::string(1, getSignature()[1]));
+        const char key_type = getSignature()[1];
+        DBus::Validation::throwOnInvalidBasicType(key_type);
+        m_Value.first = Type::create(std::string(1, key_type), isLittleEndian());
     }
 
     if (m_Unmarshalling.onKeyType) {
         if (Type::unmarshallData(m_Value.first, data)) {
-            m_Value.second = Type::create(std::string(1, getSignature()[2]));
+            m_Value.second = Type::create(std::string(1, getSignature()[2]), isLittleEndian());
             m_Unmarshalling.onKeyType = false;
         }
     } else { // on value type

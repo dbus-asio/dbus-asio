@@ -103,12 +103,13 @@ const DBus::Type::Variant& DBus::Type::refVariant(const Generic& value) { return
 //
 // Mapping methods to convert between abstract Generic types, to specific classes
 //
-DBus::Type::Generic DBus::Type::create(const std::string& type)
+DBus::Type::Generic DBus::Type::create(const std::string& type, bool littleEndian)
 {
 #define TYPE_CREATE(typename)                        \
     if (type[0] == typename ::s_StaticTypeCode[0]) { \
         typename vv;                                 \
         vv.setSignature(type);                       \
+        vv.setLittleEndian(littleEndian);            \
         Type::Generic v(vv);                         \
         return v;                                    \
     }
