@@ -15,35 +15,31 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#ifndef DBUS_TYPE_DOUBLE_H
-#define DBUS_TYPE_DOUBLE_H
+#ifndef DBUS_OCTECTSTREAM_H
+#define DBUS_OCTECTSTREAM_H
 
-#include "dbus_type_base.h"
+#include <cstdint>
+#include <cstddef>
 
 namespace DBus {
-class MessageOStream;
-class MessageIStream;
 
-namespace Type {
+class OctetBuffer
+{
+    const uint8_t * m_data;
+    size_t m_size;
 
-    class Double : public Base {
-    public:
-        Double();
-        Double(double v);
+public:
+    OctetBuffer(const uint8_t* data, size_t size);
 
-        size_t getAlignment() const { return 8; }
-        void marshall(MessageOStream& stream) const;
-        void unmarshall(MessageIStream& stream);
+    size_t size() const;
+    const uint8_t* data() const;
+    void remove_prefix(size_t count);
+    bool empty() const;
+    uint8_t operator[](unsigned long index) const;
+    void copy(uint8_t* data, size_t size) const;
+    size_t find(uint8_t byte) const;
+};
 
-        std::string toString(const std::string& prefix = "") const;
-        std::string asString() const;
-
-        static const std::string s_StaticTypeCode;
-
-    protected:
-        double m_Value;
-    };
-}
-}
+} // namespace DBus
 
 #endif

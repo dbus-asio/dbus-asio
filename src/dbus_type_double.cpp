@@ -27,6 +27,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Double::s_StaticTypeCode("d");
@@ -45,18 +46,9 @@ DBus::Type::Double::Double(double v)
 
 void DBus::Type::Double::marshall(MessageOStream& stream) const { stream.writeDouble(m_Value); }
 
-bool DBus::Type::Double::unmarshall(const UnmarshallingData& data)
+void DBus::Type::Double::unmarshall(MessageIStream& stream)
 {
-    if (m_Unmarshalling.areWeSkippingPadding && !Utils::isAlignedTo(getAlignment(), data.offset)) {
-        return false;
-    }
-    m_Unmarshalling.areWeSkippingPadding = false;
-
-    *((uint8_t*)&m_Value + m_Unmarshalling.count) = data.c;
-    if (++m_Unmarshalling.count == 8) {
-        return true;
-    }
-    return false;
+    stream.read(&m_Value);
 }
 
 std::string DBus::Type::Double::toString(const std::string& prefix) const

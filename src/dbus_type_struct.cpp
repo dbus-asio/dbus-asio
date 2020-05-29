@@ -42,6 +42,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 
 /*
 Structs and dict entries are marshalled in the same way as their contents, but their
@@ -87,7 +88,6 @@ void DBus::Type::Struct::add(const DBus::Type::Signature& v) { m_Value.push_back
 void DBus::Type::Struct::clear()
 {
     m_Value.clear();
-    m_Unmarshalling.reset();
 }
 
 void DBus::Type::Struct::marshall(MessageOStream& stream) const
@@ -101,36 +101,17 @@ void DBus::Type::Struct::marshall(MessageOStream& stream) const
     }
 }
 
-bool DBus::Type::Struct::unmarshall(const UnmarshallingData& data)
+void DBus::Type::Struct::unmarshall(MessageIStream& stream)
 {
-
-    if (m_Unmarshalling.areWeSkippingPadding && !Utils::isAlignedTo(getAlignment(), data.offset)) {
-        return false;
-    }
-    m_Unmarshalling.areWeSkippingPadding = false;
-
-    if (m_Unmarshalling.createNewType) {
-        m_Unmarshalling.createNewType = false;
-
-        m_Unmarshalling.signature = Type::extractSignature(m_Signature, m_Unmarshalling.signatureIndex);
-        m_Value.push_back(DBus::Type::create(m_Unmarshalling.signature, isLittleEndian()));
-    }
-
-    // Grab the data element in the process of being unmarshalled
-    DBus::Type::Generic& current_type = m_Value.back();
-    m_Unmarshalling.createNewType = DBus::Type::unmarshallData(current_type, data);
-
-    // If the previous type has been fully unmarshalled, we must now skip to the next
-    // type in the struct.
-    if (m_Unmarshalling.createNewType) {
-        m_Unmarshalling.signatureIndex += m_Unmarshalling.signature.length();
-
-        if (m_Unmarshalling.signatureIndex >= m_Signature.length() - 1) {
-            return true;
-        }
-    }
-
-    return false;
+    // A struct must start on an 8-byte boundary regardless of the type of the struct fields.
+    stream.align(8);
+    size_t signatureIndex = 1; // skip first '('
+    do {
+        const std::string signature = Type::extractSignature(m_Signature, signatureIndex);
+        m_Value.push_back(DBus::Type::create(signature, isLittleEndian()));
+        DBus::Type::unmarshallData(m_Value.back(), stream);
+        signatureIndex+= signature.size();
+    } while (signatureIndex < m_Signature.size() - 1);
 }
 
 std::string DBus::Type::Struct::toString(const std::string& prefix) const

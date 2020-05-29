@@ -27,6 +27,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Uint16::s_StaticTypeCode("q");
@@ -45,19 +46,9 @@ DBus::Type::Uint16::Uint16(uint16_t v)
 
 void DBus::Type::Uint16::marshall(MessageOStream& stream) const { stream.writeUint16(m_Value); }
 
-bool DBus::Type::Uint16::unmarshall(const UnmarshallingData& data)
+void DBus::Type::Uint16::unmarshall(MessageIStream& stream)
 {
-    if (m_Unmarshalling.areWeSkippingPadding && !Utils::isAlignedTo(getAlignment(), data.offset)) {
-        return false;
-    }
-    m_Unmarshalling.areWeSkippingPadding = false;
-
-    *((uint8_t*)&m_Value + m_Unmarshalling.count) = data.c;
-    if (++m_Unmarshalling.count == 2) {
-        m_Value = doSwap16(m_Value);
-        return true;
-    }
-    return false;
+    stream.read<uint16_t>(&m_Value);
 }
 
 std::string DBus::Type::Uint16::toString(const std::string& prefix) const

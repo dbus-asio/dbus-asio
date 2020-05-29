@@ -26,6 +26,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 
 const std::string DBus::Type::Signature::s_StaticTypeCode("g");
 
@@ -51,22 +52,11 @@ void DBus::Type::Signature::marshall(MessageOStream& stream) const
     stream.writeSignature(m_Value);
 }
 
-bool DBus::Type::Signature::unmarshall(const UnmarshallingData& data)
+void DBus::Type::Signature::unmarshall(MessageIStream& stream)
 {
-
-    if (m_Unmarshalling.count == 0) {
-        m_Unmarshalling.signature_size = data.c;
-
-    } else if (m_Unmarshalling.count - 1 < m_Unmarshalling.signature_size) { // octets for the signature
-        m_Value += data.c;
-
-    } else if (m_Unmarshalling.count - 1 == m_Unmarshalling.signature_size) { // the signature NUL terminator
-        return true;
-    }
-
-    ++m_Unmarshalling.count;
-
-    return false;
+    const uint8_t size = stream.read();
+    stream.read(m_Value, size);
+    stream.read(); // read null;
 }
 
 std::string DBus::Type::Signature::toString(const std::string& prefix) const

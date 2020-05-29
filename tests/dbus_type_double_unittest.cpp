@@ -5,36 +5,27 @@
 
 namespace DBus { namespace test {
 
-void TestUnmarshall(Type::Double& dbusType, double value)
+void TestUnmarshallFromMessageIStream(Type::Double& dbusType, double value, unsigned byteOrder)
 {
-    UnmarshallingData data;
-    char * bytePtr = (char*)&value;
-    for (auto i = 0; i < sizeof(double); ++i, ++bytePtr) {
-        data.c = *bytePtr;
-        if (i != sizeof(double) - 1) {
-            REQUIRE(!dbusType.unmarshall(data));
-        } else {
-            REQUIRE(dbusType.unmarshall(data));
-        }
-        ++data.offset;
-    }
+    MessageIStream stream((uint8_t*)&value, sizeof(double), byteOrder == __BYTE_ORDER);
+    dbusType.unmarshall(stream);
 
     std::stringstream ss;
     ss << value;
     REQUIRE(dbusType.asString() == ss.str());
 }
 
-TEST_CASE("Unmarshall double little endian")
+TEST_CASE("Unmarshall double little endian from MessageIStream")
 {
     Type::Double dbusType;
-    TestUnmarshall(dbusType, 5346.12);
+    TestUnmarshallFromMessageIStream(dbusType, 5346.12, __LITTLE_ENDIAN);
 }
 
-TEST_CASE("Unmarshall double big endian")
+TEST_CASE("Unmarshall double big endian from MessageIStream")
 {
     Type::Double dbusType;
     dbusType.setLittleEndian(false);
-    TestUnmarshall(dbusType, 67.25);
+    TestUnmarshallFromMessageIStream(dbusType, 67.25, __BIG_ENDIAN);
 }
 
 TEST_CASE("Marshall and unmarshall double")
@@ -44,12 +35,8 @@ TEST_CASE("Marshall and unmarshall double")
     stream.writeDouble(value);
 
     Type::Double dbusType;
-    UnmarshallingData data;
-    std::for_each(stream.data.begin(), stream.data.end(),
-        [&data, &dbusType](char c) {
-            data.c = c;
-            dbusType.unmarshall(data);
-        });
+    MessageIStream istream((uint8_t*)stream.data.data(), stream.size(), false);
+    dbusType.unmarshall(istream);
 
     std::stringstream ss;
     ss << value;

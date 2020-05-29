@@ -3,32 +3,25 @@
 #include "dbus_type_uint32.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include <byteswap.h>
 
 namespace DBus { namespace test {
 
-void TestUnmarshall(unsigned byteOrder, const std::string& stream, uint32_t v1, uint32_t v2)
+void TestUnmarshallFromMessageIStream(unsigned byteOrder, const std::string& stream, uint32_t v1, uint32_t v2)
 {
     Type::Struct dbusStruct;
     dbusStruct.setSignature("(uu)");
-    dbusStruct.setLittleEndian(byteOrder == __LITTLE_ENDIAN);
-    UnmarshallingData data;
-    for (auto i = 0; i < stream.size(); ++i) {
-        data.c = stream[i];
-        if (i != stream.size() - 1 ) {
-            REQUIRE(!dbusStruct.unmarshall(data));
-        } else {
-            REQUIRE(dbusStruct.unmarshall(data));
-        }
-        ++data.offset;
-    }
+
+    MessageIStream istream((uint8_t*)stream.data(), stream.size(), byteOrder != __LITTLE_ENDIAN);
+    dbusStruct.unmarshall(istream);
 
     REQUIRE(dbusStruct.getEntries() == 2);
     REQUIRE(Type::asString(dbusStruct[0]) == std::to_string(v1));
     REQUIRE(Type::asString(dbusStruct[1]) == std::to_string(v2));
 }
 
-void TestUnmarshall(unsigned byteOrder, uint32_t v1, uint32_t v2)
+void TestUnmarshallMessageIStream(unsigned byteOrder, uint32_t v1, uint32_t v2)
 {
     std::string data;
 
@@ -37,17 +30,17 @@ void TestUnmarshall(unsigned byteOrder, uint32_t v1, uint32_t v2)
     data.append((char*)&writeKey, sizeof(uint32_t));
     data.append((char*)&writeValue, sizeof(uint32_t));
 
-    TestUnmarshall(byteOrder, data, v1, v2);
+    TestUnmarshallFromMessageIStream(byteOrder, data, v1, v2);
 }
 
-TEST_CASE("Unmarshall struct little endian")
+TEST_CASE("Unmarshall struct little endian from MessageIStream")
 {
-    TestUnmarshall(__LITTLE_ENDIAN, 12345, 864);
+    TestUnmarshallMessageIStream(__LITTLE_ENDIAN, 12345, 864);
 }
 
-TEST_CASE("Unmarshall struct big endian")
+TEST_CASE("Unmarshall struct big endian from MessageIStream")
 {
-    TestUnmarshall(__BIG_ENDIAN, 1, 2);
+    TestUnmarshallMessageIStream(__BIG_ENDIAN, 1, 2);
 }
 
 TEST_CASE("Marshall and unmarshall struct")
@@ -60,7 +53,7 @@ TEST_CASE("Marshall and unmarshall struct")
 
     MessageOStream stream;
     dbusStruct.marshall(stream);
-    TestUnmarshall(__LITTLE_ENDIAN, stream.data, 56, 78);
+    TestUnmarshallFromMessageIStream(__LITTLE_ENDIAN, stream.data, 56, 78);
 }
 
 }} // namespace DBus::test

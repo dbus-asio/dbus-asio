@@ -21,8 +21,9 @@
 #include "dbus_type_base.h"
 
 namespace DBus {
-class UnmarshallingData;
 class MessageOStream;
+class MessageIStream;
+
 
 namespace Type {
 
@@ -34,7 +35,7 @@ namespace Type {
         //			std::string getSignature() const { return s_StaticTypeCode; }
         size_t getAlignment() const { return 4; }
         void marshall(MessageOStream& stream) const;
-        bool unmarshall(const UnmarshallingData& data);
+        void unmarshall(MessageIStream& stream);
 
         std::string toString(const std::string& prefix = "") const;
         std::string asString() const;
@@ -43,17 +44,6 @@ namespace Type {
 
     protected:
         uint32_t m_Value;
-
-        struct Unmarshalling {
-            Unmarshalling()
-                : areWeSkippingPadding(true)
-                , count(0)
-            {
-            }
-
-            bool areWeSkippingPadding;
-            size_t count;
-        } m_Unmarshalling;
     };
 }
 }

@@ -3,33 +3,24 @@
 #include "dbus_type_int32.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_type.h"
 #include <iostream>
 
 namespace DBus { namespace test {
 
-void TestUnmarshallFromStream(const std::string &stream,
+void TestUnmarshallFromMessageIStream(const std::string &stream,
     unsigned byteOrder, const std::string str)
 {
     // An array of structures
     Type::String dbusString;
-    dbusString.setLittleEndian(byteOrder == __LITTLE_ENDIAN);
-
-    UnmarshallingData data;
-    for (auto i = 0; i < stream.size(); ++i) {
-        data.c = stream[i];
-        if (i != stream.size() - 1) {
-            REQUIRE(!dbusString.unmarshall(data));
-        } else {
-            REQUIRE(dbusString.unmarshall(data));
-        }
-        ++data.offset;
-    }
+    MessageIStream istream((uint8_t*)stream.data(), stream.size(), byteOrder != __LITTLE_ENDIAN);
+    dbusString.unmarshall(istream);
 
     REQUIRE(dbusString.asString() == str);
 }
 
-void TestUnmarshall(unsigned byteOrder, const std::string& str)
+void TestUnmarshallFromMessageIStream(unsigned byteOrder, const std::string& str)
 {
     std::string stream;
     uint32_t length = str.size();
@@ -42,17 +33,17 @@ void TestUnmarshall(unsigned byteOrder, const std::string& str)
     stream.append(str);
     stream.push_back('\0');
 
-    TestUnmarshallFromStream(stream, byteOrder, str);
+    TestUnmarshallFromMessageIStream(stream, byteOrder, str);
 }
 
-TEST_CASE("Unmarshall string - little endian")
+TEST_CASE("Unmarshall string - little endian from MessageIStream")
 {
-    TestUnmarshall(__LITTLE_ENDIAN, "This is a string");
+    TestUnmarshallFromMessageIStream(__LITTLE_ENDIAN, "This is a string");
 }
 
-TEST_CASE("Unmarshall string - big endian")
+TEST_CASE("Unmarshall string - big endian from MessageIStream")
 {
-    TestUnmarshall(__BIG_ENDIAN, "This is another string");
+    TestUnmarshallFromMessageIStream(__BIG_ENDIAN, "This is another string");
 }
 
 TEST_CASE("Marshall and unmarshall string")
@@ -63,7 +54,7 @@ TEST_CASE("Marshall and unmarshall string")
     MessageOStream stream;
     dbusString.marshall(stream);
 
-   TestUnmarshallFromStream(stream.data, __LITTLE_ENDIAN, str);
+   TestUnmarshallFromMessageIStream(stream.data, __LITTLE_ENDIAN, str);
 }
 
 

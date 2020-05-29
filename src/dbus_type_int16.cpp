@@ -27,6 +27,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Int16::s_StaticTypeCode("n");
@@ -45,19 +46,9 @@ DBus::Type::Int16::Int16(int16_t v)
 
 void DBus::Type::Int16::marshall(MessageOStream& stream) const { stream.writeInt16(m_Value); }
 
-bool DBus::Type::Int16::unmarshall(const UnmarshallingData& data)
+void DBus::Type::Int16::unmarshall(MessageIStream& stream)
 {
-    if (m_Unmarshalling.areWeSkippingPadding && !Utils::isAlignedTo(getAlignment(), data.offset)) {
-        return false;
-    }
-    m_Unmarshalling.areWeSkippingPadding = false;
-
-    *((uint8_t*)&m_Value + m_Unmarshalling.count) = data.c;
-    if (++m_Unmarshalling.count == 2) {
-        m_Value = doSwap16(m_Value);
-        return true;
-    }
-    return false;
+    stream.read<int16_t>(&m_Value);
 }
 
 std::string DBus::Type::Int16::toString(const std::string& prefix) const

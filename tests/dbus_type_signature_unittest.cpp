@@ -2,33 +2,24 @@
 #include "dbus_type_signature.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_type.h"
 #include <iostream>
 
 namespace DBus { namespace test {
 
-void TestUnmarshallFromStream(const std::string &stream,
+void TestUnmarshallFromMessageIStream(const std::string &stream,
     unsigned byteOrder, const std::string str)
 {
     // An array of structures
-    Type::Signature dbusString;
-    dbusString.setLittleEndian(byteOrder == __LITTLE_ENDIAN);
+    Type::Signature signature;
+    MessageIStream istream((uint8_t*)stream.data(), stream.size(), byteOrder == __BYTE_ORDER);
+    signature.unmarshall(istream);
 
-    UnmarshallingData data;
-    for (auto i = 0; i < stream.size(); ++i) {
-        data.c = stream[i];
-        if (i != stream.size() - 1) {
-            REQUIRE(!dbusString.unmarshall(data));
-        } else {
-            REQUIRE(dbusString.unmarshall(data));
-        }
-        ++data.offset;
-    }
-
-    REQUIRE(dbusString.asString() == str);
+    REQUIRE(signature.asString() == str);
 }
 
-void TestUnmarshall(unsigned byteOrder, const std::string& str)
+void TestUnmarshallFromMessageIStream(unsigned byteOrder, const std::string& str)
 {
     std::string stream;
     uint8_t length = str.size();
@@ -37,17 +28,17 @@ void TestUnmarshall(unsigned byteOrder, const std::string& str)
     stream.append(str);
     stream.push_back('\0');
 
-    TestUnmarshallFromStream(stream, byteOrder, str);
+    TestUnmarshallFromMessageIStream(stream, byteOrder, str);
 }
 
-TEST_CASE("Unmarshall signature - little endian")
+TEST_CASE("Unmarshall signature - little endian from MessageIStream")
 {
-    TestUnmarshall(__LITTLE_ENDIAN, "{ii}");
+    TestUnmarshallFromMessageIStream(__LITTLE_ENDIAN, "{ii}");
 }
 
-TEST_CASE("Unmarshall signature - big endian")
+TEST_CASE("Unmarshall signature - big endian from MessageIStream")
 {
-    TestUnmarshall(__BIG_ENDIAN, "{ii}");
+    TestUnmarshallFromMessageIStream(__BIG_ENDIAN, "{ii}");
 }
 
 TEST_CASE("Marshall and unmarshall signature")
@@ -60,10 +51,10 @@ TEST_CASE("Marshall and unmarshall signature")
 
     // Marshalling adds additional signature to signal a signature!
     std::string signatureSignature(stream.data.begin(), stream.data.begin() + 3);
-    TestUnmarshallFromStream(signatureSignature, __LITTLE_ENDIAN, "g");
+    TestUnmarshallFromMessageIStream(signatureSignature, __LITTLE_ENDIAN, "g");
 
     std::string signatureValue(stream.data.begin() + 3, stream.data.end());
-    TestUnmarshallFromStream(signatureValue, __LITTLE_ENDIAN, str);
+    TestUnmarshallFromMessageIStream(signatureValue, __LITTLE_ENDIAN, str);
 }
 
 

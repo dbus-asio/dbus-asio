@@ -30,6 +30,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 
 uint32_t DBus::Message::Base::m_SerialCounter = 1;
 boost::recursive_mutex DBus::Message::Base::m_SerialCounterMutex;
@@ -72,7 +73,10 @@ void DBus::Message::Base::parseParameters(bool isLittleEndian, const std::string
     parameter_fields.setSignature("(" + signature + ")");
     parameter_fields.setLittleEndian(isLittleEndian);
 
-    unmarshallToStruct(parameter_fields, bodydata);
+    MessageIStream stream((uint8_t*)bodydata.data(), bodydata.size(),
+        isLittleEndian ? __BYTE_ORDER != __LITTLE_ENDIAN :
+                         __BYTE_ORDER != __BIG_ENDIAN);
+    parameter_fields.unmarshall(stream);
 
     size_t count = parameter_fields.getEntries();
     for (size_t i = 0; i < count; ++i) {

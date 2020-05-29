@@ -26,6 +26,7 @@
 
 #include <sys/socket.h>
 #include <sys/un.h>
+#include "dbus_octetbuffer.h"
 
 #define USE_ASIO_NORMAL 1
 #define USE_ASIO_ACCESSOR 0
@@ -33,7 +34,7 @@
 
 namespace DBus {
 
-typedef std::function<void(uint8_t c)> ReceiveOctetCallbackFunction;
+typedef std::function<void(OctetBuffer& buffer)> ReceiveDataCallbackFunction;
 
 class Transport {
 public:
@@ -46,8 +47,8 @@ public:
 
     void ThreadFunction();
 
-    void setOctetHandler(const ReceiveOctetCallbackFunction& callback);
-    void onReceiveOctet(uint8_t c);
+    void setDataHandler(const ReceiveDataCallbackFunction& callback);
+    void onReceiveData(OctetBuffer& buffer);
     void onAuthComplete();
     void addToMessageQueue(const std::string& data);
 
@@ -63,9 +64,9 @@ protected:
     boost::asio::io_service m_io_service;
     boost::asio::local::stream_protocol::socket m_socket;
 
-    const static size_t BufferSize = 256;
+    const static size_t BufferSize = 1024;
     uint8_t m_DataBuffer[BufferSize];
-    ReceiveOctetCallbackFunction m_ReceiveOctetCallback;
+    ReceiveDataCallbackFunction m_ReceiveDataCallback;
 
     mutable boost::recursive_mutex m_SendMutex;
     mutable boost::recursive_mutex m_CallbackMutex;

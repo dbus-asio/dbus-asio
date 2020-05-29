@@ -21,8 +21,8 @@
 #include "dbus_type_base.h"
 
 namespace DBus {
-class UnmarshallingData;
 class MessageOStream;
+class MessageIStream;
 
 namespace Type {
     class Struct;
@@ -37,8 +37,8 @@ namespace Type {
 
         size_t getAlignment() const { return 4; }
         void marshall(MessageOStream& stream) const;
+        void unmarshall(MessageIStream& stream);
         void marshallContents(MessageOStream& stream) const;
-        bool unmarshall(const UnmarshallingData& data);
 
         std::string getSignature() const;
 
@@ -51,23 +51,6 @@ namespace Type {
 
     protected:
         std::vector<DBus::Type::Generic> contents;
-
-        struct Unmarshalling {
-            Unmarshalling()
-                : areWeSkippingPaddingForSize(true)
-                , areWeSkippingPaddingForElement(true)
-                , count(0)
-                , array_size(0)
-            {
-            }
-
-            bool areWeSkippingPaddingForSize;
-            bool areWeSkippingPaddingForElement;
-            size_t count;
-            size_t array_size;
-            bool createType;
-            std::string typeSignature;
-        } m_Unmarshalling;
     };
 }
 }

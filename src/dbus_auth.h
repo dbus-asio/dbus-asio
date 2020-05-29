@@ -18,10 +18,10 @@
 #ifndef DBUS_AUTH_H
 #define DBUS_AUTH_H
 
+#include "dbus_transport.h"
 #include <boost/thread/recursive_mutex.hpp>
 
 namespace DBus {
-class Transport;
 
 // See Authentication state diagrams
 class AuthenticationProtocol {
@@ -36,7 +36,7 @@ public:
     void reset();
     void sendAuthListMethods();
     void sendAuth(AuthenticationProtocol::AuthRequired type = AUTH_BASIC);
-    bool onReceiveOctet(uint8_t c);
+    bool onReceiveData(OctetBuffer& buffer);
 
 protected:
     bool onOK(const std::string& guid /* unused in this case */);
@@ -56,10 +56,11 @@ protected:
     // Return true once we have completed the auth state
     bool onCommand(const std::string& command);
 
+    bool processData();
+
 private:
     std::shared_ptr<Transport> m_Transport;
-    uint8_t m_LastOctetSeen;
-    std::string m_CurrentCommand;
+    std::string m_data;
     AuthenticationProtocol::AuthRequired m_AuthType;
     mutable boost::recursive_mutex m_AuthTypeMutex;
 };

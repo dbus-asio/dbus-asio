@@ -42,6 +42,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 
 //
 // Helper methods to extract navtive types from the opaque 'Generic' type
@@ -224,13 +225,14 @@ void DBus::Type::marshallData(const DBus::Type::Generic& value, MessageOStream& 
 }
 
 // Process one octet of data, into the given type. Returns true if that type has completed.
-bool DBus::Type::unmarshallData(DBus::Type::Generic& result, const UnmarshallingData& data)
+void DBus::Type::unmarshallData(DBus::Type::Generic& result, MessageIStream& stream)
 {
 // TODO: Consider whether a template could handle this
 #define TYPE_UNMARSHALL_DATA(typename)                    \
     if (type[0] == typename ::s_StaticTypeCode[0]) {      \
         typename& v = boost::any_cast<typename&>(result); \
-        return v.unmarshall(data);                        \
+        v.unmarshall(stream);                             \
+        return;                                           \
     }
 
     std::string type = getMarshallingSignature(result);
@@ -256,7 +258,6 @@ bool DBus::Type::unmarshallData(DBus::Type::Generic& result, const Unmarshalling
 
 #undef TYPE_UNMARSHALL_DATA
 
-    return false;
 }
 
 // Generate an expanded description of the data type provided.
@@ -389,24 +390,4 @@ std::string DBus::Type::getMarshallingSignature(const std::vector<DBus::Type::Ge
         result += getMarshallingSignature(it);
     }
     return result;
-}
-
-void DBus::Type::unmarshallToStruct(DBus::Type::Struct& dest, const std::string& data)
-{
-    UnmarshallingData umd;
-
-    for (auto it : data) {
-        umd.c = it;
-        dest.unmarshall(umd);
-        ++umd.offset;
-    }
-}
-
-DBus::Type::Generic DBus::Type::unmarshallString(const std::string& data)
-{
-    DBus::Type::Struct dest;
-
-    dest.setSignature("(s)");
-    unmarshallToStruct(dest, data);
-    return dest[0];
 }

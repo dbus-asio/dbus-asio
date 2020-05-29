@@ -10,6 +10,10 @@ add_executable(dbus_messageostream_unittest dbus_messageostream_unittest.cpp tes
 target_link_libraries(dbus_messageostream_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_messageostream_unittest COMMAND dbus_messageostream_unittest)
 
+add_executable(dbus_messageistream_unittest dbus_messageistream_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_messageistream_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_messageistream_unittest COMMAND dbus_messageistream_unittest)
+
 add_executable(dbus_validation_unittest dbus_validation_unittest.cpp test_main.cpp)
 target_link_libraries(dbus_validation_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_validation_unittest COMMAND dbus_validation_unittest)
@@ -73,3 +77,7 @@ add_test(NAME run_dbus_type_byte_unittest COMMAND dbus_type_byte_unittest)
 add_executable(dbus_type_signature_unittest dbus_type_signature_unittest.cpp test_main.cpp)
 target_link_libraries(dbus_type_signature_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_signature_unittest COMMAND dbus_type_signature_unittest)
+
+add_executable(dbus_octetbuffer_unittest dbus_octetbuffer_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_octetbuffer_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_octetbuffer_unittest COMMAND dbus_octetbuffer_unittest)
