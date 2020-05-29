@@ -21,8 +21,8 @@
 #include "dbus_type.h"
 
 namespace DBus {
-class UnmarshallingData;
 class MessageOStream;
+class MessageIStream;
 
 namespace Type {
     class Byte;
@@ -67,7 +67,7 @@ namespace Type {
 
         size_t getAlignment() const { return 8; }
         void marshall(MessageOStream& stream) const;
-        bool unmarshall(const UnmarshallingData& data);
+        void unmarshall(MessageIStream& stream);
 
         std::string toString(const std::string& prefix = "") const;
         std::string asString() const;
@@ -79,26 +79,6 @@ namespace Type {
 
     private:
         std::vector<Generic> m_Value;
-
-        struct Unmarshalling {
-            Unmarshalling()
-            {
-                reset();
-            }
-            // This type needs 'reset' because it gets reused (as opposed to newly constructed)
-            // when we parse the incoming data.
-            void reset()
-            {
-                areWeSkippingPadding = true;
-                signatureIndex = 1; // because the first character is '(' in struct
-                createNewType = true;
-                signature = "";
-            }
-            bool areWeSkippingPadding;
-            size_t signatureIndex;
-            bool createNewType;
-            std::string signature;
-        } m_Unmarshalling;
     };
 }
 }

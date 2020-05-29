@@ -12,8 +12,10 @@ set(HEADER_FILES
 	src/dbus_matchrule.h
 	src/dbus_message.h
 	src/dbus_messageprotocol.h
-	src/dbus_messagestream.h
+	src/dbus_messageostream.h
+	src/dbus_messageistream.h
 	src/dbus_native.h
+	src/dbus_octetbuffer.h
 	src/dbus_platform.h
 	src/dbus_transport.h
 	src/dbus_type_array.h
@@ -46,12 +48,14 @@ add_library(dbus-asio SHARED
 	src/dbus_matchrule.cpp
 	src/dbus_message.cpp
 	src/dbus_message_error.cpp
+	src/dbus_messageistream.cpp
 	src/dbus_message_methodcall.cpp
 	src/dbus_message_methodreturn.cpp
 	src/dbus_messageprotocol.cpp
 	src/dbus_message_signal.cpp
 	src/dbus_native.cpp
 	src/dbus_native_messages.cpp
+	src/dbus_octetbuffer.cpp
 	src/dbus_platform.cpp
 	src/dbus_transport.cpp
 	src/dbus_type_array.cpp

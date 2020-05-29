@@ -30,6 +30,7 @@
 #include "dbus_type_variant.h"
 
 #include "dbus_message.h"
+#include "dbus_messageistream.h"
 
 DBus::Message::Error::Error(uint32_t serial, const std::string& name, const std::string& message)
     : Message::Base()
@@ -46,8 +47,18 @@ DBus::Message::Error::Error(uint32_t serial, const std::string& name, const std:
 DBus::Message::Error::Error(const DBus::Type::Struct& header, const std::string& body)
     : Message::Base(header, body)
 {
+    const bool isLittleEndian = Type::asByte(header[0]) == 'l' ? true : false;
 
-    m_Message = DBus::Type::asString(DBus::Type::unmarshallString(body));
+    DBus::Type::Struct dest;
+    dest.setSignature("(s)");
+
+    MessageIStream stream((uint8_t*)body.data(), body.size(),
+        isLittleEndian ? __BYTE_ORDER != __LITTLE_ENDIAN :
+                         __BYTE_ORDER != __BIG_ENDIAN);
+    dest.unmarshall(stream);
+
+    const std::string m_Message = DBus::Type::asString(dest[0]);
+
     m_SerialReplyingTo = DBus::Type::asUint32(m_Header.field[DBus::Message::Header::HEADER_REPLY_SERIAL]);
 
     Log::write(Log::WARNING, "DBus :: Received an error from message serial #%d : %s\n", m_SerialReplyingTo, m_Message.c_str());

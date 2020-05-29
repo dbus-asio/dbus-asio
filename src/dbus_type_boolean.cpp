@@ -27,6 +27,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Boolean::s_StaticTypeCode("b");
@@ -45,19 +46,9 @@ DBus::Type::Boolean::Boolean(uint32_t v)
 
 void DBus::Type::Boolean::marshall(MessageOStream& stream) const { stream.writeBoolean(m_Value ? true : false); }
 
-bool DBus::Type::Boolean::unmarshall(const UnmarshallingData& data)
+void DBus::Type::Boolean::unmarshall(MessageIStream& stream)
 {
-    if (m_Unmarshalling.areWeSkippingPadding && !Utils::isAlignedTo(getAlignment(), data.offset)) {
-        return false;
-    }
-    m_Unmarshalling.areWeSkippingPadding = false;
-
-    *((uint8_t*)&m_Value + m_Unmarshalling.count) = data.c;
-    if (++m_Unmarshalling.count == 4) {
-        m_Value = doSwap32(m_Value) ? true : false;
-        return true;
-    }
-    return false;
+    stream.read<uint32_t>(&m_Value);
 }
 
 std::string DBus::Type::Boolean::toString(const std::string& prefix) const

@@ -35,7 +35,7 @@ DBus::Transport::Transport(const std::string& path)
     , m_socket(m_io_service)
     , m_ShuttingDown(false)
 {
-    setOctetHandler(std::bind(&Transport::onReceiveOctet, this, std::placeholders::_1));
+    setDataHandler(std::bind(&Transport::onReceiveData, this, std::placeholders::_1));
 
     m_socket.connect(m_Busname);
 
@@ -53,11 +53,8 @@ DBus::Transport::Transport(const std::string& path)
 void DBus::Transport::handle_read_data(const boost::system::error_code& error, std::size_t bytes_transferred)
 {
     boost::recursive_mutex::scoped_lock guard(m_CallbackMutex);
-    for (size_t i = 0; i < bytes_transferred; i++)
-    {
-        ++m_Stats.bytes_read;
-        m_ReceiveOctetCallback(m_DataBuffer[i]);
-    }
+    OctetBuffer buffer(m_DataBuffer, bytes_transferred);
+    m_ReceiveDataCallback(buffer);
 
     if (error)
     {
@@ -166,20 +163,19 @@ void DBus::Transport::handle_write_output(std::shared_ptr<std::string> buf_writt
     }
 }
 
-void DBus::Transport::setOctetHandler(const ReceiveOctetCallbackFunction& callback)
+void DBus::Transport::setDataHandler(const ReceiveDataCallbackFunction& callback)
 {
     boost::recursive_mutex::scoped_lock guard(m_CallbackMutex);
-    m_ReceiveOctetCallback = callback;
+    m_ReceiveDataCallback = callback;
 }
 
-void DBus::Transport::onReceiveOctet(uint8_t c)
+void DBus::Transport::onReceiveData(OctetBuffer&)
 {
     // NOP - This stub gives our initial callback somewhere to go
 
     // This could happen if the thread reads data before native.cpp updates the callback.
-    DBus::Log::write(DBus::Log::WARNING, "DBus :: Transport : onReceiveAuthOctet is processing data, whereas it should really have been directed elsewhere via "
-                                         "setOctetHandler. (data = %c %d)\n",
-        c, c);
+    DBus::Log::write(DBus::Log::WARNING, "DBus :: Transport : onReceiveData is processing data, whereas it should really have been directed elsewhere via "
+                                         "setDataHandler\n");
 }
 
 std::string DBus::Transport::getStats() const

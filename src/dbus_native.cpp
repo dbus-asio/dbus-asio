@@ -39,7 +39,7 @@ DBus::Native::Native(const std::string& busname)
     , m_Transport(new DBus::Transport(busname))
     , m_AuthenticationProtocol(new DBus::AuthenticationProtocol(m_Transport))
 {
-    m_Transport->setOctetHandler(std::bind(&Native::onReceiveAuthOctet, this, std::placeholders::_1));
+    m_Transport->setDataHandler(std::bind(&Native::onReceiveAuthData, this, std::placeholders::_1));
     m_MessageProtocol->setMethodCallHandler(std::bind(&Native::onReceiveMethodCall, this, std::placeholders::_1));
     m_MessageProtocol->setMethodReturnHandler(std::bind(&Native::onReceiveMethodReturn, this, std::placeholders::_1));
     m_MessageProtocol->setErrorHandler(std::bind(&Native::onReceiveError, this, std::placeholders::_1));
@@ -47,7 +47,7 @@ DBus::Native::Native(const std::string& busname)
 }
 
 DBus::Native::~Native() {
-    m_Transport->setOctetHandler([](uint8_t c){});
+    m_Transport->setDataHandler([](DBus::OctetBuffer&){});
     m_MessageProtocol->setMethodCallHandler([](const DBus::Message::MethodCall& method){});
     m_MessageProtocol->setMethodReturnHandler([](const DBus::Message::MethodReturn& method){});
     m_MessageProtocol->setErrorHandler([](const DBus::Message::Error& method){});
@@ -56,12 +56,14 @@ DBus::Native::~Native() {
 
 void DBus::Native::BeginAuth(AuthenticationProtocol::AuthRequired type) { m_AuthenticationProtocol->sendAuth(type); }
 
-void DBus::Native::onReceiveAuthOctet(uint8_t c)
+void DBus::Native::onReceiveAuthData(OctetBuffer& buffer)
 {
     try {
-        ++m_Stats.bytes_auth;
-        if (m_AuthenticationProtocol->onReceiveOctet(c)) {
-            m_Transport->setOctetHandler(std::bind(&Native::onReceiveMessageOctet, this, std::placeholders::_1));
+        const size_t bufferSize = buffer.size();
+        if (m_AuthenticationProtocol->onReceiveData(buffer)) {
+            m_Stats.bytes_auth = bufferSize - buffer.size();
+            onReceiveMessageData(buffer);
+            m_Transport->setDataHandler(std::bind(&Native::onReceiveMessageData, this, std::placeholders::_1));
         }
     } catch (const std::exception& e) {
         DBus::Log::write(DBus::Log::ERROR, "DBus :: Native : onReceiveAuthOctet has thrown an exception : %s\n", e.what());
@@ -69,14 +71,14 @@ void DBus::Native::onReceiveAuthOctet(uint8_t c)
     }
 }
 
-void DBus::Native::onReceiveMessageOctet(uint8_t c)
+void DBus::Native::onReceiveMessageData(OctetBuffer& buffer)
 {
     try {
         // AFAIK, we can ever leave the message protocol, once auth'd, so the return value
         // can be safely ignored.
         // (To exit the communication we just close the socket.)
-        ++m_Stats.bytes_message;
-        (void)m_MessageProtocol->onReceiveOctet(c);
+        m_Stats.bytes_message+= buffer.size();
+        m_MessageProtocol->onReceiveData(buffer);
     } catch (const std::exception& e) {
         DBus::Log::write(DBus::Log::ERROR, "DBus :: Native : onReceiveMessageOctet has thrown an exception : %s\n", e.what());
         m_MessageProtocol->reset();

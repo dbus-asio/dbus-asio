@@ -35,6 +35,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 
 const std::string DBus::Type::Variant::s_StaticTypeCode("v");
 
@@ -81,25 +82,12 @@ void DBus::Type::Variant::marshall(MessageOStream& stream) const
     DBus::Type::marshallData(m_Value, stream);
 }
 
-bool DBus::Type::Variant::unmarshall(const UnmarshallingData& data)
+void DBus::Type::Variant::unmarshall(MessageIStream& stream)
 {
-
-    // A variant consists of
-    // 1. A signature indicating the type of data type it contains
-    // 2. The data type itself
-
-    if (m_Unmarshalling.isReadingSignature) {
-        if (m_Unmarshalling.signature.unmarshall(data)) {
-            m_Value = DBus::Type::create(m_Unmarshalling.signature.getValue(), isLittleEndian());
-            setSignature(m_Unmarshalling.signature.getValue());
-            //
-            m_Unmarshalling.isReadingSignature = false;
-        }
-        return false;
-    }
-    // else we're reading the data
-
-    return DBus::Type::unmarshallData(m_Value, data);
+    Type::Signature signature;
+    signature.unmarshall(stream);
+    m_Value = DBus::Type::create(signature.getValue(), isLittleEndian());
+    DBus::Type::unmarshallData(m_Value, stream);
 }
 
 std::string DBus::Type::Variant::toString(const std::string& prefix) const

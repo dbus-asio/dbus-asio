@@ -27,6 +27,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Byte::s_StaticTypeCode("y");
@@ -47,10 +48,9 @@ DBus::Type::Byte::Byte(const Byte& b) { m_Value = b.m_Value; }
 
 void DBus::Type::Byte::marshall(MessageOStream& stream) const { stream.writeByte(m_Value); }
 
-bool DBus::Type::Byte::unmarshall(const UnmarshallingData& data)
+void DBus::Type::Byte::unmarshall(MessageIStream& data)
 {
-    m_Value = data.c;
-    return true;
+    m_Value = data.read();
 }
 
 std::string DBus::Type::Byte::toString(const std::string& prefix) const

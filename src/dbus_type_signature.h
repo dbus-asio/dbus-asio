@@ -21,8 +21,8 @@
 #include "dbus_type.h"
 
 namespace DBus {
-class UnmarshallingData;
 class MessageOStream;
+class MessageIStream;
 
 namespace Type {
 
@@ -32,7 +32,7 @@ namespace Type {
         Signature(const std::string& v);
 
         void marshall(MessageOStream& stream) const;
-        bool unmarshall(const UnmarshallingData& data);
+        void unmarshall(MessageIStream& stream);
 
         std::string toString(const std::string& prefix = "") const;
         std::string asString() const;
@@ -42,16 +42,6 @@ namespace Type {
 
     protected:
         std::string m_Value;
-
-        struct Unmarshalling {
-            Unmarshalling()
-                : count(0)
-            {
-            }
-
-            size_t count;
-            size_t signature_size;
-        } m_Unmarshalling;
     };
 }
 }

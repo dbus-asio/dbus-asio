@@ -20,19 +20,11 @@
 
 #include "dbus_type_struct.h"
 #include "dbus_message.h"
+#include "dbus_transport.h"
 
 namespace DBus {
 
-class UnmarshallingData {
-public:
-    uint8_t c;
-    size_t offset;
 
-    UnmarshallingData()
-        : offset(0)
-    {
-    }
-};
 
 class MessageProtocol {
 public:
@@ -44,11 +36,14 @@ public:
     void setErrorHandler(const Message::CallbackFunctionError& callback);
     void setSignalHandler(const Message::CallbackFunctionSignal& callback);
 
-    bool onReceiveOctet(uint8_t c);
-    void onBodyComplete();
+    void onReceiveData(OctetBuffer& buffer);
+    void onBodyComplete(const std::string& body);
 
 private:
     enum {
+        STATE_BUFFERINGHEADERSIZE,
+        STATE_BUFFERINGHEADER,
+        STATE_BUFFERINGHEADERARRAY,
         STATE_ENDIAN,
         STATE_HEADER,
         STATE_HEADER_PADDING,
@@ -63,13 +58,13 @@ private:
     };
 
     size_t m_State;
+    size_t m_bufferSize;
     // TODO:?? Move the handler into a separate message class? We can't get 2 interspersed message so it's a
     // 1:1 relationship between protocol handler and its message, but it might be useful elsewhere.
     DBus::Type::Struct m_HeaderStruct;
+    std::basic_string<uint8_t> m_header;
+    std::basic_string<uint8_t> m_octetCache;
 
-    UnmarshallingData m_UnmarshallingData;
-    std::string m_RawStream;
-    std::string m_BodyStream;
     //
     Message::CallbackFunctionMethodCall m_MethodCallCallback;
     Message::CallbackFunctionMethodReturn m_MethodReturnCallback;
@@ -77,6 +72,8 @@ private:
     Message::CallbackFunctionSignal m_SignalCallback;
 
     void startMessage();
+    void processData(OctetBuffer& buffer);
+
 
     void onReceiveMethodCall(const DBus::Message::MethodCall& result) {}
     void onReceiveMethodReturn(const DBus::Message::MethodReturn& result) {}

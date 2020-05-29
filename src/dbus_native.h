@@ -28,8 +28,8 @@ public:
     ~Native();
 
     void BeginAuth(AuthenticationProtocol::AuthRequired type);
-    void onReceiveAuthOctet(uint8_t c);
-    void onReceiveMessageOctet(uint8_t c);
+    void onReceiveAuthData(OctetBuffer& buffer);
+    void onReceiveMessageData(OctetBuffer& buffer);
 
     void registerMethodCallHandler(const std::string& name, const Message::CallbackFunctionMethodCall& handler);
     // registerSignalHandler checks only for matching interfaces, and is a convenience method.

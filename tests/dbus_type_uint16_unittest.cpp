@@ -5,19 +5,18 @@
 
 namespace DBus { namespace test {
 
-TEST_CASE("Unmarshall uint16 little endian")
+TEST_CASE("Unmarshall uint16 little endian from MessageIStream")
 {
     Type::Uint16 dbusType;
     const uint16_t value = 12345;
-    TestUnmarshall<uint16_t, Type::Uint16>(__LITTLE_ENDIAN, value, dbusType);
+    TestUnmarshallFromMessageIStream<uint16_t, Type::Uint16>(__LITTLE_ENDIAN, value, dbusType);
 }
 
-TEST_CASE("Unmarshall uint16 big endian")
+TEST_CASE("Unmarshall uint16 big endian from MessageIStream")
 {
     Type::Uint16 dbusType;
-    dbusType.setLittleEndian(false);
     const uint16_t value = 45678;
-    TestUnmarshall<uint16_t, Type::Uint16>(__BIG_ENDIAN, value, dbusType);
+    TestUnmarshallFromMessageIStream<uint16_t, Type::Uint16>(__BIG_ENDIAN, value, dbusType);
 }
 
 TEST_CASE("Marshall and unmarshall uint16")
@@ -27,7 +26,8 @@ TEST_CASE("Marshall and unmarshall uint16")
     stream.writeInt16(value);
 
     Type::Uint16 dbusType;
-    TestUnmarshallFromStream<uint16_t, Type::Uint16>(value, dbusType, stream);
+    MessageIStream istream((uint8_t*)stream.data.data(), stream.data.size(), false);
+    TestUnmarshallFromMessageIStream<uint16_t, Type::Uint16>(value, dbusType, istream);
 }
 
 }} // namespace DBus::test

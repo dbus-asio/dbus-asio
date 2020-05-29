@@ -27,9 +27,15 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
+#include "dbus_transport.h"
+
+#include <byteswap.h>
 
 DBus::MessageProtocol::MessageProtocol()
 {
+    m_State = STATE_BUFFERINGHEADERSIZE;
+
     setMethodCallHandler(std::bind(&MessageProtocol::onReceiveMethodCall, this, std::placeholders::_1));
     setMethodReturnHandler(std::bind(&MessageProtocol::onReceiveMethodReturn, this, std::placeholders::_1));
     setErrorHandler(std::bind(&MessageProtocol::onReceiveError, this, std::placeholders::_1));
@@ -50,114 +56,97 @@ void DBus::MessageProtocol::setSignalHandler(const DBus::Message::CallbackFuncti
 
 void DBus::MessageProtocol::startMessage()
 {
-    m_State = STATE_ENDIAN;
+    m_State = STATE_BUFFERINGHEADERSIZE;
 
     m_HeaderStruct.clear();
     m_HeaderStruct.setSignature("(yyyyuua(yv))");
 
-    m_RawStream = "";
-    m_BodyStream = "";
-    m_UnmarshallingData.offset = 0;
+    //m_BodyStream.clear();
+    m_bufferSize = 0;
 }
 
-bool DBus::MessageProtocol::onReceiveOctet(uint8_t c)
+void DBus::MessageProtocol::processData(OctetBuffer& buffer)
 {
-
-    m_RawStream += c;
-    m_UnmarshallingData.c = c;
-
-    switch (m_State) {
-    case STATE_ENDIAN:
-        if (c == 'l' || c == 'B') { // ignore invalid endian types
-            Log::write(Log::TRACE, "DBus :: Unmarshall : Endian set to %s\n", c == 'l' ? "LITTLE" : "BIG");
-            m_HeaderStruct.unmarshall(m_UnmarshallingData);
-            m_HeaderStruct.setLittleEndian(c == 'l' ? true : false);
-            m_State = STATE_HEADER;
-        } else {
-            Log::write(Log::WARNING, "DBus :: Unmarshall : Spurious endian byte received (%.2x)\n", c);
-        }
-        break;
-
-    case STATE_HEADER:
-        if (m_HeaderStruct.unmarshall(m_UnmarshallingData)) {
-            uint32_t size = Type::asUint32(m_HeaderStruct[4]);
-
-            Log::write(Log::TRACE, "DBus :: Unmarshall : Header complete for message type %d. Size of body: %d\n", Type::asByte(m_HeaderStruct[1]), size);
-
-            // The current stream is already correctly aligned to move onto the body
-            // (if there is one.)
-            // So either complete the body immediately, if it doesn't exist, or skip directly
-            // to the body parser if not. Jumping into the padding processor (STATE_HEADER_PADDING)
-            // will cause onReceiveOctet to read spurious octets, pushing everything out of sync.
-            if (Utils::isAlignedTo8(m_RawStream.size())) {
-                if (size == 0) {
-                    Log::write(Log::TRACE, "DBus :: Unmarshall : Body size is 0 (and raw stream of %d is neatly padded) so message is already complete.\n",
-                        m_RawStream.size());
-                    onBodyComplete();
-                    return true;
-                }
-                m_State = STATE_BODY;
-            } else {
-                m_State = STATE_HEADER_PADDING;
+    while (buffer.size()) {
+        if (m_State == STATE_BUFFERINGHEADERSIZE) {
+            if (buffer.size() < 16) {
+                return;
             }
-        }
-        break;
 
-    case STATE_HEADER_PADDING:
-        if (Utils::isAlignedTo8(m_RawStream.size())) {
-            uint32_t size = Type::asUint32(m_HeaderStruct[4]);
-            Log::write(Log::TRACE, "DBus :: Unmarshall : Starting to read the body (of size %d  0x%.8x)\n", size, size);
+            m_bufferSize = *(uint32_t*)(buffer.data() + 12);
+            if ((buffer[0] == 'l' && __BYTE_ORDER != __LITTLE_ENDIAN) ||
+                (buffer[0] == 'B' && __BYTE_ORDER != __BIG_ENDIAN)) {
+                m_bufferSize = bswap_32(m_bufferSize);
+            }
+            m_bufferSize+= 16; // Header bytes
+            m_bufferSize+= (m_bufferSize % 8 == 0) ? 0 : 8 - (m_bufferSize % 8);
+            m_State = STATE_BUFFERINGHEADER;
+        }
+
+
+        if (m_State == STATE_BUFFERINGHEADER) {
+            if (buffer.size() < m_bufferSize) {
+                return;
+            }
+
+            MessageIStream istream((uint8_t*)buffer.data(), m_bufferSize,
+                (buffer[0] == 'l' && __BYTE_ORDER != __LITTLE_ENDIAN) ||
+                (buffer[0] == 'B' && __BYTE_ORDER != __BIG_ENDIAN));
+            m_HeaderStruct.setLittleEndian(buffer[0] == 'l'  ? true : false);
+            m_HeaderStruct.unmarshall(istream);
+            buffer.remove_prefix(m_bufferSize);
+            m_bufferSize = Type::asUint32(m_HeaderStruct[4]);
             m_State = STATE_BODY;
-            if (size == 0) {
-                Log::write(Log::TRACE, "DBus :: Unmarshall : Body size is 0, so message complete.\n");
-                onBodyComplete();
-                return true;
+        }
+
+        if (m_State == STATE_BODY) {
+            if (buffer.size() < m_bufferSize) {
+                return;
             }
-        } else {
-            Log::write(Log::TRACE, "DBus :: Unmarshall : Skipping padding byte (of size %d  0x%.2x)\n", m_RawStream.size(), c);
+
+            std::string body((const char*)buffer.data(), m_bufferSize);
+            buffer.remove_prefix(m_bufferSize);
+            onBodyComplete(body);
         }
-        break;
+    }
+}
 
-    case STATE_BODY:
-        uint32_t size = Type::asUint32(m_HeaderStruct[4]);
-
-        m_BodyStream += c;
-
-        if (m_BodyStream.size() >= size) {
-            Log::write(Log::TRACE, "DBus :: Unmarshall : All %d bytes of body now read.\n", size);
-            onBodyComplete();
-            return true;
-        }
-        break;
+void DBus::MessageProtocol::onReceiveData(OctetBuffer& buffer)
+{
+    if (m_octetCache.empty()) {
+        processData(buffer);
     }
 
-    ++m_UnmarshallingData.offset;
+    m_octetCache.append(buffer.data(), buffer.size());
+    buffer.remove_prefix(buffer.size());
 
-    return false;
+    if (!m_octetCache.empty()) {
+        OctetBuffer cachedBuffer(m_octetCache.data(), m_octetCache.size());
+        processData(cachedBuffer);
+        m_octetCache.erase(0,  m_octetCache.size() - cachedBuffer.size());
+    }
 }
 
-void DBus::MessageProtocol::onBodyComplete()
+void DBus::MessageProtocol::onBodyComplete(const std::string& body)
 {
     Log::write(Log::TRACE, "DBus :: Unmarshall : Body complete.\n");
-    Log::writeHex(Log::TRACE, "DBus :: Header data :", m_RawStream);
-    Log::writeHex(Log::TRACE, "DBus :: Body data :", m_BodyStream);
 
     uint8_t type = Type::asByte(m_HeaderStruct[1]);
     switch (type) {
     case TYPE_METHOD:
-        m_MethodCallCallback(Message::MethodCall(m_HeaderStruct, m_BodyStream));
+        m_MethodCallCallback(Message::MethodCall(m_HeaderStruct, body));
         break;
 
     case TYPE_METHOD_RETURN:
-        m_MethodReturnCallback(Message::MethodReturn(m_HeaderStruct, m_BodyStream));
+        m_MethodReturnCallback(Message::MethodReturn(m_HeaderStruct, body));
         break;
 
     case TYPE_ERROR:
-        m_ErrorCallback(Message::Error(m_HeaderStruct, m_BodyStream));
+        m_ErrorCallback(Message::Error(m_HeaderStruct, body));
         break;
 
     case TYPE_SIGNAL:
-        m_SignalCallback(Message::Signal(m_HeaderStruct, m_BodyStream));
+        m_SignalCallback(Message::Signal(m_HeaderStruct, body));
         break;
 
     default:

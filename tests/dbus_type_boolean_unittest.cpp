@@ -5,22 +5,22 @@
 
 namespace DBus { namespace test {
 
-TEST_CASE("Unmarshall boolean little endian")
+TEST_CASE("Unmarshall boolean little endian from MessageIStream")
 {
     Type::Boolean True;
-    TestUnmarshall<uint32_t, Type::Boolean>(__LITTLE_ENDIAN, 1, True);
+    TestUnmarshallFromMessageIStream<uint32_t, Type::Boolean>(__LITTLE_ENDIAN, 1, True);
 
     Type::Boolean False;
-    TestUnmarshall<uint32_t, Type::Boolean>(__LITTLE_ENDIAN, 0, False);
+    TestUnmarshallFromMessageIStream<uint32_t, Type::Boolean>(__LITTLE_ENDIAN, 0, False);
 }
 
-TEST_CASE("Unmarshall boolean big endian")
+TEST_CASE("Unmarshall boolean big endian from MessageIStream")
 {
     Type::Boolean True;
-    TestUnmarshall<uint32_t, Type::Boolean>(__BIG_ENDIAN, 1, True);
+    TestUnmarshallFromMessageIStream<uint32_t, Type::Boolean>(__BIG_ENDIAN, 1, True);
 
     Type::Boolean False;
-    TestUnmarshall<uint32_t, Type::Boolean>(__BIG_ENDIAN, 0, False);
+    TestUnmarshallFromMessageIStream<uint32_t, Type::Boolean>(__BIG_ENDIAN, 0, False);
 }
 
 TEST_CASE("Marshall and unmarshall boolean")
@@ -29,7 +29,8 @@ TEST_CASE("Marshall and unmarshall boolean")
     stream.writeInt32(true);
 
     Type::Boolean boolean;
-    TestUnmarshallFromStream<uint32_t, Type::Boolean>(1, boolean, stream);
+    MessageIStream istream((uint8_t*)stream.data.data(), stream.data.size(), false);
+    TestUnmarshallFromMessageIStream<uint32_t, Type::Boolean>(1, boolean, istream);
 }
 
 }} // namespace DBus::test

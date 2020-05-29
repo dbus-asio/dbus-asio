@@ -26,6 +26,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::String::s_StaticTypeCode("s");
@@ -46,32 +47,12 @@ void DBus::Type::String::marshall(MessageOStream& stream) const
     stream.writeString(m_Value);
 }
 
-bool DBus::Type::String::unmarshall(const UnmarshallingData& data)
+void DBus::Type::String::unmarshall(MessageIStream& stream)
 {
-
-    if (m_Unmarshalling.areWeSkippingPadding && !Utils::isAlignedTo(getAlignment(), data.offset)) {
-        return false;
-    }
-    m_Unmarshalling.areWeSkippingPadding = false;
-
-    // Read in 4 bytes describing the strings length
-    if (m_Unmarshalling.count < 4) {
-        *((uint8_t*)&m_Unmarshalling.size + m_Unmarshalling.count) = data.c;
-        if (++m_Unmarshalling.count == 4) {
-            m_Unmarshalling.size = doSwap32(m_Unmarshalling.size);
-        }
-        // Even if the string is 0 bytes in length, we still need to process the data stream to
-        // accept (and throw away) the nul terminator.
-        // (This case was unclear to me in the spec.)
-        return false;
-    }
-
-    // This adds each cahracter to the string, excluding the NUL terminator
-    if (data.c) {
-        m_Value += data.c;
-    }
-
-    return ++m_Unmarshalling.count == m_Unmarshalling.size + 4 + 1;
+    uint32_t size;
+    stream.read<uint32_t>(&size);
+    stream.read(m_Value, size);
+    stream.read(); // null byte
 }
 
 std::string DBus::Type::String::toString(const std::string& prefix) const

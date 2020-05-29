@@ -28,6 +28,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_validation.h"
 
 /*
@@ -76,34 +77,16 @@ void DBus::Type::DictEntry::marshall(MessageOStream& stream) const
     DBus::Type::marshallData(m_Value.second, stream);
 }
 
-bool DBus::Type::DictEntry::unmarshall(const UnmarshallingData& data)
+void DBus::Type::DictEntry::unmarshall(MessageIStream& stream)
 {
+    stream.align(8);
 
-    if (m_Unmarshalling.areWeSkippingPadding && !Utils::isAlignedTo(getAlignment(), data.offset)) {
-        return false;
-    }
-
-    m_Unmarshalling.areWeSkippingPadding = false;
-    if (m_Unmarshalling.count == 0) {
-        const char key_type = getSignature()[1];
-        DBus::Validation::throwOnInvalidBasicType(key_type);
-        m_Value.first = Type::create(std::string(1, key_type), isLittleEndian());
-    }
-
-    if (m_Unmarshalling.onKeyType) {
-        if (Type::unmarshallData(m_Value.first, data)) {
-            m_Value.second = Type::create(std::string(1, getSignature()[2]), isLittleEndian());
-            m_Unmarshalling.onKeyType = false;
-        }
-    } else { // on value type
-        if (Type::unmarshallData(m_Value.second, data)) {
-            return true;
-        }
-    }
-
-    ++m_Unmarshalling.count;
-
-    return false;
+    const char key_type = getSignature()[1];
+    DBus::Validation::throwOnInvalidBasicType(key_type);
+    m_Value.first = Type::create(std::string(1, key_type), isLittleEndian());
+    m_Value.second = Type::create(DBus::Type::extractSignature(getSignature(), 2), isLittleEndian());
+    DBus::Type::unmarshallData(m_Value.first, stream);
+    DBus::Type::unmarshallData(m_Value.second, stream);
 }
 
 std::string DBus::Type::DictEntry::toString(const std::string& prefix) const

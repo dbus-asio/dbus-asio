@@ -36,13 +36,12 @@ AGREE   ---->
 
 DBus::AuthenticationProtocol::AuthenticationProtocol(std::shared_ptr<Transport>& transport)
     : m_Transport(transport)
-    , m_LastOctetSeen(0)
 {
 }
 
 void DBus::AuthenticationProtocol::reset()
 {
-    m_LastOctetSeen = 0;
+    m_data.clear();
     sendAuth(m_AuthType);
 }
 
@@ -62,29 +61,31 @@ void DBus::AuthenticationProtocol::sendAuth(DBus::AuthenticationProtocol::AuthRe
     sendWire(auth);
 }
 
-bool DBus::AuthenticationProtocol::onReceiveOctet(uint8_t c)
+bool DBus::AuthenticationProtocol::processData()
 {
-    // rt indicates whether we have complete authentication, and can switch mode into
-    // message handling. I don't like this ATM, since the switch is governed by the
-    // sendBegin message, not the receiving of the incoming command. They are 100%
-    // equivalent (i.e. receiving AGREE_UNIX_FD is the same as sending BEGIN) but it
-    // feels icky.
-    bool rt = false;
+    const size_t pos = m_data.find("\r\n");
+    if (pos != std::string::npos ) {
+        std::string command(m_data.data(), pos + 2);
+        return onCommand(command);
+        m_data = m_data.substr(pos + 2);
+    };
 
-    m_CurrentCommand += c;
+    return false;
+}
 
-    if (m_LastOctetSeen == '\r' && c == '\n') {
-        Log::write(Log::TRACE, "DBus :: RCVD: %s", m_CurrentCommand.c_str());
+bool DBus::AuthenticationProtocol::onReceiveData(DBus::OctetBuffer& buffer)
+{
+    bool authenticated = false;
 
-        // Pass a temporary version of the string, in case we receive a second call to
-        // onReceiveOctet before onCommand returns.
-        std::string tmp_command(m_CurrentCommand);
-        m_CurrentCommand = "";
-        rt = onCommand(tmp_command);
-    }
+    while (buffer.size() && !authenticated) {
+        size_t pos = buffer.find('\n');
+        pos = pos == std::string::npos ?  buffer.size() : pos + 1;
+        m_data.append((const char*)buffer.data(), pos);
+        buffer.remove_prefix(pos);
+        authenticated = processData();
+    };
 
-    m_LastOctetSeen = c;
-    return rt;
+    return authenticated;
 }
 
 //

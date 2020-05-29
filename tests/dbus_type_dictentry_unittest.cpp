@@ -3,26 +3,20 @@
 #include "dbus_type_uint32.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include <byteswap.h>
 #include <iomanip>
 
 namespace DBus { namespace test {
 
-void TestUnmarshall(unsigned byteOrder, const std::string& stream, uint32_t key, uint32_t value)
+void TestUnmarshallFromMessageIStream(unsigned byteOrder, const std::string& stream, uint32_t key, uint32_t value)
 {
     Type::DictEntry dictEntry;
     dictEntry.setSignature("{uu}");
     dictEntry.setLittleEndian(byteOrder == __LITTLE_ENDIAN);
-    UnmarshallingData data;
-    for (auto i = 0; i < stream.size(); ++i) {
-        data.c = stream[i];
-        if (i != stream.size() - 1 ) {
-            REQUIRE(!dictEntry.unmarshall(data));
-        } else {
-            REQUIRE(dictEntry.unmarshall(data));
-        }
-        ++data.offset;
-    }
+    MessageIStream istream((uint8_t*)stream.data(), stream.size(), byteOrder != __LITTLE_ENDIAN);
+    dictEntry.unmarshall(istream);
+
     std::stringstream ss;
     ss << "DictEntry ({uu}) : {" << std::endl;
     ss << "   key:      Uint32 " << key << " (0x";
@@ -36,7 +30,7 @@ void TestUnmarshall(unsigned byteOrder, const std::string& stream, uint32_t key,
     REQUIRE(dictEntry.toString() == ss.str());
 }
 
-void TestUnmarshall(unsigned byteOrder, uint32_t key, uint32_t value)
+void TestUnmarshallFromMessageIStream(unsigned byteOrder, uint32_t key, uint32_t value)
 {
     std::string data;
 
@@ -45,17 +39,17 @@ void TestUnmarshall(unsigned byteOrder, uint32_t key, uint32_t value)
     data.append((char*)&writeKey, sizeof(uint32_t));
     data.append((char*)&writeValue, sizeof(uint32_t));
 
-    TestUnmarshall(byteOrder, data, key, value);
+    TestUnmarshallFromMessageIStream(byteOrder, data, key, value);
 }
 
-TEST_CASE("Unmarshall dictionary entry little endian")
+TEST_CASE("Unmarshall dictionary entry little endian from MessageIStream")
 {
-    TestUnmarshall(__LITTLE_ENDIAN, 12345, 864);
+    TestUnmarshallFromMessageIStream(__LITTLE_ENDIAN, 12345, 864);
 }
 
-TEST_CASE("Unmarshall dictionary entry big endian")
+TEST_CASE("Unmarshall dictionary entry big endian from MessageIStream")
 {
-    TestUnmarshall(__BIG_ENDIAN, 1, 2);
+    TestUnmarshallFromMessageIStream(__BIG_ENDIAN, 1, 2);
 }
 
 TEST_CASE("Marshall and unmarshall dictionary entry")
@@ -66,7 +60,7 @@ TEST_CASE("Marshall and unmarshall dictionary entry")
 
     MessageOStream stream;
     dictEntry.marshall(stream);
-    TestUnmarshall(__LITTLE_ENDIAN, stream.data, 42, 24);
+    TestUnmarshallFromMessageIStream(__LITTLE_ENDIAN, stream.data, 42, 24);
 }
 
 }} // namespace DBus::test

@@ -27,6 +27,7 @@
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
+#include "dbus_messageistream.h"
 #include "dbus_type_struct.h"
 
 const std::string DBus::Type::Uint32::s_StaticTypeCode("u");
@@ -45,19 +46,9 @@ DBus::Type::Uint32::Uint32(uint32_t v)
 
 void DBus::Type::Uint32::marshall(MessageOStream& stream) const { stream.writeUint32(m_Value); }
 
-bool DBus::Type::Uint32::unmarshall(const UnmarshallingData& data)
+void DBus::Type::Uint32::unmarshall(MessageIStream& stream)
 {
-    if (m_Unmarshalling.areWeSkippingPadding && !Utils::isAlignedTo(getAlignment(), data.offset)) {
-        return false;
-    }
-    m_Unmarshalling.areWeSkippingPadding = false;
-
-    *((uint8_t*)&m_Value + m_Unmarshalling.count) = data.c;
-    if (++m_Unmarshalling.count == 4) {
-        m_Value = doSwap32(m_Value);
-        return true;
-    }
-    return false;
+    stream.read<uint32_t>(&m_Value);
 }
 
 std::string DBus::Type::Uint32::toString(const std::string& prefix) const

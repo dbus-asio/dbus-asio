@@ -27,7 +27,7 @@
 
 namespace DBus {
 class MessageOStream;
-class UnmarshallingData;
+class MessageIStream;
 
 namespace Type {
     class Array;
@@ -51,11 +51,7 @@ namespace Type {
     DBus::Type::Generic create(const std::string& type, bool littleEndian);
 
     void marshallData(const DBus::Type::Generic& any, MessageOStream& stream);
-
-    bool unmarshallData(DBus::Type::Generic& result, const UnmarshallingData& data);
-    Type::Generic unmarshallString(const std::string& data);
-
-    void unmarshallToStruct(DBus::Type::Struct& dest, const std::string& data);
+    void unmarshallData(DBus::Type::Generic& result, MessageIStream& stream);
 
     std::string toString(const DBus::Type::Generic& data, const std::string& prefix = "");
 

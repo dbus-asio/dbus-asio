@@ -21,8 +21,8 @@
 #include "dbus_type_signature.h"
 
 namespace DBus {
-class UnmarshallingData;
 class MessageOStream;
+class MessageIStream;
 
 namespace Type {
     class ObjectPath;
@@ -40,26 +40,16 @@ namespace Type {
 
         size_t getAlignment() const { return 8; }
         void marshall(MessageOStream& stream) const;
-        bool unmarshall(const UnmarshallingData& data);
+        void unmarshall(MessageIStream& stream);
 
         std::string toString(const std::string& prefix = "") const;
         std::string asString() const;
-        const DBus::Type::Generic& getValue() const; // please use sparingly - this is provided as a courtesy to the Message::getHeaderField method
+        const DBus::Type::Generic& getValue() const;
 
         static const std::string s_StaticTypeCode;
 
     private:
         DBus::Type::Generic m_Value;
-
-        struct Unmarshalling {
-            Unmarshalling()
-                : isReadingSignature(true)
-            {
-            }
-
-            bool isReadingSignature;
-            DBus::Type::Signature signature;
-        } m_Unmarshalling;
     };
 }
 }
