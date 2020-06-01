@@ -23,7 +23,6 @@ void testServer()
     DBus::Log::setLevel(DBus::Log::WARNING);
 
     DBus::Native native(DBus::Platform::getSessionBus());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     native.BeginAuth(DBus::AuthenticationProtocol::AUTH_BASIC);
 
@@ -89,7 +88,6 @@ void testServer()
             std::cout << "ERROR FROM callRequestName : " << msg.getMessage() << std::endl;
         });
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
     bool bRunLoop = true;
 
     // Now do a mini-self test
@@ -112,7 +110,7 @@ void testServer()
 
     // Spin!
     while (bRunLoop) {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
         if (gInterrupted) {
             break;
         }

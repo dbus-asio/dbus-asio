@@ -19,7 +19,6 @@ bool testClient(const std::string& stubname, size_t iterations)
     DBus::Log::setLevel(DBus::Log::INFO);
 
     DBus::Native native(DBus::Platform::getSessionBus());
-    std::this_thread::sleep_for(std::chrono::seconds(1));
 
     native.BeginAuth(DBus::AuthenticationProtocol::AUTH_BASIC);
 
@@ -29,8 +28,6 @@ bool testClient(const std::string& stubname, size_t iterations)
             return -1;
         });
 
-    std::this_thread::sleep_for(std::chrono::seconds(1));
-
     milliseconds ms_start = duration_cast<milliseconds>(
         system_clock::now().time_since_epoch());
 
@@ -38,7 +35,6 @@ bool testClient(const std::string& stubname, size_t iterations)
     size_t correct = 0;
     size_t errors = 0;
     size_t sent = 0;
-    milliseconds message_sleep = std::chrono::milliseconds(18);
     for (; sent < iterations; ++sent) {
         std::string expected(stubname);
         std::string number(std::to_string(sent));
@@ -67,7 +63,7 @@ bool testClient(const std::string& stubname, size_t iterations)
         // If we have a short delay (e.g. 1ms) between messages, everything is happy for 10-10-100
         // If this is 10ms, then the timeouts below happen a lot more frequently.
         // ATM, I can't tell if this is coincidence, or intentional.
-        std::this_thread::sleep_for(message_sleep);
+        //std::this_thread::sleep_for(message_sleep);
     }
 
     // We don't get a callback upon timeout. We use a separate loop to check for that
@@ -79,7 +75,7 @@ bool testClient(const std::string& stubname, size_t iterations)
     milliseconds ms_end;
 
     do {
-        std::this_thread::sleep_for(std::chrono::seconds(1));
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
 
         ms_end = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
@@ -102,7 +98,6 @@ bool testClient(const std::string& stubname, size_t iterations)
 
     std::cout << "  Parameters: " << std::endl;
     std::cout << "    Timeout: " << std::to_string(timeout.count()).c_str() << "ms" << std::endl;
-    std::cout << "    Message sleep: " << std::to_string(message_sleep.count()) << "ms" << std::endl;
     std::cout << "    Iterations: " << iterations;
     std::cout << std::endl;
 
