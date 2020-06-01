@@ -44,7 +44,7 @@ DBus::Message::MethodReturn::MethodReturn(const DBus::Type::Struct& header, cons
 
     m_Header.flags = 0;
     m_Header.type = Message::Header::TYPE_METHOD_RETURN;
-    m_SerialReplyingTo = DBus::Type::asUint32(m_Header.field[DBus::Message::Header::HEADER_REPLY_SERIAL]);
+    m_SerialReplyingTo = getReplySerial();
 
     Log::write(Log::TRACE, "DBus :: Received a method return with serial #%d\n", m_SerialReplyingTo);
 }

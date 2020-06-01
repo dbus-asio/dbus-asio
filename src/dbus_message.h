@@ -108,17 +108,14 @@ namespace Message {
         uint8_t flags;
         uint8_t type;
         uint32_t serial;
+        uint32_t replySerial;
 
         std::string path;
         std::string interface;
         std::string member;
         std::string destination;
         std::string sender;
-        //
-        DBus::Type::Generic field[HEADER_FIELD_COUNT];
     };
-
-    Type::Generic getHeaderField(const DBus::Type::Struct& header, size_t type);
 
     class Base {
     public:
@@ -128,6 +125,11 @@ namespace Message {
         uint32_t getSerial() const
         {
             return m_Header.serial;
+        }
+
+        uint32_t getReplySerial() const
+        {
+            return m_Header.replySerial;
         }
 
         std::string getHeaderPath() const
@@ -155,10 +157,7 @@ namespace Message {
             return m_Header.destination;
         }
 
-        Type::Generic getHeaderField(size_t type) const
-        {
-            return m_Header.field[type];
-        }
+
 
         const Type::Generic& getParameter(size_t idx) const
         {
@@ -185,7 +184,7 @@ namespace Message {
         static uint32_t m_SerialCounter;
         static boost::recursive_mutex m_SerialCounterMutex;
 
-        void parseParameters(bool isLittleEndian, const std::string& bodydata);
+        void parseParameters(bool isLittleEndian, const std::string& bodydata, const std::string& signature);
     };
 
     class MethodCall : public Message::Base {
