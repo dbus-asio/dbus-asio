@@ -49,28 +49,47 @@ DBus::Message::Base::Base(const DBus::Type::Struct& header, const std::string& b
     m_Header.flags = Type::asByte(header[2]);
     m_Header.serial = Type::asUint32(header[5]);
 
-    // The fields are opaque types, each one (yv)
-    for (size_t i = 0; i < Message::Header::HEADER_FIELD_COUNT; ++i) {
-        m_Header.field[i] = Message::getHeaderField(header, i);
-    }
+    std::string signature;
+    const DBus::Type::Array& fields = DBus::Type::refArray(header[6]);
+    for (auto it : fields.getContents()) {
+        const DBus::Type::Struct& headerField = DBus::Type::refStruct(it);
+        uint8_t type = Type::asByte(headerField[0]);
+        switch (type) {
+            case Header::HEADER_PATH:
+                m_Header.path = DBus::Type::asString(headerField[1]);
+                break;
+            case Header::HEADER_INTERFACE:
+                m_Header.interface = DBus::Type::asString(headerField[1]);
+                break;
+            case Header::HEADER_MEMBER:
+                m_Header.member = DBus::Type::asString(headerField[1]);
+                break;
+            case Header::HEADER_DESTINATION:
+                 m_Header.destination = DBus::Type::asString(headerField[1]);
+                 break;
+            case Header::HEADER_SENDER:
+                m_Header.sender = DBus::Type::asString(headerField[1]);
+                break;
+            case Header::HEADER_SIGNATURE:
+                signature = DBus::Type::asString(headerField[1]);
+                break;
+            case Header::HEADER_REPLY_SERIAL:
+                m_Header.replySerial = DBus::Type::asUint32(headerField[1]);
+                break;
 
-    // Store a copy of the header fields in type-safe data types
-    m_Header.path = DBus::Type::asString(m_Header.field[Message::Header::HEADER_PATH]);
-    m_Header.interface = DBus::Type::asString(m_Header.field[Message::Header::HEADER_INTERFACE]);
-    m_Header.member = DBus::Type::asString(m_Header.field[Message::Header::HEADER_MEMBER]);
-    m_Header.destination = DBus::Type::asString(m_Header.field[Message::Header::HEADER_DESTINATION]);
-    m_Header.sender = DBus::Type::asString(m_Header.field[Message::Header::HEADER_SENDER]);
+            default:
+                break;
+        }
+    }
 
     // Empty bodies have no parameters
     if (body.size()) {
-        parseParameters(isLittleEndian, body);
+        parseParameters(isLittleEndian, body, signature);
     }
 }
 
-void DBus::Message::Base::parseParameters(bool isLittleEndian, const std::string& bodydata)
+void DBus::Message::Base::parseParameters(bool isLittleEndian, const std::string& bodydata, const std::string& signature)
 {
-    std::string signature(DBus::Type::asString(m_Header.field[Message::Header::HEADER_SIGNATURE]));
-
     DBus::Type::Struct parameter_fields;
 
     parameter_fields.setSignature("(" + signature + ")");
@@ -84,22 +103,6 @@ void DBus::Message::Base::parseParameters(bool isLittleEndian, const std::string
     for (size_t i = 0; i < count; ++i) {
         m_Parameters.add(parameter_fields[i]);
     }
-}
-
-DBus::Type::Generic DBus::Message::getHeaderField(const DBus::Type::Struct& header, size_t type)
-{
-    // Each field is a struct containing one byte and a variant. (yv)
-    const DBus::Type::Array& fields = DBus::Type::refArray(header[6]);
-    for (auto it : fields.getContents()) {
-        const DBus::Type::Struct& headerField = DBus::Type::refStruct(it);
-
-        if (Type::asByte(headerField[0]) == type) {
-            // The variant contains within it a type. This is the one that's of interest.
-            return DBus::Type::refVariant(headerField[1]).getValue();
-        }
-    }
-
-    return DBus::Type::Generic();
 }
 
 std::string DBus::Message::Base::marshallMessage(const DBus::Type::Array& array) const

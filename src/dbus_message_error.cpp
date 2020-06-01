@@ -58,8 +58,7 @@ DBus::Message::Error::Error(const DBus::Type::Struct& header, const std::string&
     dest.unmarshall(stream);
 
     const std::string m_Message = DBus::Type::asString(dest[0]);
-
-    m_SerialReplyingTo = DBus::Type::asUint32(m_Header.field[DBus::Message::Header::HEADER_REPLY_SERIAL]);
+    m_SerialReplyingTo = getReplySerial();
 
     Log::write(Log::WARNING, "DBus :: Received an error from message serial #%d : %s\n", m_SerialReplyingTo, m_Message.c_str());
 }
