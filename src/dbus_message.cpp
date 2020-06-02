@@ -17,8 +17,6 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
-#include "dbus_type.h"
-#include "dbus_type_array.h"
 #include "dbus_type_array.h"
 #include "dbus_type_byte.h"
 #include "dbus_type_signature.h"
@@ -28,7 +26,6 @@
 #include "dbus_type_variant.h"
 
 #include "dbus_message.h"
-#include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
 

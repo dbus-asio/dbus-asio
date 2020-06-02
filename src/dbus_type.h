@@ -18,7 +18,6 @@
 #ifndef DBUS_TYPE_H
 #define DBUS_TYPE_H
 
-#include <boost/any.hpp>
 #include <string>
 #include <vector>
 

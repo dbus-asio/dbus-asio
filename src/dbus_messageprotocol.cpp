@@ -28,7 +28,6 @@
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
-#include "dbus_transport.h"
 
 #include <byteswap.h>
 

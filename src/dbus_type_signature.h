@@ -18,7 +18,7 @@
 #ifndef DBUS_TYPE_SIGNATURE_H
 #define DBUS_TYPE_SIGNATURE_H
 
-#include "dbus_type.h"
+#include "dbus_type_base.h"
 
 namespace DBus {
 class MessageOStream;

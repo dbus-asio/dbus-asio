@@ -20,7 +20,7 @@
 
 #include "dbus_type_struct.h"
 #include "dbus_message.h"
-#include "dbus_transport.h"
+#include "dbus_octetbuffer.h"
 
 namespace DBus {
 

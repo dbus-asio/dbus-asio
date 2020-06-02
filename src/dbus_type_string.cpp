@@ -16,18 +16,10 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <sstream>
-
-#include <boost/thread/recursive_mutex.hpp>
-
 #include "dbus_type.h"
-#include "dbus_type_base.h"
 #include "dbus_type_string.h"
-
-#include "dbus_message.h"
-#include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
-#include "dbus_type_struct.h"
 
 const std::string DBus::Type::String::s_StaticTypeCode("s");
 

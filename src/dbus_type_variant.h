@@ -18,7 +18,7 @@
 #ifndef DBUS_TYPE_VARIANT_H
 #define DBUS_TYPE_VARIANT_H
 
-#include "dbus_type_signature.h"
+#include "dbus_type_base.h"
 
 namespace DBus {
 class MessageOStream;
@@ -35,8 +35,6 @@ namespace Type {
         Variant(const DBus::Type::ObjectPath& v);
         Variant(const DBus::Type::String& v);
         Variant(const DBus::Type::Uint32& v);
-
-        //std::string getSignature() const { return s_StaticTypeCode; }
 
         size_t getAlignment() const { return 8; }
         void marshall(MessageOStream& stream) const;

@@ -15,11 +15,7 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <boost/thread/recursive_mutex.hpp>
-
 #include "dbus_log.h"
-
-#include "dbus_type.h"
 #include "dbus_type_array.h"
 #include "dbus_type_byte.h"
 #include "dbus_type_signature.h"

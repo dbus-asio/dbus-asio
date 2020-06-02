@@ -15,17 +15,8 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <boost/thread/recursive_mutex.hpp>
-
-#include "dbus_type.h"
-#include "dbus_type_base.h"
-#include "dbus_type_helpers.h"
 #include "dbus_type_objectpath.h"
 #include "dbus_type_string.h"
-#include "dbus_type_struct.h"
-
-#include "dbus_message.h"
-#include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
 
 const std::string DBus::Type::ObjectPath::s_StaticTypeCode("o");

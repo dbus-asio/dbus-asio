@@ -15,7 +15,6 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include "dbus.h"
 #include "dbus_log.h"
 
 size_t DBus::Log::m_Level = WARNING;

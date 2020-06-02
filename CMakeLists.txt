@@ -25,7 +25,6 @@ set(HEADER_FILES
 	src/dbus_type_dictentry.h
 	src/dbus_type_double.h
 	src/dbus_type.h
-	src/dbus_type_helpers.h
 	src/dbus_type_int16.h
 	src/dbus_type_int32.h
 	src/dbus_type_int64.h

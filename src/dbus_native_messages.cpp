@@ -22,13 +22,10 @@
 #include "dbus_type_struct.h"
 
 #include "dbus_auth.h"
-#include "dbus_transport.h"
-
 #include "dbus_matchrule.h"
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_native.h"
-#include "dbus_transport.h"
 
 #define MESSAGE_BUS_OBJECT "/org/freedesktop/DBus"
 #define MESSAGE_BUS_INTERFACE "org.freedesktop.DBus"
