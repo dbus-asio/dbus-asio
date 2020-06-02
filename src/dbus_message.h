@@ -20,6 +20,7 @@
 
 #include <functional>
 #include <boost/thread/recursive_mutex.hpp>
+#include "dbus_type.h"
 
 namespace DBus {
 class MessageOStream;

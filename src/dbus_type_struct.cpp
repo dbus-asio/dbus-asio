@@ -16,17 +16,9 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <sstream>
-
-#include <boost/thread/recursive_mutex.hpp>
-
-#include "dbus_log.h"
-
-#include "dbus_type.h"
-#include "dbus_type_base.h"
 #include "dbus_type_boolean.h"
 #include "dbus_type_byte.h"
 #include "dbus_type_double.h"
-#include "dbus_type_helpers.h"
 #include "dbus_type_int16.h"
 #include "dbus_type_int32.h"
 #include "dbus_type_int64.h"
@@ -38,9 +30,6 @@
 #include "dbus_type_uint32.h"
 #include "dbus_type_uint64.h"
 #include "dbus_type_variant.h"
-
-#include "dbus_message.h"
-#include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
 

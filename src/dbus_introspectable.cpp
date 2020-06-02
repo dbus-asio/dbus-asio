@@ -17,7 +17,6 @@
 
 #include "dbus_introspectable.h"
 #include "dbus_log.h"
-#include "dbus_platform.h"
 #include "dbus_type.h"
 #include "dbus_utils.h"
 

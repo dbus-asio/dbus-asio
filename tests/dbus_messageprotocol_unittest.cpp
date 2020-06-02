@@ -1,6 +1,6 @@
 #include <catch2/catch.hpp>
 #include "dbus_messageprotocol.h"
-#include "dbus_transport.h"
+#include "dbus_octetbuffer.h"
 
 namespace DBus { namespace test {
 

@@ -16,7 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "dbus_platform.h"
-#include "dbus_type.h"
+#include <unistd.h>
 
 namespace {
 

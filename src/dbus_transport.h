@@ -18,14 +18,8 @@
 #ifndef DBUS_TRANSPORT_H
 #define DBUS_TRANSPORT_H
 
-#include <condition_variable>
-#include <thread>
-
 #include <boost/asio.hpp>
 #include <boost/thread.hpp>
-
-#include <sys/socket.h>
-#include <sys/un.h>
 #include "dbus_octetbuffer.h"
 
 #define USE_ASIO_NORMAL 1

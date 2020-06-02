@@ -16,15 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include <sstream>
-
-#include <boost/thread/recursive_mutex.hpp>
-
-#include "dbus_type.h"
 #include "dbus_type_signature.h"
-#include "dbus_type_struct.h"
-
-#include "dbus_message.h"
-#include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
 

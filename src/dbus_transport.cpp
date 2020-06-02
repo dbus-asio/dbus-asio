@@ -15,15 +15,8 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <boost/thread/recursive_mutex.hpp>
-#include <sys/prctl.h>
-
-#include "dbus_auth.h"
 #include "dbus_log.h"
 #include "dbus_transport.h"
-#include "dbus_type.h"
-
-#include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <chrono>
 

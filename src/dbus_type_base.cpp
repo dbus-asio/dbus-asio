@@ -15,9 +15,7 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include "dbus_type.h"
-#include <byteswap.h>
-
+#include "dbus_type_base.h"
 
 void DBus::Type::Base::setSignature(const std::string& type) { m_Signature = type; }
 

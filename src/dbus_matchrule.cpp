@@ -21,8 +21,6 @@
 #include <boost/tokenizer.hpp>
 
 #include "dbus_log.h"
-#include "dbus_type.h"
-
 #include "dbus_matchrule.h"
 #include "dbus_message.h"
 

@@ -15,20 +15,10 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <iomanip>
 #include <sstream>
-
-#include <boost/thread/recursive_mutex.hpp>
-
-#include "dbus_type.h"
-#include "dbus_type_base.h"
 #include "dbus_type_double.h"
-
-#include "dbus_message.h"
-#include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
-#include "dbus_type_struct.h"
 
 const std::string DBus::Type::Double::s_StaticTypeCode("d");
 

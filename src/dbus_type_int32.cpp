@@ -17,18 +17,9 @@
 
 #include <iomanip>
 #include <sstream>
-
-#include <boost/thread/recursive_mutex.hpp>
-
-#include "dbus_type.h"
-#include "dbus_type_base.h"
 #include "dbus_type_int32.h"
-
-#include "dbus_message.h"
-#include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
-#include "dbus_type_struct.h"
 
 const std::string DBus::Type::Int32::s_StaticTypeCode("i");
 

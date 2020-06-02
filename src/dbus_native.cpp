@@ -16,21 +16,11 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "dbus_log.h"
-
-#include "dbus_type.h"
-#include "dbus_type_base.h"
-#include "dbus_type_string.h"
-#include "dbus_type_struct.h"
-#include "dbus_type_uint32.h"
-
 #include "dbus_auth.h"
-#include "dbus_transport.h"
-
 #include "dbus_matchrule.h"
 #include "dbus_message.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_native.h"
-#include "dbus_transport.h"
 
 std::string DBus::Native::DBusDaemon("org.freedesktop.DBus");
 
