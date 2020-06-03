@@ -71,11 +71,11 @@ protected:
 
 private:
     struct Stats {
-        size_t count_messagessent;
-        size_t count_messagesqueued;
-        size_t count_messagespumped;
-        size_t bytes_sent;
-        size_t bytes_read;
+        size_t count_messagessent = 0;
+        size_t count_messagesqueued = 0;
+        size_t count_messagespumped = 0;
+        size_t bytes_sent = 0;
+        size_t bytes_read = 0;
     } m_Stats;
 };
 }

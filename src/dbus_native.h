@@ -94,16 +94,16 @@ private:
     };
 
     struct Stats {
-        size_t bytes_auth;
-        size_t bytes_message;
-        size_t count_sent_methodcalls;
-        size_t count_sent_methodreturns;
-        size_t count_sent_errors;
-        size_t count_sent_signals;
-        size_t count_receive_methodcalls;
-        size_t count_receive_methodreturns;
-        size_t count_receive_errors;
-        size_t count_receive_signals;
+        size_t bytes_auth = 0;
+        size_t bytes_message = 0;
+        size_t count_sent_methodcalls = 0;
+        size_t count_sent_methodreturns = 0;
+        size_t count_sent_errors = 0;
+        size_t count_sent_signals = 0;
+        size_t count_receive_methodcalls = 0;
+        size_t count_receive_methodreturns = 0;
+        size_t count_receive_errors = 0;
+        size_t count_receive_signals = 0;
     } m_Stats;
 
     mutable boost::recursive_mutex m_MessageQueueMutex;
