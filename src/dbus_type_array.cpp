@@ -80,7 +80,7 @@ void DBus::Type::Array::unmarshall(MessageIStream& stream)
 
     MessageIStream arrayStream(stream, size);
     while(!arrayStream.empty()) {
-        contents.push_back(DBus::Type::create(signature, isLittleEndian()));
+        contents.push_back(DBus::Type::create(signature));
         DBus::Type::unmarshallData(contents.back(), arrayStream);
     };
 }

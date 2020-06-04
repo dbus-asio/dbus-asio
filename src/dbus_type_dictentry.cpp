@@ -81,10 +81,10 @@ void DBus::Type::DictEntry::unmarshall(MessageIStream& stream)
 {
     stream.align(8);
 
-    const char key_type = getSignature()[1];
+    const char key_type = getSignature().at(1);
     DBus::Validation::throwOnInvalidBasicType(key_type);
-    m_Value.first = Type::create(std::string(1, key_type), isLittleEndian());
-    m_Value.second = Type::create(DBus::Type::extractSignature(getSignature(), 2), isLittleEndian());
+    m_Value.first = Type::create(std::string(1, key_type));
+    m_Value.second = Type::create(DBus::Type::extractSignature(getSignature(), 2));
     DBus::Type::unmarshallData(m_Value.first, stream);
     DBus::Type::unmarshallData(m_Value.second, stream);
 }

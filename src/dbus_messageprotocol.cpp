@@ -32,15 +32,37 @@
 
 #include <byteswap.h>
 
-DBus::MessageProtocol::MessageProtocol()
-{
-    m_State = STATE_BUFFERINGHEADERSIZE;
+namespace {
 
+inline bool SwapRequired(uint8_t c)
+{
+    return (c == 'l' && __BYTE_ORDER != __LITTLE_ENDIAN) ||
+           (c == 'B' && __BYTE_ORDER != __BIG_ENDIAN);
+}
+
+inline uint32_t CorrectEndianess(uint8_t c, uint32_t value)
+{
+    if (SwapRequired(c)) {
+        return bswap_32(value);
+    }
+    return value;
+}
+
+static const size_t MAX_ARRAY_SIZE = 67108864;
+static const size_t MAX_MESSAGE_SIZE = 134217728;
+
+} // anonymouse namespace
+
+DBus::MessageProtocol::MessageProtocol()
+  : m_State(STATE_GETHEADERSIZE),
+    m_headerSize(0),
+    m_bodySize(0)
+{
     setMethodCallHandler(std::bind(&MessageProtocol::onReceiveMethodCall, this, std::placeholders::_1));
     setMethodReturnHandler(std::bind(&MessageProtocol::onReceiveMethodReturn, this, std::placeholders::_1));
     setErrorHandler(std::bind(&MessageProtocol::onReceiveError, this, std::placeholders::_1));
     setSignalHandler(std::bind(&MessageProtocol::onReceiveSignal, this, std::placeholders::_1));
-    //
+
     reset();
 }
 
@@ -56,70 +78,107 @@ void DBus::MessageProtocol::setSignalHandler(const DBus::Message::CallbackFuncti
 
 void DBus::MessageProtocol::startMessage()
 {
-    m_State = STATE_BUFFERINGHEADERSIZE;
+    m_State = STATE_GETHEADERSIZE;
 
     m_HeaderStruct.clear();
     m_HeaderStruct.setSignature("(yyyyuua(yv))");
+    m_headerSize = 0;
+    m_bodySize = 0;
+}
 
-    //m_BodyStream.clear();
-    m_bufferSize = 0;
+bool DBus::MessageProtocol::getHeaderSize(OctetBuffer& buffer)
+{
+    // Initial header consists of byte, byte, byte, byte, uint32_t, uint32_t
+    // the next element is the size of the array of field info data
+    // making a total of 16 bytes
+    if (buffer.size() >= 16) {
+        // Read the size of the array
+        m_headerSize = *(uint32_t*)(buffer.data() + 12);
+        m_headerSize = CorrectEndianess(buffer[0], m_headerSize);
+        if (m_headerSize > MAX_ARRAY_SIZE) {
+            throw std::out_of_range("DBus message error: Maximum size exceeded");
+        }
+
+        // Add the 16 bytes of the header
+        m_headerSize+= 16;
+        // The header MUST finish on an 8 byte boundary
+        m_headerSize+= (m_headerSize % 8 == 0) ? 0 : 8 - (m_headerSize % 8);
+
+        m_State = STATE_UNMARSHALLHEADER;
+        return true;
+    }
+    return false;
+}
+
+bool DBus::MessageProtocol::unmarshallHeader(OctetBuffer& buffer)
+{
+    if (buffer.size() >= m_headerSize) {
+        // When all of the header is buffered the header can be unmarshalled
+        MessageIStream istream(buffer.data(), m_headerSize,
+            SwapRequired(buffer[0]));
+        m_HeaderStruct.unmarshall(istream);
+        buffer.remove_prefix(m_headerSize);
+        // The body of the message is next
+        m_bodySize = Type::asUint32(m_HeaderStruct[4]);
+
+        if ((m_headerSize + m_bodySize) > MAX_MESSAGE_SIZE) {
+            throw std::out_of_range("DBus message error: Maximum size exceeded");
+        }
+
+        m_State = STATE_GETBODY;
+        return true;
+    }
+    return false;
+}
+
+bool DBus::MessageProtocol::getBody(OctetBuffer& buffer)
+{
+    if (buffer.size() >= m_bodySize) {
+        std::string body((const char*)buffer.data(), m_bodySize);
+        buffer.remove_prefix(m_bodySize);
+        onBodyComplete(body);
+        return true;
+    }
+    return false;
 }
 
 void DBus::MessageProtocol::processData(OctetBuffer& buffer)
 {
     while (buffer.size()) {
-        if (m_State == STATE_BUFFERINGHEADERSIZE) {
-            if (buffer.size() < 16) {
+        if (m_State == STATE_GETHEADERSIZE) {
+            if (!getHeaderSize(buffer)) {
                 return;
             }
-
-            m_bufferSize = *(uint32_t*)(buffer.data() + 12);
-            if ((buffer[0] == 'l' && __BYTE_ORDER != __LITTLE_ENDIAN) ||
-                (buffer[0] == 'B' && __BYTE_ORDER != __BIG_ENDIAN)) {
-                m_bufferSize = bswap_32(m_bufferSize);
-            }
-            m_bufferSize+= 16; // Header bytes
-            m_bufferSize+= (m_bufferSize % 8 == 0) ? 0 : 8 - (m_bufferSize % 8);
-            m_State = STATE_BUFFERINGHEADER;
         }
 
-
-        if (m_State == STATE_BUFFERINGHEADER) {
-            if (buffer.size() < m_bufferSize) {
+        if (m_State == STATE_UNMARSHALLHEADER) {
+            if (!unmarshallHeader(buffer)) {
                 return;
             }
-
-            MessageIStream istream((uint8_t*)buffer.data(), m_bufferSize,
-                (buffer[0] == 'l' && __BYTE_ORDER != __LITTLE_ENDIAN) ||
-                (buffer[0] == 'B' && __BYTE_ORDER != __BIG_ENDIAN));
-            m_HeaderStruct.setLittleEndian(buffer[0] == 'l'  ? true : false);
-            m_HeaderStruct.unmarshall(istream);
-            buffer.remove_prefix(m_bufferSize);
-            m_bufferSize = Type::asUint32(m_HeaderStruct[4]);
-            m_State = STATE_BODY;
         }
 
-        if (m_State == STATE_BODY) {
-            if (buffer.size() < m_bufferSize) {
+        if (m_State == STATE_GETBODY) {
+            if (!getBody(buffer)) {
                 return;
             }
-
-            std::string body((const char*)buffer.data(), m_bufferSize);
-            buffer.remove_prefix(m_bufferSize);
-            onBodyComplete(body);
         }
     }
 }
 
 void DBus::MessageProtocol::onReceiveData(OctetBuffer& buffer)
 {
+    // If a whole message is contained in the buffer
+    // it can be processed without copying but only if
+    // there is no data already cached
     if (m_octetCache.empty()) {
         processData(buffer);
     }
 
+    // Append any remaining data to the data cache
     m_octetCache.append(buffer.data(), buffer.size());
     buffer.remove_prefix(buffer.size());
 
+    // If the data cache is not empty process it
     if (!m_octetCache.empty()) {
         OctetBuffer cachedBuffer(m_octetCache.data(), m_octetCache.size());
         processData(cachedBuffer);

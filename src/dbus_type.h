@@ -48,7 +48,7 @@ namespace Type {
     const Type::Variant& refVariant(const Generic& v);
 
     // Generic type handling code
-    DBus::Type::Generic create(const std::string& type, bool littleEndian);
+    DBus::Type::Generic create(const std::string& type);
 
     void marshallData(const DBus::Type::Generic& any, MessageOStream& stream);
     void unmarshallData(DBus::Type::Generic& result, MessageIStream& stream);

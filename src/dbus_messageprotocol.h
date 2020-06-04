@@ -41,13 +41,9 @@ public:
 
 private:
     enum {
-        STATE_BUFFERINGHEADERSIZE,
-        STATE_BUFFERINGHEADER,
-        STATE_BUFFERINGHEADERARRAY,
-        STATE_ENDIAN,
-        STATE_HEADER,
-        STATE_HEADER_PADDING,
-        STATE_BODY
+        STATE_GETHEADERSIZE,
+        STATE_UNMARSHALLHEADER,
+        STATE_GETBODY
     };
 
     enum {
@@ -58,11 +54,11 @@ private:
     };
 
     size_t m_State;
-    size_t m_bufferSize;
+    size_t m_headerSize;
+    size_t m_bodySize;
     // TODO:?? Move the handler into a separate message class? We can't get 2 interspersed message so it's a
     // 1:1 relationship between protocol handler and its message, but it might be useful elsewhere.
     DBus::Type::Struct m_HeaderStruct;
-    std::basic_string<uint8_t> m_header;
     std::basic_string<uint8_t> m_octetCache;
 
     //
@@ -72,8 +68,11 @@ private:
     Message::CallbackFunctionSignal m_SignalCallback;
 
     void startMessage();
-    void processData(OctetBuffer& buffer);
 
+    bool getHeaderSize(OctetBuffer& buffer);
+    bool unmarshallHeader(OctetBuffer& buffer);
+    bool getBody(OctetBuffer& buffer);
+    void processData(OctetBuffer& buffer);
 
     void onReceiveMethodCall(const DBus::Message::MethodCall& result) {}
     void onReceiveMethodReturn(const DBus::Message::MethodReturn& result) {}

@@ -108,7 +108,7 @@ void DBus::Type::Struct::unmarshall(MessageIStream& stream)
     size_t signatureIndex = 1; // skip first '('
     do {
         const std::string signature = Type::extractSignature(m_Signature, signatureIndex);
-        m_Value.push_back(DBus::Type::create(signature, isLittleEndian()));
+        m_Value.push_back(DBus::Type::create(signature));
         DBus::Type::unmarshallData(m_Value.back(), stream);
         signatureIndex+= signature.size();
     } while (signatureIndex < m_Signature.size() - 1);

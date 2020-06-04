@@ -14,7 +14,6 @@ void TestUnmarshallFromMessageIStream(const std::string &stream,
 {
     // An array of structures
     Type::Array array;
-    array.setLittleEndian(byteOrder == __LITTLE_ENDIAN);
     array.setSignature("a(i)");
 
     MessageIStream istream((uint8_t*)stream.data(), stream.size(), byteOrder != __LITTLE_ENDIAN);

@@ -51,17 +51,10 @@ namespace Type {
     class Base {
     public:
         Base()
-            : m_isLittleEndian(true)
         {
         }
 
-        uint16_t doSwap16(uint16_t v) const;
-        uint32_t doSwap32(uint32_t v) const;
-        uint64_t doSwap64(uint64_t v) const;
-        void setLittleEndian(bool isLittle) { m_isLittleEndian = isLittle; }
-        bool isLittleEndian() const { return m_isLittleEndian ; }
         size_t getAlignment() const { return 1; }
-
         void setSignature(const std::string& type);
         std::string getSignature() const;
 
@@ -69,10 +62,7 @@ namespace Type {
         std::string asString() const;
 
     protected:
-        bool m_isLittleEndian;
         std::string m_Signature;
-
-        bool isSwapRequired() const;
     };
 }
 }

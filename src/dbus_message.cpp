@@ -61,7 +61,10 @@ DBus::Message::Base::Base(const DBus::Type::Struct& header, const std::string& b
     m_Header.destination = DBus::Type::asString(m_Header.field[Message::Header::HEADER_DESTINATION]);
     m_Header.sender = DBus::Type::asString(m_Header.field[Message::Header::HEADER_SENDER]);
 
-    parseParameters(isLittleEndian, body);
+    // Empty bodies have no parameters
+    if (body.size()) {
+        parseParameters(isLittleEndian, body);
+    }
 }
 
 void DBus::Message::Base::parseParameters(bool isLittleEndian, const std::string& bodydata)
@@ -71,7 +74,6 @@ void DBus::Message::Base::parseParameters(bool isLittleEndian, const std::string
     DBus::Type::Struct parameter_fields;
 
     parameter_fields.setSignature("(" + signature + ")");
-    parameter_fields.setLittleEndian(isLittleEndian);
 
     MessageIStream stream((uint8_t*)bodydata.data(), bodydata.size(),
         isLittleEndian ? __BYTE_ORDER != __LITTLE_ENDIAN :
