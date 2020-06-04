@@ -86,7 +86,7 @@ void DBus::Type::Variant::unmarshall(MessageIStream& stream)
 {
     Type::Signature signature;
     signature.unmarshall(stream);
-    m_Value = DBus::Type::create(signature.getValue(), isLittleEndian());
+    m_Value = DBus::Type::create(signature.getValue());
     DBus::Type::unmarshallData(m_Value, stream);
 }
 

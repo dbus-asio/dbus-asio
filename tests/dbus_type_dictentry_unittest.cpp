@@ -13,7 +13,6 @@ void TestUnmarshallFromMessageIStream(unsigned byteOrder, const std::string& str
 {
     Type::DictEntry dictEntry;
     dictEntry.setSignature("{uu}");
-    dictEntry.setLittleEndian(byteOrder == __LITTLE_ENDIAN);
     MessageIStream istream((uint8_t*)stream.data(), stream.size(), byteOrder != __LITTLE_ENDIAN);
     dictEntry.unmarshall(istream);
 

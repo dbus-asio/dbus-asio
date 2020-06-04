@@ -24,7 +24,6 @@ TEST_CASE("Unmarshall double little endian from MessageIStream")
 TEST_CASE("Unmarshall double big endian from MessageIStream")
 {
     Type::Double dbusType;
-    dbusType.setLittleEndian(false);
     TestUnmarshallFromMessageIStream(dbusType, 67.25, __BIG_ENDIAN);
 }
 
