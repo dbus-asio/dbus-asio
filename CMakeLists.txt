@@ -109,7 +109,7 @@ configure_file(dbus-asio.pc.in dbus-asio.pc @ONLY)
 
 target_include_directories(dbus-asio PUBLIC src)
 
-enable_testing()
+include(CTest)
 
 option(ENABLE_EXAMPLES "Build example projects" OFF)
 if (ENABLE_EXAMPLES)
