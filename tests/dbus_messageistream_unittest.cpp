@@ -69,7 +69,9 @@ TEST_CASE("Read double")
 {
     double value = 0.75483;
     MessageIStream leStream((const uint8_t*)&value, sizeof(double), false);
-    MessageIStream beStream((const uint8_t*)&value, sizeof(double), true);
+
+    uint64_t swapped_value = __bswap_64(*reinterpret_cast<uint64_t *>(&value));
+    MessageIStream beStream((const uint8_t*)&swapped_value, sizeof(double), true);
 
     double readValue = 0.0;
     leStream.read(&readValue);

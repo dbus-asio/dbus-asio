@@ -64,7 +64,9 @@ void MessageIStream::read(uint8_t* value, size_t size)
 
 void MessageIStream::read(double* value)
 {
-    read((uint8_t*)value, sizeof(double));
+    uint64_t u;
+    read(&u);
+    *value = *reinterpret_cast<double *>(&u);
 }
 
 void MessageIStream::read(std::string& string, size_t size)
