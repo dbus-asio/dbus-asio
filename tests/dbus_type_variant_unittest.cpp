@@ -1,4 +1,6 @@
 #include <catch2/catch.hpp>
+#include "dbus_type_objectpath.h"
+#include "dbus_type_string.h"
 #include "dbus_type_variant.h"
 #include "dbus_type_uint32.h"
 #include "dbus_messageprotocol.h"
@@ -55,6 +57,35 @@ TEST_CASE("Marshall and unmarshall variant")
     TestUnmarshallFromMessageIStream(__LITTLE_ENDIAN, stream.data, 42);
 }
 
+TEST_CASE("Round trip")
+{
+    Type::Variant input;
+
+    SECTION("String")
+    {
+        input = Type::Variant(Type::String("Hello"));
+    }
+
+    SECTION("ObjectPath")
+    {
+        input = Type::Variant(Type::ObjectPath("/object/path"));
+    }
+
+    SECTION("Uint32")
+    {
+        input = Type::Variant(Type::Uint32(42U));
+    }
+
+    MessageOStream ostream;
+    input.marshall(ostream);
+
+    Type::Variant output;
+    output.setSignature(input.getSignature());
+    MessageIStream istream((uint8_t*)ostream.data.data(), ostream.data.size(), false);
+    output.unmarshall(istream);
+
+    REQUIRE(input.toString() == output.toString());
+}
 
 }} // namespace DBus::test
 

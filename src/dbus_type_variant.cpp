@@ -39,23 +39,24 @@ larger than 64, including other container types such as structures. (See Valid S
 DBus::Type::Variant::Variant() { setSignature(s_StaticTypeCode); }
 
 DBus::Type::Variant::Variant(const DBus::Type::ObjectPath& v)
-    : m_Value(v)
+    : m_Value(v),
+      m_ContainedSignature(v.getSignature())
 {
-    // Technically speaking, the signature is part of the data field
-    // (We're reusing this method for convenience while we have the type)
-    setSignature(v.getSignature());
+    setSignature(s_StaticTypeCode);
 }
 
 DBus::Type::Variant::Variant(const DBus::Type::String& v)
-    : m_Value(v)
+    : m_Value(v),
+      m_ContainedSignature(v.getSignature())
 {
-    setSignature(v.getSignature());
+    setSignature(s_StaticTypeCode);
 }
 
 DBus::Type::Variant::Variant(const DBus::Type::Uint32& v)
-    : m_Value(v)
+    : m_Value(v),
+      m_ContainedSignature(v.getSignature())
 {
-    setSignature(v.getSignature());
+    setSignature(s_StaticTypeCode);
 }
 
 const DBus::Type::Generic& DBus::Type::Variant::getValue() const { return m_Value; }
@@ -64,7 +65,7 @@ void DBus::Type::Variant::marshall(MessageOStream& stream) const
 {
 
     // The marshalled SIGNATURE of a single complete type...
-    stream.writeSignature(getSignature());
+    stream.writeSignature(m_ContainedSignature);
 
     // ...followed by a marshaled m_Value with the type given in the signature.
     DBus::Type::marshallData(m_Value, stream);
@@ -74,6 +75,7 @@ void DBus::Type::Variant::unmarshall(MessageIStream& stream)
 {
     Type::Signature signature;
     signature.unmarshall(stream);
+    m_ContainedSignature = signature.getValue();
     m_Value = DBus::Type::create(signature.getValue());
     DBus::Type::unmarshallData(m_Value, stream);
 }
@@ -82,7 +84,7 @@ std::string DBus::Type::Variant::toString(const std::string& prefix) const
 {
     std::stringstream ss;
 
-    ss << prefix << "Variant (" << getSignature() << ")\n";
+    ss << prefix << "Variant (" << m_ContainedSignature << ")\n";
     std::string contents_prefix(prefix);
     contents_prefix += "   ";
     ss << DBus::Type::toString(m_Value, contents_prefix);
