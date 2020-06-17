@@ -183,7 +183,7 @@ std::string DBus::Type::Array::toString(const std::string& prefix) const
 
     ss << prefix << "Array (" << getSignature() << ") [\n";
     for (size_t i = 0; i < contents.size(); ++i) {
-        ss << prefix << "   [" << i << "] = \n";
+        ss << prefix << "   [" << i << "] =\n";
         ss << DBus::Type::toString(contents[i], prefix + "      ");
     }
     ss << prefix << "]\n";
