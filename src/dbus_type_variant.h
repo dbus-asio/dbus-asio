@@ -48,6 +48,7 @@ namespace Type {
 
     private:
         DBus::Type::Generic m_Value;
+        std::string m_ContainedSignature;
     };
 }
 }
