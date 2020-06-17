@@ -18,8 +18,21 @@
 #include <sstream>
 #include "dbus_type_array.h"
 #include "dbus_type.h"
-#include "dbus_type_struct.h"
+#include "dbus_type_boolean.h"
+#include "dbus_type_byte.h"
 #include "dbus_type_dictentry.h"
+#include "dbus_type_double.h"
+#include "dbus_type_int16.h"
+#include "dbus_type_int32.h"
+#include "dbus_type_int64.h"
+#include "dbus_type_objectpath.h"
+#include "dbus_type_signature.h"
+#include "dbus_type_string.h"
+#include "dbus_type_struct.h"
+#include "dbus_type_uint16.h"
+#include "dbus_type_uint32.h"
+#include "dbus_type_uint64.h"
+#include "dbus_type_variant.h"
 
 #include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
@@ -27,6 +40,84 @@
 const std::string DBus::Type::Array::s_StaticTypeCode("a");
 
 size_t DBus::Type::Array::size() const { return contents.size(); }
+
+size_t DBus::Type::Array::add(const DBus::Type::Byte& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Boolean& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::ObjectPath& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Int16& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Uint16& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Int32& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Uint32& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Int64& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Uint64& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Double& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::String& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Variant& v)
+{
+    contents.push_back(v);
+    return size();
+}
+
+size_t DBus::Type::Array::add(const DBus::Type::Signature& v)
+{
+    contents.push_back(v);
+    return size();
+}
 
 size_t DBus::Type::Array::add(const DBus::Type::Struct& s)
 {
