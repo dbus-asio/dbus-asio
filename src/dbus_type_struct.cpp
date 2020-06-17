@@ -18,6 +18,7 @@
 #include <sstream>
 #include "dbus_type_boolean.h"
 #include "dbus_type_byte.h"
+#include "dbus_type_dictentry.h"
 #include "dbus_type_double.h"
 #include "dbus_type_int16.h"
 #include "dbus_type_int32.h"
@@ -71,6 +72,10 @@ void DBus::Type::Struct::add(const DBus::Type::String& v) { m_Value.push_back(v)
 void DBus::Type::Struct::add(const DBus::Type::Variant& v) { m_Value.push_back(v); }
 
 void DBus::Type::Struct::add(const DBus::Type::Signature& v) { m_Value.push_back(v); }
+
+void DBus::Type::Struct::add(const DBus::Type::Struct& v) { m_Value.push_back(v); }
+
+void DBus::Type::Struct::add(const DBus::Type::DictEntry& v) { m_Value.push_back(v); }
 
 // BUGWARN: This should work in all cases, but I'm thinking of moving it into
 // a utility method (like all unmarshall).

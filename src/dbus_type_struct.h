@@ -38,6 +38,7 @@ namespace Type {
     class String;
     class Variant;
     class Struct;
+    class DictEntry;
 
     class Struct : public Base {
     public:
@@ -58,6 +59,8 @@ namespace Type {
         void add(const DBus::Type::String& v);
         void add(const DBus::Type::Variant& v);
         void add(const DBus::Type::Signature& v);
+        void add(const DBus::Type::Struct& v);
+        void add(const DBus::Type::DictEntry& v);
 
         std::string getSignature() const
         {

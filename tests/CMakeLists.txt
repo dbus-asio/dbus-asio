@@ -78,6 +78,10 @@ add_executable(dbus_type_signature_unittest dbus_type_signature_unittest.cpp tes
 target_link_libraries(dbus_type_signature_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_signature_unittest COMMAND dbus_type_signature_unittest)
 
+add_executable(dbus_type_multiple_unittest dbus_type_multiple_unittest.cpp test_main.cpp)
+target_link_libraries(dbus_type_multiple_unittest LINK_PRIVATE dbus-asio)
+add_test(NAME run_dbus_type_multiple_unittest COMMAND dbus_type_multiple_unittest)
+
 add_executable(dbus_octetbuffer_unittest dbus_octetbuffer_unittest.cpp test_main.cpp)
 target_link_libraries(dbus_octetbuffer_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_octetbuffer_unittest COMMAND dbus_octetbuffer_unittest)
