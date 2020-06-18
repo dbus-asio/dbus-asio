@@ -84,7 +84,7 @@ std::string DBus::Message::Signal::marshall(const std::string& destination) cons
     if (m_Parameters.getParameterCount()) {
         DBus::Type::Struct sSignature;
         sSignature.add(DBus::Type::Byte(DBus::Message::Header::HEADER_SIGNATURE));
-        sSignature.add(DBus::Type::Signature(m_Parameters.getMarshallingSignature()));
+        sSignature.add(DBus::Type::Variant(DBus::Type::Signature(m_Parameters.getMarshallingSignature())));
         array.add(sSignature);
     }
 

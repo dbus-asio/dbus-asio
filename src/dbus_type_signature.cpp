@@ -34,13 +34,6 @@ const std::string& DBus::Type::Signature::getValue() const { return m_Value; }
 
 void DBus::Type::Signature::marshall(MessageOStream& stream) const
 {
-    // NOTE: We marshall out the 'g' to indicate a signature, but don't parse it on unmarshall
-    stream.writeByte(1);
-    stream.writeByte(s_StaticTypeCode[0]);
-    stream.writeByte(0);
-
-    // The same as STRING except the length is a single byte (thus signatures
-    // have a maximum length of 255) and the content must be a valid signature.
     stream.writeSignature(m_Value);
 }
 

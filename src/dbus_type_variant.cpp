@@ -59,6 +59,13 @@ DBus::Type::Variant::Variant(const DBus::Type::Uint32& v)
     setSignature(s_StaticTypeCode);
 }
 
+DBus::Type::Variant::Variant(const DBus::Type::Signature& v)
+    : m_Value(v),
+      m_ContainedSignature(v.getSignature())
+{
+    setSignature(s_StaticTypeCode);
+}
+
 const DBus::Type::Generic& DBus::Type::Variant::getValue() const { return m_Value; }
 
 void DBus::Type::Variant::marshall(MessageOStream& stream) const

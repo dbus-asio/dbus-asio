@@ -26,6 +26,7 @@ class MessageIStream;
 
 namespace Type {
     class ObjectPath;
+    class Signature;
     class String;
     class Uint32;
 
@@ -35,6 +36,7 @@ namespace Type {
         Variant(const DBus::Type::ObjectPath& v);
         Variant(const DBus::Type::String& v);
         Variant(const DBus::Type::Uint32& v);
+        Variant(const DBus::Type::Signature& v);
 
         size_t getAlignment() const { return 8; }
         void marshall(MessageOStream& stream) const;
