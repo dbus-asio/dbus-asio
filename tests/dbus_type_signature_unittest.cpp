@@ -48,13 +48,7 @@ TEST_CASE("Marshall and unmarshall signature")
 
     MessageOStream stream;
     dbusString.marshall(stream);
-
-    // Marshalling adds additional signature to signal a signature!
-    std::string signatureSignature(stream.data.begin(), stream.data.begin() + 3);
-    TestUnmarshallFromMessageIStream(signatureSignature, __LITTLE_ENDIAN, "g");
-
-    std::string signatureValue(stream.data.begin() + 3, stream.data.end());
-    TestUnmarshallFromMessageIStream(signatureValue, __LITTLE_ENDIAN, str);
+    TestUnmarshallFromMessageIStream(stream.data, __LITTLE_ENDIAN, str);
 }
 
 
