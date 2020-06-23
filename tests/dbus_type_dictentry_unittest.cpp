@@ -7,6 +7,7 @@
 #include "dbus_type_string.h"
 #include "dbus_type_struct.h"
 #include "dbus_type_uint32.h"
+#include "dbus_type_variant.h"
 #include "dbus_messageprotocol.h"
 #include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
@@ -147,6 +148,19 @@ TEST_CASE("Marshall and unmarshall dictionary entry with struct value")
     MessageOStream stream;
     dictEntry.marshall(stream);
     TestUnmarshallFromMessageIStream(__LITTLE_ENDIAN, stream.data, 85, std::make_pair(4.5, static_cast<uint8_t>(32)));
+}
+
+TEST_CASE("Invalid basic type for key input")
+{
+    std::array<uint8_t, 22> encoded = {
+        0x01, 0x73, 0x00, 0x00, 0x03, 0x00, 0x00, 0x00, 0x4b, 0x65, 0x79, 0x00, 0x05, 0x00, 0x00, 0x00,
+        0x56, 0x61, 0x6c, 0x75, 0x65, 0x00,
+    };
+
+    Type::DictEntry dictEntry;
+    dictEntry.setSignature("{vu}");
+    MessageIStream istream(encoded.data(), encoded.size(), false);
+    REQUIRE_THROWS_WITH(dictEntry.unmarshall(istream), "Invalid basic type: v");
 }
 
 }} // namespace DBus::test
