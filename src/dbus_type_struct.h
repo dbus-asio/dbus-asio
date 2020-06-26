@@ -83,7 +83,7 @@ namespace Type {
     private:
         std::vector<Generic> m_Value;
     };
-}
-}
+} // namespace Type
+} // namespace DBus
 
 #endif

@@ -17,10 +17,16 @@
 
 #include "dbus_type_base.h"
 
-void DBus::Type::Base::setSignature(const std::string& type) { m_Signature = type; }
+void DBus::Type::Base::setSignature(const std::string& type)
+{
+    m_Signature = type;
+}
 
 std::string DBus::Type::Base::getSignature() const { return m_Signature; }
 
-std::string DBus::Type::Base::toString(const std::string& prefix) const { return std::string(prefix + "\n"); }
+std::string DBus::Type::Base::toString(const std::string& prefix) const
+{
+    return std::string(prefix + "\n");
+}
 
 std::string DBus::Type::Base::asString() const { return ""; }

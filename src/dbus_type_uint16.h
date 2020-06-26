@@ -43,7 +43,7 @@ namespace Type {
     protected:
         uint16_t m_Value;
     };
-}
-}
+} // namespace Type
+} // namespace DBus
 
 #endif

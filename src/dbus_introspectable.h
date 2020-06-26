@@ -54,7 +54,8 @@ namespace Introspectable {
 
     class Method {
     public:
-        Method(const std::string& name, const std::string& in_params, const std::string& out_params);
+        Method(const std::string& name, const std::string& in_params,
+            const std::string& out_params);
 
         std::string serialize() const;
 
@@ -71,7 +72,8 @@ namespace Introspectable {
             PROPERTY_READWRITE,
         } PropertAccess;
 
-        Property(const std::string& name, const std::string& type, size_t access = Property::PROPERTY_READ);
+        Property(const std::string& name, const std::string& type,
+            size_t access = Property::PROPERTY_READ);
 
         std::string serialize() const;
 
@@ -93,7 +95,7 @@ namespace Introspectable {
     };
 
     // TODO: Support names for each property and signal
-}
-}
+} // namespace Introspectable
+} // namespace DBus
 
 #endif

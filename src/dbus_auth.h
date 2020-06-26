@@ -64,6 +64,6 @@ private:
     AuthenticationProtocol::AuthRequired m_AuthType;
     mutable boost::recursive_mutex m_AuthTypeMutex;
 };
-}
+} // namespace DBus
 
 #endif // DBUS_AUTH_H

@@ -32,7 +32,8 @@ AGREE   ---->
         <---  BEGIN
 */
 
-DBus::AuthenticationProtocol::AuthenticationProtocol(std::shared_ptr<Transport>& transport)
+DBus::AuthenticationProtocol::AuthenticationProtocol(
+    std::shared_ptr<Transport>& transport)
     : m_Transport(transport)
 {
 }
@@ -43,10 +44,14 @@ void DBus::AuthenticationProtocol::reset()
     sendAuth(m_AuthType);
 }
 
-void DBus::AuthenticationProtocol::sendAuthListMethods() { sendWire(std::string("AUTH\r\n")); }
+void DBus::AuthenticationProtocol::sendAuthListMethods()
+{
+    sendWire(std::string("AUTH\r\n"));
+}
 
 // RCVD: REJECTED EXTERNAL DBUS_COOKIE_SHA1 ANONYMOUS
-void DBus::AuthenticationProtocol::sendAuth(DBus::AuthenticationProtocol::AuthRequired type /* = AUTH_BASIC*/)
+void DBus::AuthenticationProtocol::sendAuth(
+    DBus::AuthenticationProtocol::AuthRequired type /* = AUTH_BASIC*/)
 {
     {
         boost::recursive_mutex::scoped_lock guard(m_AuthTypeMutex);
@@ -54,7 +59,8 @@ void DBus::AuthenticationProtocol::sendAuth(DBus::AuthenticationProtocol::AuthRe
     }
 
     std::string auth("AUTH EXTERNAL ");
-    DBus::Utils::ConvertBinaryToHexString(auth, std::to_string(Platform::getUID()));
+    DBus::Utils::ConvertBinaryToHexString(auth,
+        std::to_string(Platform::getUID()));
     auth += "\r\n";
     sendWire(auth);
 }
@@ -62,7 +68,7 @@ void DBus::AuthenticationProtocol::sendAuth(DBus::AuthenticationProtocol::AuthRe
 bool DBus::AuthenticationProtocol::processData()
 {
     const size_t pos = m_data.find("\r\n");
-    if (pos != std::string::npos ) {
+    if (pos != std::string::npos) {
         std::string command(m_data.data(), pos + 2);
         return onCommand(command);
         m_data = m_data.substr(pos + 2);
@@ -77,7 +83,7 @@ bool DBus::AuthenticationProtocol::onReceiveData(DBus::OctetBuffer& buffer)
 
     while (buffer.size() && !authenticated) {
         size_t pos = buffer.find('\n');
-        pos = pos == std::string::npos ?  buffer.size() : pos + 1;
+        pos = pos == std::string::npos ? buffer.size() : pos + 1;
         m_data.append((const char*)buffer.data(), pos);
         buffer.remove_prefix(pos);
         authenticated = processData();
@@ -89,7 +95,8 @@ bool DBus::AuthenticationProtocol::onReceiveData(DBus::OctetBuffer& buffer)
 //
 // Protected methods
 //
-bool DBus::AuthenticationProtocol::onOK(const std::string& guid /* unused in this case */)
+bool DBus::AuthenticationProtocol::onOK(
+    const std::string& guid /* unused in this case */)
 {
     std::string address;
     DBus::Utils::ConvertHexStringToBinary(address, guid);
@@ -114,16 +121,19 @@ bool DBus::AuthenticationProtocol::onOK(const std::string& guid /* unused in thi
 
 bool DBus::AuthenticationProtocol::onError(const std::string& error_message)
 {
-    DBus::Log::write(DBus::Log::ERROR, "DBus :: onError : %s\n", error_message.c_str());
+    DBus::Log::write(DBus::Log::ERROR, "DBus :: onError : %s\n",
+        error_message.c_str());
     return false;
 }
 
-bool DBus::AuthenticationProtocol::onRejected(const std::string& error_message)
+bool DBus::AuthenticationProtocol::onRejected(
+    const std::string& error_message)
 {
     // Split by space
     // Store the list of available auth methods
     // Optionally, retry. (determin by cb?)
-    DBus::Log::write(DBus::Log::WARNING, "DBus :: Reject : %s\n", error_message.c_str());
+    DBus::Log::write(DBus::Log::WARNING, "DBus :: Reject : %s\n",
+        error_message.c_str());
     return false;
 }
 
@@ -140,9 +150,15 @@ bool DBus::AuthenticationProtocol::onData(const std::string&) { return false; }
 
 bool DBus::AuthenticationProtocol::onCancel() { return false; }
 
-bool DBus::AuthenticationProtocol::onNegotiateUnixFD(const std::string&) { return false; }
+bool DBus::AuthenticationProtocol::onNegotiateUnixFD(const std::string&)
+{
+    return false;
+}
 
-void DBus::AuthenticationProtocol::sendNegotiateUnixFD() { sendWire(std::string("NEGOTIATE_UNIX_FD\r\n")); }
+void DBus::AuthenticationProtocol::sendNegotiateUnixFD()
+{
+    sendWire(std::string("NEGOTIATE_UNIX_FD\r\n"));
+}
 
 void DBus::AuthenticationProtocol::sendBegin()
 {
@@ -159,7 +175,10 @@ void DBus::AuthenticationProtocol::sendData(std::string& data)
     sendWire(packet);
 }
 
-void DBus::AuthenticationProtocol::sendWire(const std::string& data) { m_Transport->sendStringDirect(data); }
+void DBus::AuthenticationProtocol::sendWire(const std::string& data)
+{
+    m_Transport->sendStringDirect(data);
+}
 
 // Return true once we have completed the auth state
 bool DBus::AuthenticationProtocol::onCommand(const std::string& command)
@@ -167,26 +186,46 @@ bool DBus::AuthenticationProtocol::onCommand(const std::string& command)
     DBus::Log::write(DBus::Log::TRACE, "DBus :: CMD: %s\n", command.c_str());
     DBus::Log::writeHex(DBus::Log::TRACE, "DBus :: CMD: ", command);
 
-    std::pair<const char*, std::function<bool(const std::string&)> > callback_list[8] = {
-        // Client
-        std::make_pair("OK", std::bind(&DBus::AuthenticationProtocol::onOK, this, std::placeholders::_1)),
-        std::make_pair("ERROR", std::bind(&DBus::AuthenticationProtocol::onError, this, std::placeholders::_1)),
-        std::make_pair("REJECTED", std::bind(&DBus::AuthenticationProtocol::onRejected, this, std::placeholders::_1)),
-        std::make_pair("AGREE_UNIX_FD", std::bind(&DBus::AuthenticationProtocol::onAgreeUnixFD, this)),
-        std::make_pair("DATA", std::bind(&DBus::AuthenticationProtocol::onData, this, std::placeholders::_1)),
-        // Server (TODO)
-        std::make_pair("AUTH", std::bind(&DBus::AuthenticationProtocol::onAuth, this, std::placeholders::_1)),
-        std::make_pair("NEGOTIATE_UNIX_FD", std::bind(&DBus::AuthenticationProtocol::onNegotiateUnixFD, this, std::placeholders::_1)),
-        std::make_pair("CANCEL", std::bind(&DBus::AuthenticationProtocol::onCancel, this))
-    };
+    std::pair<const char*, std::function<bool(const std::string&)>>
+        callback_list[8] = {
+            // Client
+            std::make_pair("OK", std::bind(&DBus::AuthenticationProtocol::onOK, this, std::placeholders::_1)),
+            std::make_pair("ERROR",
+                std::bind(&DBus::AuthenticationProtocol::onError, this,
+                    std::placeholders::_1)),
+            std::make_pair("REJECTED",
+                std::bind(&DBus::AuthenticationProtocol::onRejected,
+                    this, std::placeholders::_1)),
+            std::make_pair(
+                "AGREE_UNIX_FD",
+                std::bind(&DBus::AuthenticationProtocol::onAgreeUnixFD, this)),
+            std::make_pair("DATA",
+                std::bind(&DBus::AuthenticationProtocol::onData, this,
+                    std::placeholders::_1)),
+            // Server (TODO)
+            std::make_pair("AUTH",
+                std::bind(&DBus::AuthenticationProtocol::onAuth, this,
+                    std::placeholders::_1)),
+            std::make_pair(
+                "NEGOTIATE_UNIX_FD",
+                std::bind(&DBus::AuthenticationProtocol::onNegotiateUnixFD, this,
+                    std::placeholders::_1)),
+            std::make_pair(
+                "CANCEL",
+                std::bind(&DBus::AuthenticationProtocol::onCancel, this))
+        };
 
     for (size_t i = 0; i < 8; ++i) {
         if (command.substr(0, strlen(callback_list[i].first)) == callback_list[i].first) {
-            return callback_list[i].second(command.substr(strlen(callback_list[i].first) + 1));
+            return callback_list[i].second(
+                command.substr(strlen(callback_list[i].first) + 1));
         }
     }
 
-    DBus::Log::write(DBus::Log::WARNING, "DBus :: CMD: %s did not execute anything, so please implement the method.\n", command.c_str());
+    DBus::Log::write(DBus::Log::WARNING,
+        "DBus :: CMD: %s did not execute anything, so please "
+        "implement the method.\n",
+        command.c_str());
 
     return false;
 }

@@ -26,8 +26,8 @@
 #include "dbus_type_variant.h"
 
 #include "dbus_message.h"
-#include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
 
 uint32_t DBus::Message::Base::m_SerialCounter = 1;
 boost::recursive_mutex DBus::Message::Base::m_SerialCounterMutex;
@@ -38,7 +38,8 @@ DBus::Message::Base::Base(uint32_t serial)
     m_Header.serial = serial ? serial : m_SerialCounter++;
 }
 
-DBus::Message::Base::Base(const DBus::Type::Struct& header, const std::string& body)
+DBus::Message::Base::Base(const DBus::Type::Struct& header,
+    const std::string& body)
 {
     // Capture the basic parameters
     bool isLittleEndian = Type::asByte(header[0]) == 'l' ? true : false;
@@ -52,30 +53,30 @@ DBus::Message::Base::Base(const DBus::Type::Struct& header, const std::string& b
         const DBus::Type::Struct& headerField = DBus::Type::refStruct(it);
         uint8_t type = Type::asByte(headerField[0]);
         switch (type) {
-            case Header::HEADER_PATH:
-                m_Header.path = DBus::Type::asString(headerField[1]);
-                break;
-            case Header::HEADER_INTERFACE:
-                m_Header.interface = DBus::Type::asString(headerField[1]);
-                break;
-            case Header::HEADER_MEMBER:
-                m_Header.member = DBus::Type::asString(headerField[1]);
-                break;
-            case Header::HEADER_DESTINATION:
-                 m_Header.destination = DBus::Type::asString(headerField[1]);
-                 break;
-            case Header::HEADER_SENDER:
-                m_Header.sender = DBus::Type::asString(headerField[1]);
-                break;
-            case Header::HEADER_SIGNATURE:
-                signature = DBus::Type::asString(headerField[1]);
-                break;
-            case Header::HEADER_REPLY_SERIAL:
-                m_Header.replySerial = DBus::Type::asUint32(headerField[1]);
-                break;
+        case Header::HEADER_PATH:
+            m_Header.path = DBus::Type::asString(headerField[1]);
+            break;
+        case Header::HEADER_INTERFACE:
+            m_Header.interface = DBus::Type::asString(headerField[1]);
+            break;
+        case Header::HEADER_MEMBER:
+            m_Header.member = DBus::Type::asString(headerField[1]);
+            break;
+        case Header::HEADER_DESTINATION:
+            m_Header.destination = DBus::Type::asString(headerField[1]);
+            break;
+        case Header::HEADER_SENDER:
+            m_Header.sender = DBus::Type::asString(headerField[1]);
+            break;
+        case Header::HEADER_SIGNATURE:
+            signature = DBus::Type::asString(headerField[1]);
+            break;
+        case Header::HEADER_REPLY_SERIAL:
+            m_Header.replySerial = DBus::Type::asUint32(headerField[1]);
+            break;
 
-            default:
-                break;
+        default:
+            break;
         }
     }
 
@@ -85,15 +86,17 @@ DBus::Message::Base::Base(const DBus::Type::Struct& header, const std::string& b
     }
 }
 
-void DBus::Message::Base::parseParameters(bool isLittleEndian, const std::string& bodydata, const std::string& signature)
+void DBus::Message::Base::parseParameters(bool isLittleEndian,
+    const std::string& bodydata,
+    const std::string& signature)
 {
     DBus::Type::Struct parameter_fields;
 
     parameter_fields.setSignature("(" + signature + ")");
 
     MessageIStream stream((uint8_t*)bodydata.data(), bodydata.size(),
-        isLittleEndian ? __BYTE_ORDER != __LITTLE_ENDIAN :
-                         __BYTE_ORDER != __BIG_ENDIAN);
+        isLittleEndian ? __BYTE_ORDER != __LITTLE_ENDIAN
+                       : __BYTE_ORDER != __BIG_ENDIAN);
     parameter_fields.unmarshall(stream);
 
     size_t count = parameter_fields.getEntries();
@@ -102,65 +105,72 @@ void DBus::Message::Base::parseParameters(bool isLittleEndian, const std::string
     }
 }
 
-std::string DBus::Message::Base::marshallMessage(const DBus::Type::Array& array) const
+std::string
+DBus::Message::Base::marshallMessage(const DBus::Type::Array& array) const
 {
     MessageOStream header;
     MessageOStream body;
 
     /*
-            The signature of the header is:
+          The signature of the header is:
 
-                    "yyyyuua(yv)"
+                  "yyyyuua(yv)"
 
-            Written out more readably, this is:
+          Written out more readably, this is:
 
-                    BYTE, BYTE, BYTE, BYTE, UINT32, UINT32, ARRAY of STRUCT of (BYTE,VARIANT)
-    */
+                  BYTE, BYTE, BYTE, BYTE, UINT32, UINT32, ARRAY of STRUCT of
+     (BYTE,VARIANT)
+  */
 
     // 1st BYTE
-    // Endianness flag; ASCII 'l' for little-endian or ASCII 'B' for big-endian. Both header and body are in this endianness.
+    // Endianness flag; ASCII 'l' for little-endian or ASCII 'B' for big-endian.
+    // Both header and body are in this endianness.
     header.writeByte(__BYTE_ORDER == __LITTLE_ENDIAN ? 'l' : 'B');
 
     // 2nd BYTE
-    // Message type. Unknown types must be ignored. Currently-defined types are described below.
+    // Message type. Unknown types must be ignored. Currently-defined types are
+    // described below.
     header.writeByte(m_Header.type);
 
     // 3rd BYTE
-    // Bitwise OR of flags. Unknown flags must be ignored. Currently-defined flags are described below.
+    // Bitwise OR of flags. Unknown flags must be ignored. Currently-defined flags
+    // are described below.
     header.writeByte(m_Header.flags);
 
     // 4th BYTE
-    // Major protocol version of the sending application. If the major protocol version of the receiving application
-    // does not match, the applications will not be able to communicate and the D-Bus connection must be
-    // disconnected. The major protocol version for this version of the specification is 1.
+    // Major protocol version of the sending application. If the major protocol
+    // version of the receiving application does not match, the applications will
+    // not be able to communicate and the D-Bus connection must be disconnected.
+    // The major protocol version for this version of the specification is 1.
     header.writeByte(1);
 
     // 1st UINT32
-    // Length in bytes of the message body, starting from the end of the header. The header ends after its alignment
-    // padding to an 8-boundary.
+    // Length in bytes of the message body, starting from the end of the header.
+    // The header ends after its alignment padding to an 8-boundary.
     m_Parameters.marshallData(body);
 
     header.writeUint32(body.data.length());
 
     // 2nd UINT32
-    // The serial of this message, used as a cookie by the sender to identify the reply corresponding to this request. This must not be zero.
+    // The serial of this message, used as a cookie by the sender to identify the
+    // reply corresponding to this request. This must not be zero.
     header.writeUint32(m_Header.serial);
 
     // Header fields length
     MessageOStream header_fields;
 
-    // It appears, from studying the packet data, that the header field array is not marshalled with
-    // the length of the array data in bytes, as suggested in the spec.
-    // Presumably this is because the header fields size can be determined from
-    // the packet_size - body_size - standard_header_size
+    // It appears, from studying the packet data, that the header field array is
+    // not marshalled with the length of the array data in bytes, as suggested in
+    // the spec. Presumably this is because the header fields size can be
+    // determined from the packet_size - body_size - standard_header_size
     array.marshallContents(header_fields);
     header.writeUint32((int32_t)header_fields.size());
 
     // End of header preparation
 
-    // Both header & header_fields constitute the header, which must end of an 8 boundary.
-    // (See the phrase: "The header ends after its alignment padding to an 8-boundary.")
-    // Therefore we add the padding here.
+    // Both header & header_fields constitute the header, which must end of an 8
+    // boundary. (See the phrase: "The header ends after its alignment padding to
+    // an 8-boundary.") Therefore we add the padding here.
     MessageOStream packet;
     packet.write(header);
     packet.write(header_fields);
@@ -175,7 +185,8 @@ std::string DBus::Message::Base::marshallMessage(const DBus::Type::Array& array)
 //
 // Parameters
 //
-std::string DBus::Message::MethodCallParameters::getMarshallingSignature() const
+std::string
+DBus::Message::MethodCallParameters::getMarshallingSignature() const
 {
     std::string signature;
     for (auto it : m_Contents.m_TypeList) {
@@ -184,31 +195,60 @@ std::string DBus::Message::MethodCallParameters::getMarshallingSignature() const
     return signature;
 }
 
-void DBus::Message::MethodCallParameters::marshallData(MessageOStream& stream) const
+void DBus::Message::MethodCallParameters::marshallData(
+    MessageOStream& stream) const
 {
     for (auto it : m_Contents.m_TypeList) {
         DBus::Type::marshallData(it, stream);
     }
 }
 
-size_t DBus::Message::MethodCallParameters::getParameterCount() const { return m_Contents.m_TypeList.size(); }
+size_t DBus::Message::MethodCallParameters::getParameterCount() const
+{
+    return m_Contents.m_TypeList.size();
+}
 
-const DBus::Type::Generic& DBus::Message::MethodCallParameters::getParameter(size_t idx) const { return m_Contents.m_TypeList[idx]; }
+const DBus::Type::Generic&
+DBus::Message::MethodCallParameters::getParameter(size_t idx) const
+{
+    return m_Contents.m_TypeList[idx];
+}
 
-DBus::Message::MethodCallParametersIn::MethodCallParametersIn(const Type::Generic& v) { add(v); }
+DBus::Message::MethodCallParametersIn::MethodCallParametersIn(
+    const Type::Generic& v)
+{
+    add(v);
+}
 
-DBus::Message::MethodCallParametersIn::MethodCallParametersIn(const std::string& v) { add(v); }
+DBus::Message::MethodCallParametersIn::MethodCallParametersIn(
+    const std::string& v)
+{
+    add(v);
+}
 
-DBus::Message::MethodCallParametersIn::MethodCallParametersIn(const std::string& v1, uint32_t v2)
+DBus::Message::MethodCallParametersIn::MethodCallParametersIn(
+    const std::string& v1, uint32_t v2)
 {
     add(v1);
     add(v2);
 }
 
-void DBus::Message::MethodCallParametersIn::add(const Type::Generic& value) { m_Contents.m_TypeList.push_back(value); }
+void DBus::Message::MethodCallParametersIn::add(const Type::Generic& value)
+{
+    m_Contents.m_TypeList.push_back(value);
+}
 
-void DBus::Message::MethodCallParametersIn::add(uint8_t value) { add(DBus::Type::Byte(value)); }
+void DBus::Message::MethodCallParametersIn::add(uint8_t value)
+{
+    add(DBus::Type::Byte(value));
+}
 
-void DBus::Message::MethodCallParametersIn::add(uint32_t value) { add(DBus::Type::Uint32(value)); }
+void DBus::Message::MethodCallParametersIn::add(uint32_t value)
+{
+    add(DBus::Type::Uint32(value));
+}
 
-void DBus::Message::MethodCallParametersIn::add(const std::string& value) { add(DBus::Type::String(value)); }
+void DBus::Message::MethodCallParametersIn::add(const std::string& value)
+{
+    add(DBus::Type::String(value));
+}

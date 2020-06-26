@@ -18,9 +18,9 @@
 #ifndef DBUS_MESSAGEISTREAM_H
 #define DBUS_MESSAGEISTREAM_H
 
+#include "dbus_octetbuffer.h"
 #include <byteswap.h>
 #include <string>
-#include "dbus_octetbuffer.h"
 
 namespace DBus {
 
@@ -29,18 +29,21 @@ class MessageIStream {
     size_t m_offset;
     bool m_swapByteOrder;
 
-    template<class T>
+    template <class T>
     T swap(T value) const
     {
-        switch(sizeof(T)) {
-            case 2:
-                return bswap_16(value); break;
-            case 4:
-                return bswap_32(value); break;
-            case 8:
-                return bswap_64(value); break;
-            default:
-                break;
+        switch (sizeof(T)) {
+        case 2:
+            return bswap_16(value);
+            break;
+        case 4:
+            return bswap_32(value);
+            break;
+        case 8:
+            return bswap_64(value);
+            break;
+        default:
+            break;
         }
         return value;
     }
@@ -56,7 +59,7 @@ public:
     void read(double* value);
     void read(std::string& string, size_t size);
 
-    template<class T>
+    template <class T>
     void read(T* value)
     {
         align(sizeof(T));

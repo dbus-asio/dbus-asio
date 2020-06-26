@@ -26,7 +26,8 @@
 
 #include "dbus_message.h"
 
-DBus::Message::MethodCall::MethodCall(const DBus::Type::Struct& header, const std::string& body)
+DBus::Message::MethodCall::MethodCall(const DBus::Type::Struct& header,
+    const std::string& body)
     : Message::Base(header, body)
     , m_Name(m_Header.path, m_Header.interface, m_Header.member)
 {
@@ -34,13 +35,17 @@ DBus::Message::MethodCall::MethodCall(const DBus::Type::Struct& header, const st
     m_Header.type = Message::Header::TYPE_METHOD_CALL;
 }
 
-DBus::Message::MethodCall::MethodCall(const Message::MethodCallIdentifier& name, const MethodCallParametersIn& params, uint32_t flags)
+DBus::Message::MethodCall::MethodCall(const Message::MethodCallIdentifier& name,
+    const MethodCallParametersIn& params,
+    uint32_t flags)
     : Message::Base()
     , m_Name(name)
 {
 
     if (flags & Message::Header::FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION) {
-        DBus::Log::write(Log::ERROR, "DBus :: ALLOW_INTERACTIVE_AUTHORIZATION is not yet supported.");
+        DBus::Log::write(
+            Log::ERROR,
+            "DBus :: ALLOW_INTERACTIVE_AUTHORIZATION is not yet supported.");
         flags &= ~Message::Header::FLAGS_ALLOW_INTERACTIVE_AUTHORIZATION;
     }
     // Ignore any extraneous flags, also.
@@ -51,19 +56,22 @@ DBus::Message::MethodCall::MethodCall(const Message::MethodCallIdentifier& name,
     m_Parameters = params;
 }
 
-std::string DBus::Message::MethodCall::marshall(const std::string& destination) const
+std::string
+DBus::Message::MethodCall::marshall(const std::string& destination) const
 {
 
     // ARRAY of STRUCT of (BYTE,VARIANT)
-    // An array of zero or more header fields where the byte is the field code, and the variant is the
-    // field m_Value. The message type determines which fields are required.
+    // An array of zero or more header fields where the byte is the field code,
+    // and the variant is the field m_Value. The message type determines which
+    // fields are required.
     DBus::Type::Array array;
     DBus::Type::Struct sPath;
     sPath.add(DBus::Type::Byte(DBus::Message::Header::HEADER_PATH));
     sPath.add(DBus::Type::Variant(DBus::Type::ObjectPath(m_Name.m_Object)));
     array.add(sPath);
 
-    // This is necessary, to prevent errors from the daemon,although it is marked as optional in the spec
+    // This is necessary, to prevent errors from the daemon,although it is marked
+    // as optional in the spec
     DBus::Type::Struct sDestination;
     sDestination.add(DBus::Type::Byte(DBus::Message::Header::HEADER_DESTINATION));
     sDestination.add(DBus::Type::Variant(DBus::Type::String(destination)));
@@ -82,17 +90,30 @@ std::string DBus::Message::MethodCall::marshall(const std::string& destination) 
     if (m_Parameters.getParameterCount()) {
         DBus::Type::Struct sSignature;
         sSignature.add(DBus::Type::Byte(DBus::Message::Header::HEADER_SIGNATURE));
-        sSignature.add(DBus::Type::Variant(DBus::Type::Signature(m_Parameters.getMarshallingSignature())));
+        sSignature.add(DBus::Type::Variant(
+            DBus::Type::Signature(m_Parameters.getMarshallingSignature())));
         array.add(sSignature);
     }
 
     return marshallMessage(array);
 }
 
-std::string DBus::Message::MethodCall::getFullName() const { return getInterface() + "." + getMethod(); }
+std::string DBus::Message::MethodCall::getFullName() const
+{
+    return getInterface() + "." + getMethod();
+}
 
-std::string DBus::Message::MethodCall::getObject() const { return m_Name.m_Object; }
+std::string DBus::Message::MethodCall::getObject() const
+{
+    return m_Name.m_Object;
+}
 
-std::string DBus::Message::MethodCall::getInterface() const { return m_Name.m_Interface; }
+std::string DBus::Message::MethodCall::getInterface() const
+{
+    return m_Name.m_Interface;
+}
 
-std::string DBus::Message::MethodCall::getMethod() const { return m_Name.m_Method; }
+std::string DBus::Message::MethodCall::getMethod() const
+{
+    return m_Name.m_Method;
+}

@@ -18,15 +18,15 @@
 #ifndef DBUS_VALIDATION_H
 #define DBUS_VALIDATION_H
 
-#include <string>
 #include <stdexcept>
+#include <string>
 
 namespace DBus {
-    namespace Validation {
-        bool isValidBasicType(char type);
-        void throwOnInvalidBasicType(char type);
-        void throwOnInvalidBasicType(const std::string &type);
-    }
-}
+namespace Validation {
+    bool isValidBasicType(char type);
+    void throwOnInvalidBasicType(char type);
+    void throwOnInvalidBasicType(const std::string& type);
+} // namespace Validation
+} // namespace DBus
 
 #endif // DBUS_VALIDATION_H

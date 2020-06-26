@@ -34,7 +34,7 @@ namespace Type {
         void marshall(MessageOStream& stream) const;
         static const std::string s_StaticTypeCode;
     };
-}
-}
+} // namespace Type
+} // namespace DBus
 
 #endif

@@ -15,7 +15,6 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <sstream>
 #include "dbus_type_array.h"
 #include "dbus_type.h"
 #include "dbus_type_boolean.h"
@@ -33,9 +32,10 @@
 #include "dbus_type_uint32.h"
 #include "dbus_type_uint64.h"
 #include "dbus_type_variant.h"
+#include <sstream>
 
-#include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
 
 const std::string DBus::Type::Array::s_StaticTypeCode("a");
 
@@ -131,7 +131,10 @@ size_t DBus::Type::Array::add(const DBus::Type::DictEntry& s)
     return size();
 }
 
-const std::vector<DBus::Type::Generic>& DBus::Type::Array::getContents() const { return contents; }
+const std::vector<DBus::Type::Generic>& DBus::Type::Array::getContents() const
+{
+    return contents;
+}
 
 void DBus::Type::Array::marshall(MessageOStream& stream) const
 {
@@ -162,7 +165,7 @@ void DBus::Type::Array::unmarshall(MessageIStream& stream)
     stream.align(Type::getAlignment(signature));
 
     MessageIStream arrayStream(stream, size);
-    while(!arrayStream.empty()) {
+    while (!arrayStream.empty()) {
         contents.push_back(DBus::Type::create(signature));
         DBus::Type::unmarshallData(contents.back(), arrayStream);
     };

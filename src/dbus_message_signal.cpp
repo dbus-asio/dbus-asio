@@ -35,7 +35,8 @@ DBus::Message::Signal::Signal(const Message::MethodCallIdentifier& name)
     m_Header.type = Message::Header::TYPE_SIGNAL;
 }
 
-DBus::Message::Signal::Signal(const DBus::Type::Struct& header, const std::string& body)
+DBus::Message::Signal::Signal(const DBus::Type::Struct& header,
+    const std::string& body)
     : Message::Base(header, body)
     , m_SignalName(m_Header.path, m_Header.interface, m_Header.member)
 {
@@ -50,14 +51,19 @@ DBus::Message::Signal::Signal(const DBus::Type::Struct& header, const std::strin
             postfix = "\n";
         }
 
-        Log::write(Log::TRACE, "DBus :: Signal : Header :\n%s", DBus::Type::toString(header).c_str());
+        Log::write(Log::TRACE, "DBus :: Signal : Header :\n%s",
+            DBus::Type::toString(header).c_str());
         Log::write(Log::TRACE, "DBus :: Signal : Data   :\n%s\n", data.c_str());
     }
 }
 
-void DBus::Message::Signal::addParameter(const Type::Generic& value) { m_Parameters.add(value); }
+void DBus::Message::Signal::addParameter(const Type::Generic& value)
+{
+    m_Parameters.add(value);
+}
 
-std::string DBus::Message::Signal::marshall(const std::string& destination) const
+std::string
+DBus::Message::Signal::marshall(const std::string& destination) const
 {
     DBus::Type::Array array;
     DBus::Type::Struct sPath;
@@ -65,7 +71,8 @@ std::string DBus::Message::Signal::marshall(const std::string& destination) cons
     sPath.add(DBus::Type::Variant(DBus::Type::ObjectPath(m_SignalName.m_Object)));
     array.add(sPath);
 
-    // This is necessary, to prevent errors from the daemon,although it is marked as optional in the spec
+    // This is necessary, to prevent errors from the daemon,although it is marked
+    // as optional in the spec
     DBus::Type::Struct sDestination;
     sDestination.add(DBus::Type::Byte(DBus::Message::Header::HEADER_DESTINATION));
     sDestination.add(DBus::Type::Variant(DBus::Type::String(destination)));
@@ -73,7 +80,8 @@ std::string DBus::Message::Signal::marshall(const std::string& destination) cons
 
     DBus::Type::Struct sInterface;
     sInterface.add(DBus::Type::Byte(DBus::Message::Header::HEADER_INTERFACE));
-    sInterface.add(DBus::Type::Variant(DBus::Type::String(m_SignalName.m_Interface)));
+    sInterface.add(
+        DBus::Type::Variant(DBus::Type::String(m_SignalName.m_Interface)));
     array.add(sInterface);
 
     DBus::Type::Struct sMember;
@@ -84,7 +92,8 @@ std::string DBus::Message::Signal::marshall(const std::string& destination) cons
     if (m_Parameters.getParameterCount()) {
         DBus::Type::Struct sSignature;
         sSignature.add(DBus::Type::Byte(DBus::Message::Header::HEADER_SIGNATURE));
-        sSignature.add(DBus::Type::Variant(DBus::Type::Signature(m_Parameters.getMarshallingSignature())));
+        sSignature.add(DBus::Type::Variant(
+            DBus::Type::Signature(m_Parameters.getMarshallingSignature())));
         array.add(sSignature);
     }
 

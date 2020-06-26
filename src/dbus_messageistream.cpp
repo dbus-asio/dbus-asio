@@ -16,23 +16,23 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "dbus_messageistream.h"
-#include <string>
 #include <stdexcept>
+#include <string>
 
 namespace DBus {
 
-MessageIStream::MessageIStream(const uint8_t* data, size_t size, bool swapByteOrder)
-  : m_data(data, size),
-    m_offset(0),
-    m_swapByteOrder(swapByteOrder)
+MessageIStream::MessageIStream(const uint8_t* data, size_t size,
+    bool swapByteOrder)
+    : m_data(data, size)
+    , m_offset(0)
+    , m_swapByteOrder(swapByteOrder)
 {
-
 }
 
 MessageIStream::MessageIStream(MessageIStream& stream, size_t size)
-  : m_data(stream.m_data.data(), size),
-    m_offset(stream.m_offset),
-    m_swapByteOrder(stream.m_swapByteOrder)
+    : m_data(stream.m_data.data(), size)
+    , m_offset(stream.m_offset)
+    , m_swapByteOrder(stream.m_swapByteOrder)
 {
     stream.m_data.remove_prefix(size);
     stream.m_offset += size;
@@ -59,14 +59,14 @@ void MessageIStream::read(uint8_t* value, size_t size)
 {
     m_data.copy((uint8_t*)value, size);
     m_data.remove_prefix(size);
-    m_offset+= size;
+    m_offset += size;
 }
 
 void MessageIStream::read(double* value)
 {
     uint64_t u;
     read(&u);
-    *value = *reinterpret_cast<double *>(&u);
+    *value = *reinterpret_cast<double*>(&u);
 }
 
 void MessageIStream::read(std::string& string, size_t size)
@@ -76,14 +76,11 @@ void MessageIStream::read(std::string& string, size_t size)
     }
 
     string.clear();
-    string.append((const char *)m_data.data(), size);
+    string.append((const char*)m_data.data(), size);
     m_data.remove_prefix(size);
-    m_offset+= size;
+    m_offset += size;
 }
 
-bool MessageIStream::empty()
-{
-    return m_data.empty();
-}
+bool MessageIStream::empty() { return m_data.empty(); }
 
 } // namespace DBus

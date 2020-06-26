@@ -15,11 +15,11 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
+#include "dbus_type_int32.h"
+#include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
 #include <iomanip>
 #include <sstream>
-#include "dbus_type_int32.h"
-#include "dbus_messageostream.h"
-#include "dbus_messageistream.h"
 
 const std::string DBus::Type::Int32::s_StaticTypeCode("i");
 
@@ -35,7 +35,10 @@ DBus::Type::Int32::Int32(int32_t v)
     setSignature(s_StaticTypeCode);
 }
 
-void DBus::Type::Int32::marshall(MessageOStream& stream) const { stream.writeInt32(m_Value); }
+void DBus::Type::Int32::marshall(MessageOStream& stream) const
+{
+    stream.writeInt32(m_Value);
+}
 
 void DBus::Type::Int32::unmarshall(MessageIStream& stream)
 {
@@ -47,7 +50,8 @@ std::string DBus::Type::Int32::toString(const std::string& prefix) const
     std::stringstream ss;
 
     ss << prefix << "Int32 ";
-    ss << m_Value << " (0x" << std::hex << std::setfill('0') << std::setw(4) << m_Value << ")\n";
+    ss << m_Value << " (0x" << std::hex << std::setfill('0') << std::setw(4)
+       << m_Value << ")\n";
 
     return ss.str();
 }

@@ -43,7 +43,7 @@ namespace Type {
     protected:
         std::string m_Value;
     };
-}
-}
+} // namespace Type
+} // namespace DBus
 
 #endif

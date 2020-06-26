@@ -4,7 +4,8 @@ It is advisable to auto-format your code before you check-in any changes.
 First install clang-format if you don't already have it:
 $ sudo apt-get install clang-format
 
-You can use clang-format utility with WebKit syle option:
-$ clang-format -i -style=WebKit src/*
+Then run the included script to fix the formatting:
+$ ./fix-formatting
 
-You can apply clang-format to a single file or a folder..
+You can apply clang-format to a single folder by running the script in
+that folder.

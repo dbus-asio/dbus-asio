@@ -25,9 +25,9 @@
 #include "dbus_type_struct.h"
 
 #include "dbus_message.h"
-#include "dbus_messageprotocol.h"
-#include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
+#include "dbus_messageprotocol.h"
 
 #include <byteswap.h>
 
@@ -35,8 +35,7 @@ namespace {
 
 inline bool SwapRequired(uint8_t c)
 {
-    return (c == 'l' && __BYTE_ORDER != __LITTLE_ENDIAN) ||
-           (c == 'B' && __BYTE_ORDER != __BIG_ENDIAN);
+    return (c == 'l' && __BYTE_ORDER != __LITTLE_ENDIAN) || (c == 'B' && __BYTE_ORDER != __BIG_ENDIAN);
 }
 
 inline uint32_t CorrectEndianess(uint8_t c, uint32_t value)
@@ -50,30 +49,50 @@ inline uint32_t CorrectEndianess(uint8_t c, uint32_t value)
 static const size_t MAX_ARRAY_SIZE = 67108864;
 static const size_t MAX_MESSAGE_SIZE = 134217728;
 
-} // anonymouse namespace
+} // namespace
 
 DBus::MessageProtocol::MessageProtocol()
-  : m_State(STATE_GETHEADERSIZE),
-    m_headerSize(0),
-    m_bodySize(0)
+    : m_State(STATE_GETHEADERSIZE)
+    , m_headerSize(0)
+    , m_bodySize(0)
 {
-    setMethodCallHandler(std::bind(&MessageProtocol::onReceiveMethodCall, this, std::placeholders::_1));
-    setMethodReturnHandler(std::bind(&MessageProtocol::onReceiveMethodReturn, this, std::placeholders::_1));
-    setErrorHandler(std::bind(&MessageProtocol::onReceiveError, this, std::placeholders::_1));
-    setSignalHandler(std::bind(&MessageProtocol::onReceiveSignal, this, std::placeholders::_1));
+    setMethodCallHandler(std::bind(&MessageProtocol::onReceiveMethodCall, this,
+        std::placeholders::_1));
+    setMethodReturnHandler(std::bind(&MessageProtocol::onReceiveMethodReturn,
+        this, std::placeholders::_1));
+    setErrorHandler(
+        std::bind(&MessageProtocol::onReceiveError, this, std::placeholders::_1));
+    setSignalHandler(std::bind(&MessageProtocol::onReceiveSignal, this,
+        std::placeholders::_1));
 
     reset();
 }
 
 void DBus::MessageProtocol::reset() { startMessage(); }
 
-void DBus::MessageProtocol::setMethodCallHandler(const DBus::Message::CallbackFunctionMethodCall& callback) { m_MethodCallCallback = callback; }
+void DBus::MessageProtocol::setMethodCallHandler(
+    const DBus::Message::CallbackFunctionMethodCall& callback)
+{
+    m_MethodCallCallback = callback;
+}
 
-void DBus::MessageProtocol::setMethodReturnHandler(const DBus::Message::CallbackFunctionMethodReturn& callback) { m_MethodReturnCallback = callback; }
+void DBus::MessageProtocol::setMethodReturnHandler(
+    const DBus::Message::CallbackFunctionMethodReturn& callback)
+{
+    m_MethodReturnCallback = callback;
+}
 
-void DBus::MessageProtocol::setErrorHandler(const DBus::Message::CallbackFunctionError& callback) { m_ErrorCallback = callback; }
+void DBus::MessageProtocol::setErrorHandler(
+    const DBus::Message::CallbackFunctionError& callback)
+{
+    m_ErrorCallback = callback;
+}
 
-void DBus::MessageProtocol::setSignalHandler(const DBus::Message::CallbackFunctionSignal& callback) { m_SignalCallback = callback; }
+void DBus::MessageProtocol::setSignalHandler(
+    const DBus::Message::CallbackFunctionSignal& callback)
+{
+    m_SignalCallback = callback;
+}
 
 void DBus::MessageProtocol::startMessage()
 {
@@ -99,9 +118,9 @@ bool DBus::MessageProtocol::getHeaderSize(OctetBuffer& buffer)
         }
 
         // Add the 16 bytes of the header
-        m_headerSize+= 16;
+        m_headerSize += 16;
         // The header MUST finish on an 8 byte boundary
-        m_headerSize+= (m_headerSize % 8 == 0) ? 0 : 8 - (m_headerSize % 8);
+        m_headerSize += (m_headerSize % 8 == 0) ? 0 : 8 - (m_headerSize % 8);
 
         m_State = STATE_UNMARSHALLHEADER;
         return true;
@@ -181,7 +200,7 @@ void DBus::MessageProtocol::onReceiveData(OctetBuffer& buffer)
     if (!m_octetCache.empty()) {
         OctetBuffer cachedBuffer(m_octetCache.data(), m_octetCache.size());
         processData(cachedBuffer);
-        m_octetCache.erase(0,  m_octetCache.size() - cachedBuffer.size());
+        m_octetCache.erase(0, m_octetCache.size() - cachedBuffer.size());
     }
 }
 
@@ -208,9 +227,12 @@ void DBus::MessageProtocol::onBodyComplete(const std::string& body)
         break;
 
     default:
-        Log::write(Log::WARNING, "DBus :: Unknown message type %d received\n", type);
+        Log::write(Log::WARNING, "DBus :: Unknown message type %d received\n",
+            type);
     }
 
-    Log::write(Log::TRACE, "DBus :: Message type %d dispatched : new message initialized\n", type);
+    Log::write(Log::TRACE,
+        "DBus :: Message type %d dispatched : new message initialized\n",
+        type);
     startMessage();
 }

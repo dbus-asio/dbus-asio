@@ -26,20 +26,22 @@
 
 // https://dbus.freedesktop.org/doc/dbus-specification.html#message-bus-routing-match-rules
 
-DBus::MatchRule::MatchRule(const std::string& rule, const Message::CallbackFunctionSignal& handler)
+DBus::MatchRule::MatchRule(const std::string& rule,
+    const Message::CallbackFunctionSignal& handler)
 {
     // Parse the rule string into something programmatic
 
     // 1. Split by the comma
-    boost::char_separator<char> separator{ "," };
-    boost::tokenizer<boost::char_separator<char> > tokenizer{ rule, separator };
+    boost::char_separator<char> separator { "," };
+    boost::tokenizer<boost::char_separator<char>> tokenizer { rule, separator };
     for (auto&& param : tokenizer) {
         // 2. Then split each at the equals
         std::vector<std::string> keyvalue;
         boost::split(keyvalue, param, boost::is_any_of("="));
 
-        // Valid keys are: type, sender, interface, member, path, path_namespace, destination, arg*, eavesdrop
-        // We're happy for [] to throw on malformed rules, since that's watch we'd do anyway in this case
+        // Valid keys are: type, sender, interface, member, path, path_namespace,
+        // destination, arg*, eavesdrop We're happy for [] to throw on malformed
+        // rules, since that's watch we'd do anyway in this case
 
         // 3. Strip the single quotes from the value
         keyvalue[1].pop_back();
@@ -68,7 +70,8 @@ DBus::MatchRule::MatchRule(const std::string& rule, const Message::CallbackFunct
 
     // Using both path and path_namespace in the same match rule is not allowed.
     if (path != "" && path_namespace != "") {
-        throw std::runtime_error("Match rules with both 'path' and 'path_namespace' are not allowed.");
+        throw std::runtime_error(
+            "Match rules with both 'path' and 'path_namespace' are not allowed.");
     }
 
     // Finally, remember the callback
@@ -100,14 +103,16 @@ bool DBus::MatchRule::isMatched(const DBus::Message::Signal& signal)
     }
 
     // For example, path_namespace='/com/example/foo' would match signals sent
-    // by /com/example/foo or by /com/example/foo/bar, but not by /com/example/foobar.
+    // by /com/example/foo or by /com/example/foo/bar, but not by
+    // /com/example/foobar.
     if (path_namespace != "") {
         if (signal_path.find(path_namespace) != 0) {
             return false;
         }
 
-        // This handles the 3rd case, by checking the character _after_ the match is found:
-        // if it's not the terminator or another path (i.e. a new /) the search fails.
+        // This handles the 3rd case, by checking the character _after_ the match is
+        // found: if it's not the terminator or another path (i.e. a new /) the
+        // search fails.
         auto next_char = signal_path.at(path_namespace.size());
         if (next_char != '\0' && next_char != '/') {
             return false;
@@ -120,4 +125,7 @@ bool DBus::MatchRule::isMatched(const DBus::Message::Signal& signal)
     return true;
 }
 
-void DBus::MatchRule::invoke(const DBus::Message::Signal& signal) { callback(signal); }
+void DBus::MatchRule::invoke(const DBus::Message::Signal& signal)
+{
+    callback(signal);
+}

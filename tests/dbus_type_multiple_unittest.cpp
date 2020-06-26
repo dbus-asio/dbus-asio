@@ -1,5 +1,6 @@
-#include <catch2/catch.hpp>
-#include <iostream>
+#include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
+#include "dbus_messageprotocol.h"
 #include "dbus_type_array.h"
 #include "dbus_type_boolean.h"
 #include "dbus_type_byte.h"
@@ -8,11 +9,10 @@
 #include "dbus_type_string.h"
 #include "dbus_type_struct.h"
 #include "dbus_type_uint32.h"
-#include "dbus_messageprotocol.h"
-#include "dbus_messageostream.h"
-#include "dbus_messageistream.h"
 #include <byteswap.h>
+#include <catch2/catch.hpp>
 #include <iomanip>
+#include <iostream>
 
 namespace DBus::test {
 
@@ -45,7 +45,7 @@ TEST_CASE("Round trip complex data structure")
 
     REQUIRE(DBus::Type::getMarshallingSignature(input) == "{i(s{sa{s(ys)}})}");
     REQUIRE('\n' + input.toString() ==
-            R"(
+        R"(
 DictEntry ({i(s{sa{s(ys)}})}) : {
    key:      Int32 131073 (0x20001)
    value:    Struct (s{sa{s(ys)}}) <
@@ -92,7 +92,8 @@ DictEntry ({i(s{sa{s(ys)}})}) : {
     {
         Type::DictEntry output;
         output.setSignature(input.getSignature());
-        MessageIStream istream((uint8_t*)ostream.data.data(), ostream.data.size(), false);
+        MessageIStream istream((uint8_t*)ostream.data.data(), ostream.data.size(),
+            false);
         output.unmarshall(istream);
 
         REQUIRE(input.toString() == output.toString());
@@ -103,8 +104,7 @@ DictEntry ({i(s{sa{s(ys)}})}) : {
         // We don't really care what exception is thrown as long as
         // one is and valgrind doesn't complain that we went outside
         // the bounds.
-        for (const auto truncate_at : { 164, 42, 1, 0 })
-        {
+        for (const auto truncate_at : { 164, 42, 1, 0 }) {
             SECTION("Truncated")
             {
                 INFO("Truncate at " << truncate_at << " from " << ostream.data.size());
@@ -119,4 +119,4 @@ DictEntry ({i(s{sa{s(ys)}})}) : {
     }
 }
 
-}
+} // namespace DBus::test

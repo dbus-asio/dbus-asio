@@ -26,20 +26,11 @@ class MessageOStream {
 public:
     std::string data;
 
-    size_t size() const
-    {
-        return data.length();
-    }
+    size_t size() const { return data.length(); }
 
-    void writeByte(char byte)
-    {
-        data.push_back(byte);
-    }
+    void writeByte(char byte) { data.push_back(byte); }
 
-    void writeBoolean(bool value)
-    {
-        writeUint32(value ? 1 : 0);
-    }
+    void writeBoolean(bool value) { writeUint32(value ? 1 : 0); }
 
     void writeInt16(int16_t value)
     {
@@ -83,10 +74,7 @@ public:
         data.append((char*)&value, sizeof(double));
     }
 
-    void write(const std::string& str)
-    {
-        data.append(str.data(), str.length());
-    }
+    void write(const std::string& str) { data.append(str.data(), str.length()); }
 
     void write(const MessageOStream& stream)
     {
@@ -97,7 +85,8 @@ public:
     {
         pad4();
 
-        // A UINT32 indicating the string's length in bytes excluding its terminating nul,
+        // A UINT32 indicating the string's length in bytes excluding its
+        // terminating nul,
         writeUint32(str.length());
 
         // followed by non-nul string data of the given length,
@@ -109,7 +98,8 @@ public:
 
     void writeSignature(const std::string& str)
     {
-        // The same as STRING except the length is a single byte (thus signatures have a maximum length of 255)
+        // The same as STRING except the length is a single byte (thus signatures
+        // have a maximum length of 255)
         writeByte(str.length());
         // and the content must be a valid signature (see above).
         data.append(str);
@@ -121,21 +111,12 @@ public:
         data.append(DBus::Utils::getPadding(padding, data.length()), 0);
     }
 
-    void pad2()
-    {
-        pad(2);
-    }
+    void pad2() { pad(2); }
 
-    void pad4()
-    {
-        pad(4);
-    }
+    void pad4() { pad(4); }
 
-    void pad8()
-    {
-        pad(8);
-    }
+    void pad8() { pad(8); }
 };
-}
+} // namespace DBus
 
 #endif

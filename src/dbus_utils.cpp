@@ -22,7 +22,8 @@
 
 #include "dbus_utils.h"
 
-void DBus::Utils::ConvertHexStringToBinary(std::string& result, const std::string& input)
+void DBus::Utils::ConvertHexStringToBinary(std::string& result,
+    const std::string& input)
 {
     std::istringstream ss(input);
     std::string word;
@@ -35,7 +36,8 @@ void DBus::Utils::ConvertHexStringToBinary(std::string& result, const std::strin
     }
 }
 
-void DBus::Utils::ConvertBinaryToHexString(std::string& result, const std::string& input)
+void DBus::Utils::ConvertBinaryToHexString(std::string& result,
+    const std::string& input)
 {
     std::stringstream ss;
 
@@ -46,14 +48,18 @@ void DBus::Utils::ConvertBinaryToHexString(std::string& result, const std::strin
     result.append(ss.str());
 }
 
-bool DBus::Utils::isAlignedTo(size_t pad, size_t size) { return (size % pad) == 0 ? true : false; }
+bool DBus::Utils::isAlignedTo(size_t pad, size_t size)
+{
+    return (size % pad) == 0 ? true : false;
+}
 
 bool DBus::Utils::isAlignedTo8(size_t offset) { return isAlignedTo(8, offset); }
 
 // How many bytes of padding are required so that 'size' is padded to 'pad'
 size_t DBus::Utils::getPadding(size_t pad, size_t size)
 {
-    // The zero case is generally not used but be used as code-as-comment (e.g. pad(0) to indicate none is needed)
+    // The zero case is generally not used but be used as code-as-comment (e.g.
+    // pad(0) to indicate none is needed)
     if (pad == 0) {
         return 0;
     }

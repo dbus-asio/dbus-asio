@@ -18,14 +18,13 @@
 #ifndef DBUS_OCTECTSTREAM_H
 #define DBUS_OCTECTSTREAM_H
 
-#include <cstdint>
 #include <cstddef>
+#include <cstdint>
 
 namespace DBus {
 
-class OctetBuffer
-{
-    const uint8_t * m_data;
+class OctetBuffer {
+    const uint8_t* m_data;
     size_t m_size;
 
 public:

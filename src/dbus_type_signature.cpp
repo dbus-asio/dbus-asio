@@ -15,10 +15,10 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <sstream>
 #include "dbus_type_signature.h"
-#include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
+#include <sstream>
 
 const std::string DBus::Type::Signature::s_StaticTypeCode("g");
 

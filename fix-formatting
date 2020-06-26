@@ -1,0 +1,7 @@
+#!/bin/sh
+find . -name '*.h' -o -name '*.cpp' | while read file; do
+    # ensure the file ends in a newline. clang-format will remove
+    # duplicates.
+    echo >> "${file}"
+    clang-format -i -style=WebKit "${file}"
+done

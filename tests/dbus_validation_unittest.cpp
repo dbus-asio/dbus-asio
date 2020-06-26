@@ -1,5 +1,5 @@
-#include <catch2/catch.hpp>
 #include "dbus_validation.h"
+#include <catch2/catch.hpp>
 
 TEST_CASE("Basic types char")
 {

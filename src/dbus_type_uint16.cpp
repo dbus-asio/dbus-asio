@@ -15,11 +15,11 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
+#include "dbus_type_uint16.h"
+#include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
 #include <iomanip>
 #include <sstream>
-#include "dbus_type_uint16.h"
-#include "dbus_messageostream.h"
-#include "dbus_messageistream.h"
 
 const std::string DBus::Type::Uint16::s_StaticTypeCode("q");
 
@@ -35,7 +35,10 @@ DBus::Type::Uint16::Uint16(uint16_t v)
     setSignature(s_StaticTypeCode);
 }
 
-void DBus::Type::Uint16::marshall(MessageOStream& stream) const { stream.writeUint16(m_Value); }
+void DBus::Type::Uint16::marshall(MessageOStream& stream) const
+{
+    stream.writeUint16(m_Value);
+}
 
 void DBus::Type::Uint16::unmarshall(MessageIStream& stream)
 {
@@ -47,7 +50,8 @@ std::string DBus::Type::Uint16::toString(const std::string& prefix) const
     std::stringstream ss;
 
     ss << prefix << "Uint16 ";
-    ss << m_Value << " (0x" << std::hex << std::setfill('0') << std::setw(2) << m_Value << ")\n";
+    ss << m_Value << " (0x" << std::hex << std::setfill('0') << std::setw(2)
+       << m_Value << ")\n";
 
     return ss.str();
 }

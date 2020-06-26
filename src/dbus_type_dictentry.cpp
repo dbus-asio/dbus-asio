@@ -15,48 +15,61 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <sstream>
-#include "dbus_type.h"
 #include "dbus_type_dictentry.h"
+#include "dbus_type.h"
 #include "dbus_type_string.h"
 #include "dbus_type_uint32.h"
+#include <sstream>
 
 #include "dbus_message.h"
-#include "dbus_messageprotocol.h"
-#include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
+#include "dbus_messageprotocol.h"
 #include "dbus_validation.h"
 
 /*
-Structs and dict entries are marshalled in the same way as their contents, but their
-alignment is always to an 8-byte boundary, even if their contents would normally be
-less strictly aligned.
+Structs and dict entries are marshalled in the same way as their contents, but
+their alignment is always to an 8-byte boundary, even if their contents would
+normally be less strictly aligned.
 
-A DICT_ENTRY works exactly like a struct, but rather than parentheses it uses curly
-braces, and it has more restrictions. The restrictions are: it occurs only as an array
-element type; it has exactly two single complete types inside the curly braces; the
-first single complete type (the "key") must be a basic type rather than a container type.
-Implementations must not accept dict entries outside of arrays, must not accept dict
-entries with zero, one, or more than two fields, and must not accept dict entries with
-non-basic-typed keys. A dict entry is always a key-value pair.
+A DICT_ENTRY works exactly like a struct, but rather than parentheses it uses
+curly braces, and it has more restrictions. The restrictions are: it occurs only
+as an array element type; it has exactly two single complete types inside the
+curly braces; the first single complete type (the "key") must be a basic type
+rather than a container type. Implementations must not accept dict entries
+outside of arrays, must not accept dict entries with zero, one, or more than two
+fields, and must not accept dict entries with non-basic-typed keys. A dict entry
+is always a key-value pair.
 
-The first field in the DICT_ENTRY is always the key. A message is considered corrupt
-if the same key occurs twice in the same array of DICT_ENTRY. However, for performance
-reasons implementations are not required to reject dicts with duplicate keys.
+The first field in the DICT_ENTRY is always the key. A message is considered
+corrupt if the same key occurs twice in the same array of DICT_ENTRY. However,
+for performance reasons implementations are not required to reject dicts with
+duplicate keys.
 
 
 */
 
 const std::string DBus::Type::DictEntry::s_StaticTypeCode("{");
 
-DBus::Type::DictEntry::DictEntry(const DBus::Type::Generic& key, const DBus::Type::Generic& value) { set(key, value); }
+DBus::Type::DictEntry::DictEntry(const DBus::Type::Generic& key,
+    const DBus::Type::Generic& value)
+{
+    set(key, value);
+}
 
-DBus::Type::DictEntry::DictEntry(const std::string& key, std::string& value) { set(DBus::Type::String(key), DBus::Type::String(value)); }
+DBus::Type::DictEntry::DictEntry(const std::string& key, std::string& value)
+{
+    set(DBus::Type::String(key), DBus::Type::String(value));
+}
 
-DBus::Type::DictEntry::DictEntry(const std::string& key, uint32_t value) { set(DBus::Type::String(key), DBus::Type::Uint32(value)); }
+DBus::Type::DictEntry::DictEntry(const std::string& key, uint32_t value)
+{
+    set(DBus::Type::String(key), DBus::Type::Uint32(value));
+}
 
 //
-void DBus::Type::DictEntry::set(const DBus::Type::Generic& key, const DBus::Type::Generic& value)
+void DBus::Type::DictEntry::set(const DBus::Type::Generic& key,
+    const DBus::Type::Generic& value)
 {
     m_Value = std::make_pair(key, value);
     m_Signature = "{" + Type::getMarshallingSignature(m_Value.first) + Type::getMarshallingSignature(m_Value.second) + "}";
@@ -92,8 +105,10 @@ std::string DBus::Type::DictEntry::toString(const std::string& prefix) const
     contents_prefix += "   ";
 
     ss << prefix << "DictEntry (" << getSignature() << ") : {\n";
-    ss << prefix << "   key:   " << DBus::Type::toString(m_Value.first, contents_prefix);
-    ss << prefix << "   value: " << DBus::Type::toString(m_Value.second, contents_prefix);
+    ss << prefix
+       << "   key:   " << DBus::Type::toString(m_Value.first, contents_prefix);
+    ss << prefix
+       << "   value: " << DBus::Type::toString(m_Value.second, contents_prefix);
     ss << prefix << "}\n";
 
     return ss.str();
