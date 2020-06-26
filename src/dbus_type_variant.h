@@ -52,7 +52,7 @@ namespace Type {
         DBus::Type::Generic m_Value;
         std::string m_ContainedSignature;
     };
-}
-}
+} // namespace Type
+} // namespace DBus
 
 #endif

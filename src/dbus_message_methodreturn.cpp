@@ -34,7 +34,8 @@ DBus::Message::MethodReturn::MethodReturn(uint32_t serial)
     m_Header.type = Message::Header::TYPE_METHOD_RETURN;
 }
 
-DBus::Message::MethodReturn::MethodReturn(const DBus::Type::Struct& header, const std::string& body)
+DBus::Message::MethodReturn::MethodReturn(const DBus::Type::Struct& header,
+    const std::string& body)
     : Message::Base(header, body)
 {
 
@@ -42,12 +43,17 @@ DBus::Message::MethodReturn::MethodReturn(const DBus::Type::Struct& header, cons
     m_Header.type = Message::Header::TYPE_METHOD_RETURN;
     m_SerialReplyingTo = getReplySerial();
 
-    Log::write(Log::TRACE, "DBus :: Received a method return with serial #%d\n", m_SerialReplyingTo);
+    Log::write(Log::TRACE, "DBus :: Received a method return with serial #%d\n",
+        m_SerialReplyingTo);
 }
 
-void DBus::Message::MethodReturn::addParameter(const Type::Generic& value) { m_Parameters.add(value); }
+void DBus::Message::MethodReturn::addParameter(const Type::Generic& value)
+{
+    m_Parameters.add(value);
+}
 
-std::string DBus::Message::MethodReturn::marshall(const std::string& destination) const
+std::string
+DBus::Message::MethodReturn::marshall(const std::string& destination) const
 {
     DBus::Type::Array array;
     DBus::Type::Struct sDestination;
@@ -56,14 +62,16 @@ std::string DBus::Message::MethodReturn::marshall(const std::string& destination
     array.add(sDestination);
 
     DBus::Type::Struct sReplySerial;
-    sReplySerial.add(DBus::Type::Byte(DBus::Message::Header::HEADER_REPLY_SERIAL));
+    sReplySerial.add(
+        DBus::Type::Byte(DBus::Message::Header::HEADER_REPLY_SERIAL));
     sReplySerial.add(DBus::Type::Variant(DBus::Type::Uint32(m_SerialReplyingTo)));
     array.add(sReplySerial);
 
     if (m_Parameters.getParameterCount()) {
         DBus::Type::Struct sSignature;
         sSignature.add(DBus::Type::Byte(DBus::Message::Header::HEADER_SIGNATURE));
-        sSignature.add(DBus::Type::Variant(DBus::Type::Signature(m_Parameters.getMarshallingSignature())));
+        sSignature.add(DBus::Type::Variant(
+            DBus::Type::Signature(m_Parameters.getMarshallingSignature())));
         array.add(sSignature);
     }
 

@@ -18,21 +18,21 @@
 #ifndef DBUS_MESSAGEPROTOCOL
 #define DBUS_MESSAGEPROTOCOL
 
-#include "dbus_type_struct.h"
 #include "dbus_message.h"
 #include "dbus_octetbuffer.h"
+#include "dbus_type_struct.h"
 
 namespace DBus {
-
-
 
 class MessageProtocol {
 public:
     MessageProtocol();
 
     void reset();
-    void setMethodCallHandler(const Message::CallbackFunctionMethodCall& callback);
-    void setMethodReturnHandler(const Message::CallbackFunctionMethodReturn& callback);
+    void
+    setMethodCallHandler(const Message::CallbackFunctionMethodCall& callback);
+    void
+    setMethodReturnHandler(const Message::CallbackFunctionMethodReturn& callback);
     void setErrorHandler(const Message::CallbackFunctionError& callback);
     void setSignalHandler(const Message::CallbackFunctionSignal& callback);
 
@@ -40,11 +40,9 @@ public:
     void onBodyComplete(const std::string& body);
 
 private:
-    enum {
-        STATE_GETHEADERSIZE,
+    enum { STATE_GETHEADERSIZE,
         STATE_UNMARSHALLHEADER,
-        STATE_GETBODY
-    };
+        STATE_GETBODY };
 
     enum {
         TYPE_METHOD = 1,
@@ -56,8 +54,9 @@ private:
     size_t m_State;
     size_t m_headerSize;
     size_t m_bodySize;
-    // TODO:?? Move the handler into a separate message class? We can't get 2 interspersed message so it's a
-    // 1:1 relationship between protocol handler and its message, but it might be useful elsewhere.
+    // TODO:?? Move the handler into a separate message class? We can't get 2
+    // interspersed message so it's a 1:1 relationship between protocol handler
+    // and its message, but it might be useful elsewhere.
     DBus::Type::Struct m_HeaderStruct;
     std::basic_string<uint8_t> m_octetCache;
 
@@ -79,6 +78,6 @@ private:
     void onReceiveError(const DBus::Message::Error& result) {}
     void onReceiveSignal(const DBus::Message::Signal& result) {}
 };
-}
+} // namespace DBus
 
 #endif //  DBUS_MESSAGEPROTOCOL

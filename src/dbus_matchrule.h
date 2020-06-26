@@ -25,7 +25,8 @@ namespace DBus {
 
 class MatchRule {
 public:
-    MatchRule(const std::string& rule, const Message::CallbackFunctionSignal& handler);
+    MatchRule(const std::string& rule,
+        const Message::CallbackFunctionSignal& handler);
 
     bool isMatched(const DBus::Message::Signal& signal);
     void invoke(const DBus::Message::Signal& signal);
@@ -41,6 +42,6 @@ protected:
 
     Message::CallbackFunctionSignal callback;
 };
-}
+} // namespace DBus
 
 #endif //  DBUS_MATCHRULE

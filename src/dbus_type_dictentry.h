@@ -49,7 +49,7 @@ namespace Type {
     protected:
         std::pair<Generic, Generic> m_Value;
     };
-}
-}
+} // namespace Type
+} // namespace DBus
 
 #endif

@@ -15,8 +15,8 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include "dbus_log.h"
 #include "dbus_transport.h"
+#include "dbus_log.h"
 #include <boost/bind.hpp>
 #include <chrono>
 
@@ -28,41 +28,44 @@ DBus::Transport::Transport(const std::string& path)
     , m_socket(m_io_service)
     , m_ShuttingDown(false)
 {
-    setDataHandler(std::bind(&Transport::onReceiveData, this, std::placeholders::_1));
+    setDataHandler(
+        std::bind(&Transport::onReceiveData, this, std::placeholders::_1));
 
     m_socket.connect(m_Busname);
 
-    // The "special credentials passing NUL byte" is required, even for protocols that
-    // can send credentials without needing one. Otherwise, the server may disconnect us.
+    // The "special credentials passing NUL byte" is required, even for protocols
+    // that can send credentials without needing one. Otherwise, the server may
+    // disconnect us.
     sendOctetDirect('\0');
 
-    m_socket.async_read_some(boost::asio::buffer(m_DataBuffer, BufferSize),
-                             boost::bind(&Transport::handle_read_data, this, _1, _2));
+    m_socket.async_read_some(
+        boost::asio::buffer(m_DataBuffer, BufferSize),
+        boost::bind(&Transport::handle_read_data, this, _1, _2));
 
     // We use a second thread for the io context until further notice
-    m_io_service_thread = boost::thread (boost::bind (&boost::asio::io_service::run, &m_io_service));
+    m_io_service_thread = boost::thread(boost::bind(&boost::asio::io_service::run, &m_io_service));
 }
 
-void DBus::Transport::handle_read_data(const boost::system::error_code& error, std::size_t bytes_transferred)
+void DBus::Transport::handle_read_data(const boost::system::error_code& error,
+    std::size_t bytes_transferred)
 {
     boost::recursive_mutex::scoped_lock guard(m_CallbackMutex);
     OctetBuffer buffer(m_DataBuffer, bytes_transferred);
     m_ReceiveDataCallback(buffer);
 
-    if (error)
-    {
-        if (error.category() == boost::asio::error::misc_category
-            && error.value() == boost::asio::error::misc_errors::eof)
-        {
+    if (error) {
+        if (error.category() == boost::asio::error::misc_category && error.value() == boost::asio::error::misc_errors::eof) {
             if (!m_ShuttingDown)
-                Log::write(Log::ERROR, "DBus :: Transport received slightly unexpected end of stream\n");
-        }
-        else
-            Log::write(Log::ERROR, "DBus :: Transport error. %s (%d)\n", error.message().c_str(), error.value());
-    }
-    else
-        m_socket.async_read_some(boost::asio::buffer(m_DataBuffer, BufferSize),
-                                 boost::bind(&Transport::handle_read_data, this, _1, _2));
+                Log::write(
+                    Log::ERROR,
+                    "DBus :: Transport received slightly unexpected end of stream\n");
+        } else
+            Log::write(Log::ERROR, "DBus :: Transport error. %s (%d)\n",
+                error.message().c_str(), error.value());
+    } else
+        m_socket.async_read_some(
+            boost::asio::buffer(m_DataBuffer, BufferSize),
+            boost::bind(&Transport::handle_read_data, this, _1, _2));
 }
 
 DBus::Transport::~Transport()
@@ -76,26 +79,32 @@ DBus::Transport::~Transport()
     }
 
     {
-        // Take the callback mutex so that we don't call m_socket.shutdown() at the same time
-        // as handle_read_data() is calling async_read_some() on the same object
+        // Take the callback mutex so that we don't call m_socket.shutdown() at the
+        // same time as handle_read_data() is calling async_read_some() on the same
+        // object
         boost::recursive_mutex::scoped_lock guard(m_CallbackMutex);
         boost::system::error_code ec;
         m_socket.shutdown(boost::asio::ip::tcp::socket::shutdown_both, ec);
         if (ec) {
-            DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: Socket shutdown failed: (%d) \"%s\"\n", ec.value(), ec.message());
+            DBus::Log::write(
+                DBus::Log::ERROR,
+                "DBus :: Transport :: Socket shutdown failed: (%d) \"%s\"\n",
+                ec.value(), ec.message());
         }
     }
 
     // Wait for pending async_writes to complete
     if (!m_io_service_thread.try_join_for(boost::chrono::seconds(30))) {
-        DBus::Log::write(DBus::Log::ERROR, "DBus :: Transport :: IO service thread cannot join\n");
+        DBus::Log::write(DBus::Log::ERROR,
+            "DBus :: Transport :: IO service thread cannot join\n");
         abort();
     }
 }
 
 void DBus::Transport::onAuthComplete()
 {
-    DBus::Log::write(DBus::Log::INFO, "DBus :: Transport :: Authorisation has completed.\n");
+    DBus::Log::write(DBus::Log::INFO,
+        "DBus :: Transport :: Authorisation has completed.\n");
     boost::recursive_mutex::scoped_lock guard(m_SendMutex);
     for (auto msg : m_BufferedMessages) {
         sendStringDirect(msg);
@@ -107,7 +116,8 @@ void DBus::Transport::onAuthComplete()
 
 void DBus::Transport::addToMessageQueue(const std::string& data)
 {
-    DBus::Log::write(DBus::Log::INFO, "DBus :: Transport :: No BEGIN has been received, so message is queued.\n");
+    DBus::Log::write(DBus::Log::INFO, "DBus :: Transport :: No BEGIN has been "
+                                      "received, so message is queued.\n");
     boost::recursive_mutex::scoped_lock guard(m_SendMutex);
     m_BufferedMessages.push_back(data);
     ++m_Stats.count_messagesqueued;
@@ -131,7 +141,9 @@ void DBus::Transport::sendOctetDirect(uint8_t data)
     boost::recursive_mutex::scoped_lock guard(m_SendMutex);
     std::shared_ptr<std::string> buf(new std::string());
     buf.get()->push_back(static_cast<char>(data));
-    boost::asio::async_write(m_socket, boost::asio::buffer(*buf.get()), boost::bind(&Transport::handle_write_output, this, buf, _1, _2));
+    boost::asio::async_write(
+        m_socket, boost::asio::buffer(*buf.get()),
+        boost::bind(&Transport::handle_write_output, this, buf, _1, _2));
 }
 
 void DBus::Transport::sendStringDirect(const std::string& data)
@@ -142,21 +154,26 @@ void DBus::Transport::sendStringDirect(const std::string& data)
 
     // We don't know when the write will complete, so we copy the buffer
     std::shared_ptr<std::string> buf(new std::string(data));
-    boost::asio::async_write(m_socket, boost::asio::buffer(*buf.get()),
+    boost::asio::async_write(
+        m_socket, boost::asio::buffer(*buf.get()),
         boost::bind(&Transport::handle_write_output, this, buf, _1, _2));
     ++m_Stats.count_messagessent;
     m_Stats.bytes_sent += data.length();
 }
 
-void DBus::Transport::handle_write_output(std::shared_ptr<std::string> buf_written, const boost::system::error_code& error, std::size_t bytes_transferred)
+void DBus::Transport::handle_write_output(
+    std::shared_ptr<std::string> buf_written,
+    const boost::system::error_code& error, std::size_t bytes_transferred)
 {
     buf_written.reset();
     if (error) {
-        DBus::Log::write(DBus::Log::ERROR, "DBus :: ERROR in async_write : %s\n", error.message().c_str());
+        DBus::Log::write(DBus::Log::ERROR, "DBus :: ERROR in async_write : %s\n",
+            error.message().c_str());
     }
 }
 
-void DBus::Transport::setDataHandler(const ReceiveDataCallbackFunction& callback)
+void DBus::Transport::setDataHandler(
+    const ReceiveDataCallbackFunction& callback)
 {
     boost::recursive_mutex::scoped_lock guard(m_CallbackMutex);
     m_ReceiveDataCallback = callback;
@@ -166,9 +183,12 @@ void DBus::Transport::onReceiveData(OctetBuffer&)
 {
     // NOP - This stub gives our initial callback somewhere to go
 
-    // This could happen if the thread reads data before native.cpp updates the callback.
-    DBus::Log::write(DBus::Log::WARNING, "DBus :: Transport : onReceiveData is processing data, whereas it should really have been directed elsewhere via "
-                                         "setDataHandler\n");
+    // This could happen if the thread reads data before native.cpp updates the
+    // callback.
+    DBus::Log::write(DBus::Log::WARNING,
+        "DBus :: Transport : onReceiveData is processing data, "
+        "whereas it should really have been directed elsewhere via "
+        "setDataHandler\n");
 }
 
 std::string DBus::Transport::getStats() const

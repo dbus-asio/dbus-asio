@@ -23,34 +23,26 @@
 namespace DBus {
 
 OctetBuffer::OctetBuffer(const uint8_t* data, size_t size)
-    : m_data(data),
-    m_size(size)
+    : m_data(data)
+    , m_size(size)
 {
 }
 
-size_t OctetBuffer::size() const
-{
-    return m_size;
-}
+size_t OctetBuffer::size() const { return m_size; }
 
-const uint8_t* OctetBuffer::data() const
-{
-    return m_data;
-}
+const uint8_t* OctetBuffer::data() const { return m_data; }
 
 void OctetBuffer::remove_prefix(size_t count)
 {
     if (count > m_size) {
-        throw std::out_of_range("OctetBuffer::remove_prefix error: Not enough data in buffer");
+        throw std::out_of_range(
+            "OctetBuffer::remove_prefix error: Not enough data in buffer");
     }
-    m_data+= count;
-    m_size-= count;
+    m_data += count;
+    m_size -= count;
 }
 
-bool OctetBuffer::empty() const
-{
-    return m_size == 0;
-}
+bool OctetBuffer::empty() const { return m_size == 0; }
 
 uint8_t OctetBuffer::operator[](unsigned long index) const
 {
@@ -63,7 +55,8 @@ uint8_t OctetBuffer::operator[](unsigned long index) const
 void OctetBuffer::copy(uint8_t* data, size_t size) const
 {
     if (size > m_size) {
-        throw std::out_of_range("OctetBuffer copy error: Not enough data in buffer");
+        throw std::out_of_range(
+            "OctetBuffer copy error: Not enough data in buffer");
     }
     memcpy(data, m_data, size);
 }

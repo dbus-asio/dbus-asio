@@ -78,7 +78,7 @@ namespace Type {
     protected:
         std::vector<DBus::Type::Generic> contents;
     };
-}
-}
+} // namespace Type
+} // namespace DBus
 
 #endif

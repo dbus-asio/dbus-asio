@@ -27,7 +27,7 @@ namespace Utils {
     bool isAlignedTo(size_t pad, size_t size);
     bool isAlignedTo8(size_t offset);
     size_t getPadding(size_t pad, size_t size);
-}
-}
+} // namespace Utils
+} // namespace DBus
 
 #endif // DBUS_UTILS_H

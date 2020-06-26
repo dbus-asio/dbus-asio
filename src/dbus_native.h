@@ -35,15 +35,27 @@ public:
     void onReceiveAuthData(OctetBuffer& buffer);
     void onReceiveMessageData(OctetBuffer& buffer);
 
-    void registerMethodCallHandler(const std::string& name, const Message::CallbackFunctionMethodCall& handler);
-    // registerSignalHandler checks only for matching interfaces, and is a convenience method.
-    // It is preferably to use callAddMatch in most cases.
-    void registerSignalHandler(const std::string& name, const Message::CallbackFunctionSignal& handler);
+    void
+    registerMethodCallHandler(const std::string& name,
+        const Message::CallbackFunctionMethodCall& handler);
+    // registerSignalHandler checks only for matching interfaces, and is a
+    // convenience method. It is preferably to use callAddMatch in most cases.
+    void registerSignalHandler(const std::string& name,
+        const Message::CallbackFunctionSignal& handler);
 
-    void sendMethodCall(const std::string& destination, const DBus::Message::MethodCall& msg, const DBus::Message::CallbackFunctionMethodReturn& success = [](const DBus::Message::MethodReturn& msg) {}, const DBus::Message::CallbackFunctionError& failure = [](const DBus::Message::Error& msg) {});
-    void sendMethodReturn(const std::string& destination, const DBus::Message::MethodReturn& result);
-    void sendError(const std::string& destination, const DBus::Message::Error& err);
-    void sendSignal(const std::string& destination, const DBus::Message::Signal& signal);
+    void
+    sendMethodCall(const std::string& destination,
+        const DBus::Message::MethodCall& msg,
+        const DBus::Message::CallbackFunctionMethodReturn& success =
+            [](const DBus::Message::MethodReturn& msg) {},
+        const DBus::Message::CallbackFunctionError& failure =
+            [](const DBus::Message::Error& msg) {});
+    void sendMethodReturn(const std::string& destination,
+        const DBus::Message::MethodReturn& result);
+    void sendError(const std::string& destination,
+        const DBus::Message::Error& err);
+    void sendSignal(const std::string& destination,
+        const DBus::Message::Signal& signal);
 
     void onReceiveMethodCall(const DBus::Message::MethodCall& method);
     void onReceiveMethodReturn(const Message::MethodReturn& reply);
@@ -52,16 +64,38 @@ public:
 
     // Message Bus Messages (see dbus_native_messages.cpp for implementation)
     // Q. Move elsewhere? (because of the myriad flag definitions these need)
-    void callHello(const Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
-    void callGetUnixProcessId(const std::string& name, const DBus::Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
-    void callGetConnectionUnixUser(const std::string& name, const DBus::Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
-    void callRequestName(const std::string& name, uint32_t flags, const Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
-    void callReleaseName(const std::string& name, const Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
-    void callListQueuedOwners(const std::string& bus_name, const Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
-    void callListNames(const DBus::Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
-    void callListActivatableNames(const DBus::Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
-    void callNameHasOwner(const std::string& name, const Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure);
-    void callAddMatch(const std::string& rule, const DBus::Message::CallbackFunctionMethodReturn& success, const Message::CallbackFunctionError& failure, const Message::CallbackFunctionSignal& handler);
+    void callHello(const Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure);
+    void callGetUnixProcessId(
+        const std::string& name,
+        const DBus::Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure);
+    void callGetConnectionUnixUser(
+        const std::string& name,
+        const DBus::Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure);
+    void callRequestName(const std::string& name, uint32_t flags,
+        const Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure);
+    void callReleaseName(const std::string& name,
+        const Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure);
+    void
+    callListQueuedOwners(const std::string& bus_name,
+        const Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure);
+    void callListNames(const DBus::Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure);
+    void callListActivatableNames(
+        const DBus::Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure);
+    void callNameHasOwner(const std::string& name,
+        const Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure);
+    void callAddMatch(const std::string& rule,
+        const DBus::Message::CallbackFunctionMethodReturn& success,
+        const Message::CallbackFunctionError& failure,
+        const Message::CallbackFunctionSignal& handler);
     void callRemoveMatch(const std::string& rule);
 
     std::string getStats() const;
@@ -87,7 +121,8 @@ public:
 
 private:
     struct CallbackPair {
-        CallbackPair(const Message::CallbackFunctionMethodReturn& s, const Message::CallbackFunctionError& f)
+        CallbackPair(const Message::CallbackFunctionMethodReturn& s,
+            const Message::CallbackFunctionError& f)
             : success(s)
             , failure(f)
         {
@@ -129,6 +164,6 @@ private:
 public:
     static std::string DBusDaemon;
 };
-}
+} // namespace DBus
 
 #endif

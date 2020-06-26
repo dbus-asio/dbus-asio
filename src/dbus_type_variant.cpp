@@ -15,58 +15,63 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <sstream>
+#include "dbus_type_variant.h"
+#include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type.h"
 #include "dbus_type_objectpath.h"
 #include "dbus_type_signature.h"
 #include "dbus_type_string.h"
 #include "dbus_type_uint32.h"
-#include "dbus_type_variant.h"
-#include "dbus_messageostream.h"
-#include "dbus_messageistream.h"
+#include <sstream>
 
 const std::string DBus::Type::Variant::s_StaticTypeCode("v");
 
 /*
-Variants are marshalled as the SIGNATURE of the contents (which must be a single complete type),
-followed by a marshalled m_Value with the type given by that signature.
+Variants are marshalled as the SIGNATURE of the contents (which must be a single
+complete type), followed by a marshalled m_Value with the type given by that
+signature.
 
-The variant has the same 1-byte alignment as the signature, which means that alignment padding
-before a variant is never needed. Use of variants must not cause a total message depth to be
-larger than 64, including other container types such as structures. (See Valid Signatures.)
+The variant has the same 1-byte alignment as the signature, which means that
+alignment padding before a variant is never needed. Use of variants must not
+cause a total message depth to be larger than 64, including other container
+types such as structures. (See Valid Signatures.)
 */
 
 DBus::Type::Variant::Variant() { setSignature(s_StaticTypeCode); }
 
 DBus::Type::Variant::Variant(const DBus::Type::ObjectPath& v)
-    : m_Value(v),
-      m_ContainedSignature(v.getSignature())
+    : m_Value(v)
+    , m_ContainedSignature(v.getSignature())
 {
     setSignature(s_StaticTypeCode);
 }
 
 DBus::Type::Variant::Variant(const DBus::Type::String& v)
-    : m_Value(v),
-      m_ContainedSignature(v.getSignature())
+    : m_Value(v)
+    , m_ContainedSignature(v.getSignature())
 {
     setSignature(s_StaticTypeCode);
 }
 
 DBus::Type::Variant::Variant(const DBus::Type::Uint32& v)
-    : m_Value(v),
-      m_ContainedSignature(v.getSignature())
+    : m_Value(v)
+    , m_ContainedSignature(v.getSignature())
 {
     setSignature(s_StaticTypeCode);
 }
 
 DBus::Type::Variant::Variant(const DBus::Type::Signature& v)
-    : m_Value(v),
-      m_ContainedSignature(v.getSignature())
+    : m_Value(v)
+    , m_ContainedSignature(v.getSignature())
 {
     setSignature(s_StaticTypeCode);
 }
 
-const DBus::Type::Generic& DBus::Type::Variant::getValue() const { return m_Value; }
+const DBus::Type::Generic& DBus::Type::Variant::getValue() const
+{
+    return m_Value;
+}
 
 void DBus::Type::Variant::marshall(MessageOStream& stream) const
 {
@@ -99,4 +104,7 @@ std::string DBus::Type::Variant::toString(const std::string& prefix) const
     return ss.str();
 }
 
-std::string DBus::Type::Variant::asString() const { return DBus::Type::asString(m_Value); }
+std::string DBus::Type::Variant::asString() const
+{
+    return DBus::Type::asString(m_Value);
+}

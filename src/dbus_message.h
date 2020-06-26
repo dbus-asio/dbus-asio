@@ -18,9 +18,9 @@
 #ifndef DBUS_MESSAGE
 #define DBUS_MESSAGE
 
-#include <functional>
-#include <boost/thread/recursive_mutex.hpp>
 #include "dbus_type.h"
+#include <boost/thread/recursive_mutex.hpp>
+#include <functional>
 
 namespace DBus {
 class MessageOStream;
@@ -29,7 +29,8 @@ namespace Message {
 
     class MethodCallIdentifier {
     public:
-        MethodCallIdentifier(const std::string& object, const std::string& interface, const std::string& method)
+        MethodCallIdentifier(const std::string& object, const std::string& interface,
+            const std::string& method)
             : m_Object(object)
             , m_Interface(interface)
             , m_Method(method)
@@ -57,9 +58,9 @@ namespace Message {
 
     class MethodCallParametersIn : public MethodCallParameters {
     public:
-        // We have a series of ctor's to permit the basic prototypes to be declared inline, with
-        // MethodCallParametersIn("param") etc. Everyone else will need to use a temporary variable
-        // and add()
+        // We have a series of ctor's to permit the basic prototypes to be declared
+        // inline, with MethodCallParametersIn("param") etc. Everyone else will need
+        // to use a temporary variable and add()
         MethodCallParametersIn() {}
         MethodCallParametersIn(const Type::Generic& v);
         MethodCallParametersIn(const std::string& v);
@@ -93,15 +94,23 @@ namespace Message {
 
         enum {
             HEADER_INVALID,
-            HEADER_PATH, // The object to send a call to, or the object a signal is emitted from.
-            HEADER_INTERFACE, // The interface to invoke a method call on, or that a signal is emitted from. Optional for method calls, required for signals.
+            HEADER_PATH, // The object to send a call to, or the object a signal is
+            // emitted from.
+            HEADER_INTERFACE, // The interface to invoke a method call on, or that a
+            // signal is emitted from. Optional for method calls,
+            // required for signals.
             HEADER_MEMBER, // The member, either the method name or signal name.
             HEADER_ERROR_NAME, // The name of the error that occurred, for errors
-            HEADER_REPLY_SERIAL, // The serial number of the message this message is a reply to.
-            HEADER_DESTINATION, // The name of the connection this message is intended for.
+            HEADER_REPLY_SERIAL, // The serial number of the message this message is a
+            // reply to.
+            HEADER_DESTINATION, // The name of the connection this message is intended
+            // for.
             HEADER_SENDER, // Unique name of the sending connection.
-            HEADER_SIGNATURE, // The signature of the message body. If omitted, it is assumed to be the empty signature "" (i.e. the body must be 0-length).
-            HEADER_UNIX_FDS, // The number of Unix file descriptors that accompany the message.
+            HEADER_SIGNATURE, // The signature of the message body. If omitted, it is
+            // assumed to be the empty signature "" (i.e. the body
+            // must be 0-length).
+            HEADER_UNIX_FDS, // The number of Unix file descriptors that accompany the
+            // message.
             //
             HEADER_FIELD_COUNT // = HEADER_UNIX_FDS+1
         } HeaderFields;
@@ -123,42 +132,19 @@ namespace Message {
         Base(uint32_t serial = 0);
         Base(const DBus::Type::Struct& header, const std::string& body);
 
-        uint32_t getSerial() const
-        {
-            return m_Header.serial;
-        }
+        uint32_t getSerial() const { return m_Header.serial; }
 
-        uint32_t getReplySerial() const
-        {
-            return m_Header.replySerial;
-        }
+        uint32_t getReplySerial() const { return m_Header.replySerial; }
 
-        std::string getHeaderPath() const
-        {
-            return m_Header.path;
-        }
+        std::string getHeaderPath() const { return m_Header.path; }
 
-        std::string getHeaderInterface() const
-        {
-            return m_Header.interface;
-        }
+        std::string getHeaderInterface() const { return m_Header.interface; }
 
-        std::string getHeaderMember() const
-        {
-            return m_Header.member;
-        }
+        std::string getHeaderMember() const { return m_Header.member; }
 
-        std::string getHeaderSender() const
-        {
-            return m_Header.sender;
-        }
+        std::string getHeaderSender() const { return m_Header.sender; }
 
-        std::string getHeaderDestination() const
-        {
-            return m_Header.destination;
-        }
-
-
+        std::string getHeaderDestination() const { return m_Header.destination; }
 
         const Type::Generic& getParameter(size_t idx) const
         {
@@ -172,7 +158,9 @@ namespace Message {
 
         const bool isReplyExpected() const
         {
-            return !(m_Header.flags & DBus::Message::Header::FLAGS_NO_REPLY_EXPECTED) ? true : false;
+            return !(m_Header.flags & DBus::Message::Header::FLAGS_NO_REPLY_EXPECTED)
+                ? true
+                : false;
         }
 
     protected:
@@ -185,13 +173,16 @@ namespace Message {
         static uint32_t m_SerialCounter;
         static boost::recursive_mutex m_SerialCounterMutex;
 
-        void parseParameters(bool isLittleEndian, const std::string& bodydata, const std::string& signature);
+        void parseParameters(bool isLittleEndian, const std::string& bodydata,
+            const std::string& signature);
     };
 
     class MethodCall : public Message::Base {
     public:
         // This is for outgoing calls
-        MethodCall(const MethodCallIdentifier& name, const MethodCallParametersIn& params = MethodCallParametersIn(), uint32_t flags = 0);
+        MethodCall(const MethodCallIdentifier& name,
+            const MethodCallParametersIn& params = MethodCallParametersIn(),
+            uint32_t flags = 0);
         // This is for receeiving method calls
         MethodCall(const DBus::Type::Struct& header, const std::string& body);
 
@@ -233,7 +224,7 @@ namespace Message {
         std::string marshall(const std::string& destination) const;
 
     private:
-        uint32_t m_SerialReplyingTo; //NOTE: Means the query one, on rcvr side
+        uint32_t m_SerialReplyingTo; // NOTE: Means the query one, on rcvr side
         std::string m_Errorname; // e.g. biz.brightsign.Error.InvalidParameters
         std::string m_Message; // i.e. the user text to display
     };
@@ -253,11 +244,14 @@ namespace Message {
         MethodCallIdentifier m_SignalName;
     };
 
-    typedef std::function<void(const Message::MethodCall& method)> CallbackFunctionMethodCall;
-    typedef std::function<void(const Message::MethodReturn& reply)> CallbackFunctionMethodReturn;
+    typedef std::function<void(const Message::MethodCall& method)>
+        CallbackFunctionMethodCall;
+    typedef std::function<void(const Message::MethodReturn& reply)>
+        CallbackFunctionMethodReturn;
     typedef std::function<void(const Message::Error& error)> CallbackFunctionError;
-    typedef std::function<void(const Message::Signal& signal)> CallbackFunctionSignal;
-}
-}
+    typedef std::function<void(const Message::Signal& signal)>
+        CallbackFunctionSignal;
+} // namespace Message
+} // namespace DBus
 
 #endif //  DBUS_MESSAGE

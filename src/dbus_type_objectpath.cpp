@@ -16,8 +16,8 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "dbus_type_objectpath.h"
-#include "dbus_type_string.h"
 #include "dbus_messageostream.h"
+#include "dbus_type_string.h"
 
 const std::string DBus::Type::ObjectPath::s_StaticTypeCode("o");
 
@@ -31,6 +31,7 @@ DBus::Type::ObjectPath::ObjectPath(const std::string& v)
 
 void DBus::Type::ObjectPath::marshall(MessageOStream& stream) const
 {
-    // Exactly the same as STRING except the content must be a valid object path (see above).
+    // Exactly the same as STRING except the content must be a valid object path
+    // (see above).
     Type::String::marshall(stream);
 }

@@ -64,7 +64,8 @@ std::string DBus::Platform::getSystemBus(const char* dbus_system_bus_address)
     return "/var/run/dbus/system_bus_socket";
 }
 
-std::string DBus::Platform::getSessionBus(const char* dbus_session_bus_address)
+std::string
+DBus::Platform::getSessionBus(const char* dbus_session_bus_address)
 {
     if (dbus_session_bus_address) {
         return getPath(dbus_session_bus_address);
@@ -74,7 +75,8 @@ std::string DBus::Platform::getSessionBus(const char* dbus_session_bus_address)
 
 std::string DBus::Platform::getSystemBus()
 {
-    return getSystemBus(getenv("DBUS_SYSTEM_BUS_ADDRESS")); // AFAIK, this is not a standardised name
+    return getSystemBus(getenv(
+        "DBUS_SYSTEM_BUS_ADDRESS")); // AFAIK, this is not a standardised name
 }
 
 std::string DBus::Platform::getSessionBus()

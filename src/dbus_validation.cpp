@@ -17,43 +17,40 @@
 #include "dbus_validation.h"
 #include <stdexcept>
 
-namespace DBus
-{
-    namespace Validation
+namespace DBus {
+namespace Validation {
+    bool isValidBasicType(char type)
     {
-        bool isValidBasicType(char type)
-        {
-            switch (type)
-            {
-            case 'y':
-            case 'b':
-            case 'n':
-            case 'q':
-            case 'i':
-            case 'u':
-            case 'x':
-            case 't':
-            case 'd':
-            case 'h':
-            case 's':
-            case 'o':
-            case 'g':
-                return true;
-            default:
-                return false;
-            }
-        }
-
-        void throwOnInvalidBasicType(char type)
-        {
-            if (!isValidBasicType(type))
-                throw std::runtime_error(std::string("Invalid basic type: ") + type);
-        }
-
-        void throwOnInvalidBasicType(const std::string &type)
-        {
-            if (type.size() != 1 || !isValidBasicType(type[0]))
-                throw std::runtime_error(std::string("Invalid basic type: ") + type);
+        switch (type) {
+        case 'y':
+        case 'b':
+        case 'n':
+        case 'q':
+        case 'i':
+        case 'u':
+        case 'x':
+        case 't':
+        case 'd':
+        case 'h':
+        case 's':
+        case 'o':
+        case 'g':
+            return true;
+        default:
+            return false;
         }
     }
-}
+
+    void throwOnInvalidBasicType(char type)
+    {
+        if (!isValidBasicType(type))
+            throw std::runtime_error(std::string("Invalid basic type: ") + type);
+    }
+
+    void throwOnInvalidBasicType(const std::string& type)
+    {
+        if (type.size() != 1 || !isValidBasicType(type[0]))
+            throw std::runtime_error(std::string("Invalid basic type: ") + type);
+    }
+} // namespace Validation
+} // namespace DBus

@@ -52,15 +52,17 @@ namespace Type {
     void marshallData(const DBus::Type::Generic& any, MessageOStream& stream);
     void unmarshallData(DBus::Type::Generic& result, MessageIStream& stream);
 
-    std::string toString(const DBus::Type::Generic& data, const std::string& prefix = "");
+    std::string toString(const DBus::Type::Generic& data,
+        const std::string& prefix = "");
 
     size_t getAlignment(const std::string& declaration);
 
     std::string extractSignature(const std::string& declaration, size_t idx);
 
     std::string getMarshallingSignature(const DBus::Type::Generic& value);
-    std::string getMarshallingSignature(const std::vector<DBus::Type::Generic>& value);
-}
-}
+    std::string
+    getMarshallingSignature(const std::vector<DBus::Type::Generic>& value);
+} // namespace Type
+} // namespace DBus
 
 #endif

@@ -15,10 +15,10 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <sstream>
 #include "dbus_type_double.h"
-#include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
+#include <sstream>
 
 const std::string DBus::Type::Double::s_StaticTypeCode("d");
 
@@ -34,7 +34,10 @@ DBus::Type::Double::Double(double v)
     setSignature(s_StaticTypeCode);
 }
 
-void DBus::Type::Double::marshall(MessageOStream& stream) const { stream.writeDouble(m_Value); }
+void DBus::Type::Double::marshall(MessageOStream& stream) const
+{
+    stream.writeDouble(m_Value);
+}
 
 void DBus::Type::Double::unmarshall(MessageIStream& stream)
 {

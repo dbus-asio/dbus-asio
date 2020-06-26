@@ -55,7 +55,8 @@ public:
         va_end(ap);
     }
 
-    static void writeHex(size_t type, const std::string& prefix, const std::string& hex)
+    static void writeHex(size_t type, const std::string& prefix,
+        const std::string& hex)
     {
         if (!isActive(type)) {
             return;
@@ -69,7 +70,8 @@ public:
             if (++column == 32) {
                 write(type, "\n");
                 column = 0;
-                if (hex.size() % 32) { // pad the next line if there's likely to be one. i.e. not 32, 64, 96 length etc
+                if (hex.size() % 32) { // pad the next line if there's likely to be one.
+                    // i.e. not 32, 64, 96 length etc
                     write(type, std::string(prefix.length(), ' ').c_str()); // pad 2nd line to match prefix
                 }
             }
@@ -80,10 +82,7 @@ public:
         }
     }
 
-    static void flush()
-    {
-        fflush(stderr);
-    }
+    static void flush() { fflush(stderr); }
 
     static void setLevel(size_t lowest_visible_level)
     {
@@ -92,6 +91,6 @@ public:
 
     static size_t m_Level;
 };
-}
+} // namespace DBus
 
 #endif // DBUS_LOG_H

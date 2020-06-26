@@ -24,7 +24,6 @@ namespace DBus {
 class MessageOStream;
 class MessageIStream;
 
-
 namespace Type {
 
     class Uint32 : public Base {
@@ -32,7 +31,9 @@ namespace Type {
         Uint32();
         Uint32(uint32_t v);
 
-        //			std::string getSignature() const { return s_StaticTypeCode; }
+        //			std::string getSignature() const { return
+        //s_StaticTypeCode;
+        //}
         size_t getAlignment() const { return 4; }
         void marshall(MessageOStream& stream) const;
         void unmarshall(MessageIStream& stream);
@@ -45,7 +46,7 @@ namespace Type {
     protected:
         uint32_t m_Value;
     };
-}
-}
+} // namespace Type
+} // namespace DBus
 
 #endif

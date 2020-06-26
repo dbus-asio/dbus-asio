@@ -15,11 +15,11 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include <sstream>
-#include "dbus_type.h"
 #include "dbus_type_string.h"
-#include "dbus_messageostream.h"
 #include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
+#include "dbus_type.h"
+#include <sstream>
 
 const std::string DBus::Type::String::s_StaticTypeCode("s");
 
@@ -33,9 +33,9 @@ DBus::Type::String::String(const std::string& v)
 
 void DBus::Type::String::marshall(MessageOStream& stream) const
 {
-    // A UINT32 indicating the string's length in bytes excluding its terminating nul,
-    // followed by non-nul string data of the given length,
-    // followed by a terminating nul byte.
+    // A UINT32 indicating the string's length in bytes excluding its terminating
+    // nul, followed by non-nul string data of the given length, followed by a
+    // terminating nul byte.
     stream.writeString(m_Value);
 }
 

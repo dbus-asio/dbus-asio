@@ -15,8 +15,10 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
-#include "dbus_log.h"
 #include "dbus_type.h"
+#include "dbus_log.h"
+#include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
 #include "dbus_type_array.h"
 #include "dbus_type_base.h"
 #include "dbus_type_boolean.h"
@@ -34,22 +36,26 @@
 #include "dbus_type_uint32.h"
 #include "dbus_type_uint64.h"
 #include "dbus_type_variant.h"
-#include "dbus_messageostream.h"
-#include "dbus_messageistream.h"
 
 //
 // Helper methods to extract navtive types from the opaque 'Generic' type
 //
-uint8_t DBus::Type::asByte(const Generic& v) { return std::stoi(Type::asString(v)); }
+uint8_t DBus::Type::asByte(const Generic& v)
+{
+    return std::stoi(Type::asString(v));
+}
 
-uint32_t DBus::Type::asUint32(const Generic& v) { return std::stoi(Type::asString(v)); }
+uint32_t DBus::Type::asUint32(const Generic& v)
+{
+    return std::stoi(Type::asString(v));
+}
 
 // Generate a compact, machine-friendly, version of the data.
 // (compare to toString, which is intended for humans debugging)
 std::string DBus::Type::asString(const DBus::Type::Generic& value)
 {
-    // It is possible to receive an empty value when dealing with void parameter lists, or
-    // with uninitialised types from header fields.
+    // It is possible to receive an empty value when dealing with void parameter
+    // lists, or with uninitialised types from header fields.
     if (value.empty()) {
         return "";
     }
@@ -81,21 +87,35 @@ std::string DBus::Type::asString(const DBus::Type::Generic& value)
 
 #undef TYPE_ASSTRING
 
-    Log::write(DBus::Log::ERROR, "DBus :: asString type not implemented (%s)\n", ti.name());
+    Log::write(DBus::Log::ERROR, "DBus :: asString type not implemented (%s)\n",
+        ti.name());
 
     return "";
 }
 
-const DBus::Type::Array& DBus::Type::refArray(const Generic& value) { return boost::any_cast<const Type::Array&>(value); }
+const DBus::Type::Array& DBus::Type::refArray(const Generic& value)
+{
+    return boost::any_cast<const Type::Array&>(value);
+}
 
-const DBus::Type::Struct& DBus::Type::refStruct(const Generic& value) { return boost::any_cast<const Type::Struct&>(value); }
+const DBus::Type::Struct& DBus::Type::refStruct(const Generic& value)
+{
+    return boost::any_cast<const Type::Struct&>(value);
+}
 
-const DBus::Type::Signature& DBus::Type::refSignature(const Generic& value) { return boost::any_cast<const Type::Signature&>(value); }
+const DBus::Type::Signature& DBus::Type::refSignature(const Generic& value)
+{
+    return boost::any_cast<const Type::Signature&>(value);
+}
 
-const DBus::Type::Variant& DBus::Type::refVariant(const Generic& value) { return boost::any_cast<const Type::Variant&>(value); }
+const DBus::Type::Variant& DBus::Type::refVariant(const Generic& value)
+{
+    return boost::any_cast<const Type::Variant&>(value);
+}
 
 //
-// Mapping methods to convert between abstract Generic types, to specific classes
+// Mapping methods to convert between abstract Generic types, to specific
+// classes
 //
 DBus::Type::Generic DBus::Type::create(const std::string& type)
 {
@@ -126,14 +146,17 @@ DBus::Type::Generic DBus::Type::create(const std::string& type)
 
 #undef TYPE_CREATE
 
-    Log::write(DBus::Log::ERROR, "DBus :: Can not create a signature type of (%s)\n", type.c_str());
+    Log::write(DBus::Log::ERROR,
+        "DBus :: Can not create a signature type of (%s)\n", type.c_str());
 
     return Type::Generic();
 }
 
-std::string DBus::Type::getMarshallingSignature(const DBus::Type::Generic& value)
+std::string
+DBus::Type::getMarshallingSignature(const DBus::Type::Generic& value)
 {
-    // It is possible to receive an empty value when dealing with void parameter lists.
+    // It is possible to receive an empty value when dealing with void parameter
+    // lists.
     if (value.empty()) {
         return "";
     }
@@ -144,7 +167,8 @@ std::string DBus::Type::getMarshallingSignature(const DBus::Type::Generic& value
             return typename ::s_StaticTypeCode;    \
         }                                          \
     }
-//		if (ti == is_type.type()) {	return boost::any_cast<typename>(value).getSignature(); } }
+//		if (ti == is_type.type()) {	return
+//boost::any_cast<typename>(value).getSignature(); } }
 #define TYPE_MARSHALL_SIGNATURE2(typename)                          \
     {                                                               \
         static Type::Generic is_type = typename();                  \
@@ -171,7 +195,9 @@ std::string DBus::Type::getMarshallingSignature(const DBus::Type::Generic& value
     TYPE_MARSHALL_SIGNATURE(Type::Signature);
     TYPE_MARSHALL_SIGNATURE2(Type::DictEntry);
 
-    Log::write(DBus::Log::ERROR, "DBus :: Marshalling signature type not implemented (%s)\n", ti.name());
+    Log::write(DBus::Log::ERROR,
+        "DBus :: Marshalling signature type not implemented (%s)\n",
+        ti.name());
 
 #undef TYPE_MARSHALL_SIGNATURE
 
@@ -180,9 +206,11 @@ std::string DBus::Type::getMarshallingSignature(const DBus::Type::Generic& value
 
 // TODO: macro-in-a-macro to try and reduce duplicated list of types
 
-void DBus::Type::marshallData(const DBus::Type::Generic& value, MessageOStream& stream)
+void DBus::Type::marshallData(const DBus::Type::Generic& value,
+    MessageOStream& stream)
 {
-    // It is possible to receive an empty value when dealing with void parameter lists.
+    // It is possible to receive an empty value when dealing with void parameter
+    // lists.
     if (value.empty()) {
         return;
     }
@@ -211,13 +239,17 @@ void DBus::Type::marshallData(const DBus::Type::Generic& value, MessageOStream& 
     TYPE_MARSHALL_DATA(Type::Signature);
     TYPE_MARSHALL_DATA(Type::DictEntry);
 
-    Log::write(DBus::Log::ERROR, "DBus :: Marshalling data of type %s is not implemented.\n", type.c_str());
+    Log::write(DBus::Log::ERROR,
+        "DBus :: Marshalling data of type %s is not implemented.\n",
+        type.c_str());
 
 #undef TYPE_MARSHALL_DATA
 }
 
-// Process one octet of data, into the given type. Returns true if that type has completed.
-void DBus::Type::unmarshallData(DBus::Type::Generic& result, MessageIStream& stream)
+// Process one octet of data, into the given type. Returns true if that type has
+// completed.
+void DBus::Type::unmarshallData(DBus::Type::Generic& result,
+    MessageIStream& stream)
 {
 // TODO: Consider whether a template could handle this
 #define TYPE_UNMARSHALL_DATA(typename)                    \
@@ -246,14 +278,15 @@ void DBus::Type::unmarshallData(DBus::Type::Generic& result, MessageIStream& str
     TYPE_UNMARSHALL_DATA(Type::Signature);
     TYPE_UNMARSHALL_DATA(Type::DictEntry);
 
-    Log::write(DBus::Log::ERROR, "DBus :: Unmarshalling type not implemented (%s)\n", type.c_str());
+    Log::write(DBus::Log::ERROR,
+        "DBus :: Unmarshalling type not implemented (%s)\n", type.c_str());
 
 #undef TYPE_UNMARSHALL_DATA
-
 }
 
 // Generate an expanded description of the data type provided.
-std::string DBus::Type::toString(const DBus::Type::Generic& value, const std::string& prefix)
+std::string DBus::Type::toString(const DBus::Type::Generic& value,
+    const std::string& prefix)
 {
 #define TYPE_TOSTRING(typename)                                              \
     {                                                                        \
@@ -283,7 +316,8 @@ std::string DBus::Type::toString(const DBus::Type::Generic& value, const std::st
 
 #undef TYPE_TOSTRING
 
-    Log::write(DBus::Log::ERROR, "DBus :: toString type not implemented (%s)\n", ti.name());
+    Log::write(DBus::Log::ERROR, "DBus :: toString type not implemented (%s)\n",
+        ti.name());
 
     return "?unknown?";
 }
@@ -321,7 +355,8 @@ size_t DBus::Type::getAlignment(const std::string& declaration)
 //
 // Other methods
 //
-std::string DBus::Type::extractSignature(const std::string& declaration, size_t idx)
+std::string DBus::Type::extractSignature(const std::string& declaration,
+    size_t idx)
 {
     std::string result;
 
@@ -341,12 +376,15 @@ std::string DBus::Type::extractSignature(const std::string& declaration, size_t 
             }
         }
         //
-        Log::write(Log::ERROR, "DBus :: The declaration is invalid due to mis-matched brackets in the array signature.");
+        Log::write(Log::ERROR, "DBus :: The declaration is invalid due to "
+                               "mis-matched brackets in the array signature.");
     }
     // Handle dictentry
     else if (declaration[idx] == '{') {
         if (idx == 0) {
-            Log::write(Log::ERROR, "DBus :: The declaration is invalid because a dictentry must be inside an array container type.");
+            Log::write(Log::ERROR,
+                "DBus :: The declaration is invalid because a dictentry must "
+                "be inside an array container type.");
         }
         // Find the matching brace, and skip all internal signatures
         size_t number_of_brackets = 0;
@@ -362,7 +400,8 @@ std::string DBus::Type::extractSignature(const std::string& declaration, size_t 
             }
         }
         //
-        Log::write(Log::ERROR, "DBus :: The declaration is invalid due to mis-matched braces in the dictentry signature.");
+        Log::write(Log::ERROR, "DBus :: The declaration is invalid due to "
+                               "mis-matched braces in the dictentry signature.");
     }
 
     result += declaration[idx];
@@ -374,7 +413,8 @@ std::string DBus::Type::extractSignature(const std::string& declaration, size_t 
     return result;
 }
 
-std::string DBus::Type::getMarshallingSignature(const std::vector<DBus::Type::Generic>& value)
+std::string DBus::Type::getMarshallingSignature(
+    const std::vector<DBus::Type::Generic>& value)
 {
     std::string result;
 

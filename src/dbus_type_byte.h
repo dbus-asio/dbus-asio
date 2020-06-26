@@ -44,7 +44,7 @@ namespace Type {
     protected:
         uint8_t m_Value;
     };
-}
-}
+} // namespace Type
+} // namespace DBus
 
 #endif

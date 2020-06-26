@@ -15,11 +15,11 @@
 // file named COPYING. If you do not have this file see
 // <http://www.gnu.org/licenses/>.
 
+#include "dbus_type_byte.h"
+#include "dbus_messageistream.h"
+#include "dbus_messageostream.h"
 #include <iomanip>
 #include <sstream>
-#include "dbus_type_byte.h"
-#include "dbus_messageostream.h"
-#include "dbus_messageistream.h"
 
 const std::string DBus::Type::Byte::s_StaticTypeCode("y");
 
@@ -37,7 +37,10 @@ DBus::Type::Byte::Byte(size_t v)
 
 DBus::Type::Byte::Byte(const Byte& b) { m_Value = b.m_Value; }
 
-void DBus::Type::Byte::marshall(MessageOStream& stream) const { stream.writeByte(m_Value); }
+void DBus::Type::Byte::marshall(MessageOStream& stream) const
+{
+    stream.writeByte(m_Value);
+}
 
 void DBus::Type::Byte::unmarshall(MessageIStream& data)
 {
@@ -49,7 +52,8 @@ std::string DBus::Type::Byte::toString(const std::string& prefix) const
     std::stringstream ss;
 
     ss << prefix << "Byte ";
-    ss << (size_t)m_Value << " (0x" << std::hex << std::setfill('0') << std::setw(2) << int(uint8_t(m_Value)) << ")\n";
+    ss << (size_t)m_Value << " (0x" << std::hex << std::setfill('0')
+       << std::setw(2) << int(uint8_t(m_Value)) << ")\n";
 
     return ss.str();
 }
