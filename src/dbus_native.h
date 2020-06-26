@@ -18,6 +18,10 @@
 #ifndef DBUS_NATIVE
 #define DBUS_NATIVE
 
+#include "dbus_auth.h"
+#include "dbus_matchrule.h"
+#include "dbus_message.h"
+#include "dbus_messageprotocol.h"
 #include "dbus_transport.h"
 
 namespace DBus {
