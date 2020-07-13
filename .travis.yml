@@ -10,5 +10,5 @@ script:
   - mkdir -p travis-build
   - cd travis-build
   - cmake .. -G Ninja
-  - cmake --build .
+  - cmake --build . -- -k 100
   - ctest .
