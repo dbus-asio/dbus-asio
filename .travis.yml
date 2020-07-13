@@ -7,6 +7,10 @@ addons:
   apt:
     packages: ninja-build libboost-dev libboost-system-dev libboost-thread-dev libboost-chrono-dev
 
+compiler:
+  - gcc
+  - clang
+
 script:
   - git log -1
   - mkdir -p travis-build
