@@ -3,89 +3,111 @@ add_executable(dbus_asio_test dbus_asio_test.cpp)
 target_link_libraries(dbus_asio_test LINK_PRIVATE dbus-asio)
 
 add_executable(dbus_platform_unittest dbus_platform_unittest.cpp test_main.cpp)
+target_include_directories(dbus_platform_unittest PRIVATE ../extern)
 target_link_libraries(dbus_platform_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_platform_unittest COMMAND dbus_platform_unittest)
 
 add_executable(dbus_messageostream_unittest dbus_messageostream_unittest.cpp test_main.cpp)
+target_include_directories(dbus_messageostream_unittest PRIVATE ../extern)
 target_link_libraries(dbus_messageostream_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_messageostream_unittest COMMAND dbus_messageostream_unittest)
 
 add_executable(dbus_messageistream_unittest dbus_messageistream_unittest.cpp test_main.cpp)
+target_include_directories(dbus_messageistream_unittest PRIVATE ../extern)
 target_link_libraries(dbus_messageistream_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_messageistream_unittest COMMAND dbus_messageistream_unittest)
 
 add_executable(dbus_validation_unittest dbus_validation_unittest.cpp test_main.cpp)
+target_include_directories(dbus_validation_unittest PRIVATE ../extern)
 target_link_libraries(dbus_validation_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_validation_unittest COMMAND dbus_validation_unittest)
 
 add_executable(dbus_type_array_unittest dbus_type_array_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_array_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_array_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_array_unittest COMMAND dbus_type_array_unittest)
 
 add_executable(dbus_type_variant_unittest dbus_type_variant_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_variant_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_variant_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_variant_unittest COMMAND dbus_type_variant_unittest)
 
 add_executable(dbus_type_dictentry_unittest dbus_type_dictentry_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_dictentry_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_dictentry_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_dictentry_unittest COMMAND dbus_type_dictentry_unittest)
 
 add_executable(dbus_type_struct_unittest dbus_type_struct_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_struct_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_struct_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_struct_unittest COMMAND dbus_type_struct_unittest)
 
 add_executable(dbus_type_boolean_unittest dbus_type_boolean_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_boolean_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_boolean_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_boolean_unittest COMMAND dbus_type_boolean_unittest)
 
 add_executable(dbus_type_int16_unittest dbus_type_int16_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_int16_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_int16_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_int16_unittest COMMAND dbus_type_int16_unittest)
 
 add_executable(dbus_type_uint16_unittest dbus_type_uint16_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_uint16_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_uint16_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_uint16_unittest COMMAND dbus_type_uint16_unittest)
 
 add_executable(dbus_type_int32_unittest dbus_type_int32_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_int32_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_int32_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_int32_unittest COMMAND dbus_type_int32_unittest)
 
 add_executable(dbus_type_uint32_unittest dbus_type_uint32_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_uint32_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_uint32_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_uint32_unittest COMMAND dbus_type_uint32_unittest)
 
 add_executable(dbus_type_int64_unittest dbus_type_int64_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_int64_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_int64_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_int64_unittest COMMAND dbus_type_int64_unittest)
 
 add_executable(dbus_type_uint64_unittest dbus_type_uint64_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_uint64_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_uint64_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_uint64_unittest COMMAND dbus_type_uint64_unittest)
 
 add_executable(dbus_type_double_unittest dbus_type_double_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_double_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_double_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_double_unittest COMMAND dbus_type_double_unittest)
 
 add_executable(dbus_type_string_unittest dbus_type_string_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_string_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_string_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_string_unittest COMMAND dbus_type_string_unittest)
 
 add_executable(dbus_type_byte_unittest dbus_type_byte_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_byte_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_byte_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_byte_unittest COMMAND dbus_type_byte_unittest)
 
 add_executable(dbus_type_signature_unittest dbus_type_signature_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_signature_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_signature_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_signature_unittest COMMAND dbus_type_signature_unittest)
 
 add_executable(dbus_type_multiple_unittest dbus_type_multiple_unittest.cpp test_main.cpp)
+target_include_directories(dbus_type_multiple_unittest PRIVATE ../extern)
 target_link_libraries(dbus_type_multiple_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_type_multiple_unittest COMMAND dbus_type_multiple_unittest)
 
 add_executable(dbus_octetbuffer_unittest dbus_octetbuffer_unittest.cpp test_main.cpp)
+target_include_directories(dbus_octetbuffer_unittest PRIVATE ../extern)
 target_link_libraries(dbus_octetbuffer_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_dbus_octetbuffer_unittest COMMAND dbus_octetbuffer_unittest)
 
 add_executable(dbus_messageprotocol_unittest dbus_messageprotocol_unittest.cpp test_main.cpp)
+target_include_directories(dbus_messageprotocol_unittest PRIVATE ../extern)
 target_link_libraries(dbus_messageprotocol_unittest LINK_PRIVATE dbus-asio)
 add_test(NAME run_messageprotocol_unittest COMMAND dbus_messageprotocol_unittest)
