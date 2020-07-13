@@ -114,7 +114,7 @@ namespace test {
                 resultReturned = true;
             });
 
-        for (auto i = 0; i < sizeof(vector1); ++i) {
+        for (size_t i = 0; i < sizeof(vector1); ++i) {
             OctetBuffer buffer(vector1 + i, 1);
             protocol.onReceiveData(buffer);
         }

@@ -20,9 +20,9 @@ namespace test {
     template <class T>
     void testType(T value, MessageOStream& stream, std::function<void(T)> write)
     {
-        for (auto i = 0; i < sizeof(T) + 1; ++i) {
+        for (size_t i = 0; i < sizeof(T) + 1; ++i) {
             stream.data.clear();
-            for (auto p = 0; p < i; ++p) {
+            for (size_t p = 0; p < i; ++p) {
                 stream.writeByte('p');
             }
 
@@ -32,13 +32,13 @@ namespace test {
             REQUIRE(stream.data.size() == expectedSize);
 
             // Check padding
-            for (auto p = i; p < expectedSize - sizeof(T); ++p) {
+            for (size_t p = i; p < expectedSize - sizeof(T); ++p) {
                 REQUIRE(stream.data[p] == 0);
             }
 
             // Check value
             char* valuePtr = (char*)&value;
-            for (auto p = expectedSize - sizeof(T); p < expectedSize; ++p, ++valuePtr) {
+            for (size_t p = expectedSize - sizeof(T); p < expectedSize; ++p, ++valuePtr) {
                 REQUIRE(stream.data[p] == *valuePtr);
             }
         }
