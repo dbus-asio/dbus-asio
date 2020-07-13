@@ -16,7 +16,7 @@ script:
   - mkdir -p travis-build
   - cd travis-build
   - ccache -s
-  - cmake .. -G Ninja -DCMAKE_CXX_FLAGS="-Werror -Wall"
+  - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_FLAGS="-Werror -Wall"
   - cmake --build . -- -k 100
   - ctest -T memcheck .
   - ccache -s
