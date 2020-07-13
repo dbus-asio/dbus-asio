@@ -19,6 +19,7 @@
 #define DBUS_MESSAGEOSTREAM_H
 
 #include "dbus_utils.h"
+#include <cstdint>
 
 namespace DBus {
 
@@ -28,7 +29,7 @@ public:
 
     size_t size() const { return data.length(); }
 
-    void writeByte(char byte) { data.push_back(byte); }
+    void writeByte(uint8_t byte) { data.push_back(byte); }
 
     void writeBoolean(bool value) { writeUint32(value ? 1 : 0); }
 
