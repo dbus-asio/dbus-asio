@@ -1,0 +1,14 @@
+dist: focal
+sudo: false
+language: cpp
+
+addons:
+  apt:
+    packages: ninja-build libboost-dev libboost-system-dev libboost-thread-dev libboost-chrono-dev
+
+script:
+  - mkdir -p travis-build
+  - cd travis-build
+  - cmake .. -G Ninja
+  - cmake --build .
+  - ctest .
