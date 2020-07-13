@@ -52,8 +52,6 @@ std::string getPath(const char* bus)
 
 } // anonymous namespace
 
-uint32_t DBus::Platform::getPID() { return getpid(); }
-
 uint32_t DBus::Platform::getUID() { return getuid(); }
 
 std::string DBus::Platform::getSystemBus(const char* dbus_system_bus_address)

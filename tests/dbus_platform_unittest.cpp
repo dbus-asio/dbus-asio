@@ -95,7 +95,6 @@ namespace Platform {
 
         TEST_CASE("get unix IDs")
         {
-            REQUIRE(DBus::Platform::getPID() == getpid());
             REQUIRE(DBus::Platform::getUID() == getuid());
         }
 

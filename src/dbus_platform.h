@@ -27,7 +27,6 @@ namespace Platform {
     // typedef _pid_t _pid_t;
     // typedef dbus_uid_t _pid_t;
 
-    uint32_t getPID();
     uint32_t getUID();
 
     std::string getSystemBus(const char* dbus_system_bus_address);
