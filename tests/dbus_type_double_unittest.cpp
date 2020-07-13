@@ -12,13 +12,18 @@ namespace test {
         uint64_t u;
         memcpy(&u, &value, sizeof(u));
 
-        // __FLOAT_WORD_ORDER__ is the same as __BYTE_ORDER__ on almost
-        // everything in the world. We only swap or not so we couldn't
-        // cope if it is not. Let's use __FLOAT_WORD_ORDER__ here so at
-        // least this test will fail in that case.
+        // __FLOAT_WORD_ORDER__ is the same as __BYTE_ORDER__ on
+        // almost everything in the world. We only swap or not so we
+        // couldn't cope if it is not. Let's use __FLOAT_WORD_ORDER__
+        // if it's available so at least this test will fail in that
+        // case.
+#if defined(__FLOAT_WORD_ORDER__)
         if (byteOrder != __FLOAT_WORD_ORDER__)
             u = __bswap_64(u);
-
+#else
+        if (byteOrder != __BYTE_ORDER)
+            u = __bswap_64(u);
+#endif
         MessageIStream stream((uint8_t*)&u, sizeof(u), byteOrder != __BYTE_ORDER);
         dbusType.unmarshall(stream);
 
