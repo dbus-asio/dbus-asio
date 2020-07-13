@@ -1,6 +1,7 @@
 dist: focal
 sudo: false
 language: cpp
+cache: ccache
 
 addons:
   apt:
@@ -9,6 +10,8 @@ addons:
 script:
   - mkdir -p travis-build
   - cd travis-build
+  - ccache -s
   - cmake .. -G Ninja
   - cmake --build . -- -k 100
   - ctest .
+  - ccache -s
