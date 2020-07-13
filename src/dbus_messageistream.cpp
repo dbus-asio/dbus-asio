@@ -16,6 +16,8 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "dbus_messageistream.h"
+#include <algorithm>
+#include <iterator>
 #include <stdexcept>
 #include <string>
 
@@ -64,9 +66,11 @@ void MessageIStream::read(uint8_t* value, size_t size)
 
 void MessageIStream::read(double* value)
 {
-    uint64_t u;
-    read(&u);
-    *value = *reinterpret_cast<double*>(&u);
+    uint8_t bytes[sizeof(double)];
+    read(bytes, sizeof(double));
+    if (m_swapByteOrder)
+        std::reverse(std::begin(bytes), std::end(bytes));
+    *value = *reinterpret_cast<double*>(bytes);
 }
 
 void MessageIStream::read(std::string& string, size_t size)
