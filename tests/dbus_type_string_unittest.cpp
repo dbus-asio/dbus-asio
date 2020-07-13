@@ -41,8 +41,6 @@ namespace test {
         if (stream.size() > truncate_at)
             stream.erase(truncate_at);
 
-        fprintf(stderr, "%u\n", stream.size());
-
         TestUnmarshallFromMessageIStream(stream, byteOrder, str);
     }
 
