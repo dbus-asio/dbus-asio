@@ -12,7 +12,7 @@ script:
   - mkdir -p travis-build
   - cd travis-build
   - ccache -s
-  - cmake .. -G Ninja
+  - cmake .. -G Ninja -DCMAKE_CXX_FLAGS="-Werror -Wall"
   - cmake --build . -- -k 100
   - ctest .
   - ccache -s
