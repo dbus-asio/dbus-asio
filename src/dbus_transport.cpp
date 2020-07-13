@@ -89,7 +89,7 @@ DBus::Transport::~Transport()
             DBus::Log::write(
                 DBus::Log::ERROR,
                 "DBus :: Transport :: Socket shutdown failed: (%d) \"%s\"\n",
-                ec.value(), ec.message());
+                ec.value(), ec.message().c_str());
         }
     }
 
