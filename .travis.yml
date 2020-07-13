@@ -5,7 +5,7 @@ cache: ccache
 
 addons:
   apt:
-    packages: ninja-build libboost-dev libboost-system-dev libboost-thread-dev libboost-chrono-dev
+    packages: ninja-build valgrind libboost-dev libboost-system-dev libboost-thread-dev libboost-chrono-dev
 
 compiler:
   - gcc
@@ -18,5 +18,5 @@ script:
   - ccache -s
   - cmake .. -G Ninja -DCMAKE_CXX_FLAGS="-Werror -Wall"
   - cmake --build . -- -k 100
-  - ctest .
+  - ctest -T memcheck .
   - ccache -s
