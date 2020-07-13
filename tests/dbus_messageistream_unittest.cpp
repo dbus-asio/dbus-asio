@@ -29,7 +29,7 @@ namespace test {
     {
         std::vector<uint8_t> data(2 * sizeof(T), 0);
 
-        for (auto i = 0; i < sizeof(T); i++) {
+        for (size_t i = 0; i < sizeof(T); i++) {
             memcpy(&data[i > 0 ? sizeof(T) : 0], &value, sizeof(T));
 
             MessageIStream leStream(data.data(), data.size(), false);
