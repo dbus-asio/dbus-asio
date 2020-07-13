@@ -77,8 +77,7 @@ add_library(dbus-asio SHARED
 )
 
 # DBUS DEPENDENCIES
-find_package(Boost COMPONENTS system REQUIRED)
-find_package(Boost COMPONENTS thread REQUIRED)
+find_package(Boost COMPONENTS system thread REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 set (PRIVATE_LIBS ${Boost_LIBRARIES})
 link_directories(${Boost_LIBRARY_DIRS})
