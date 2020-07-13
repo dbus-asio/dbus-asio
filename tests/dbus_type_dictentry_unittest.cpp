@@ -103,7 +103,8 @@ namespace test {
         while (data.size() % 8 != 0)
             data.push_back('\0');
 
-        uint64_t value1 = *reinterpret_cast<const uint64_t*>(&value.first);
+        uint64_t value1;
+        memcpy(&value1, &value.first, sizeof(value1));
         if (byteOrder != __BYTE_ORDER) {
             value1 = __bswap_64(value1);
         }

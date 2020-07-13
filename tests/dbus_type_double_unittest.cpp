@@ -9,7 +9,8 @@ namespace test {
     void TestUnmarshallFromMessageIStream(Type::Double& dbusType, double value,
         unsigned byteOrder)
     {
-        uint64_t u = *reinterpret_cast<uint64_t*>(&value);
+        uint64_t u;
+        memcpy(&u, &value, sizeof(u));
 
         // __FLOAT_WORD_ORDER__ is the same as __BYTE_ORDER__ on almost
         // everything in the world. We only swap or not so we couldn't
