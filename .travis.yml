@@ -8,6 +8,7 @@ addons:
     packages: ninja-build libboost-dev libboost-system-dev libboost-thread-dev libboost-chrono-dev
 
 script:
+  - git log -1
   - mkdir -p travis-build
   - cd travis-build
   - ccache -s
