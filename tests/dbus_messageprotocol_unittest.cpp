@@ -43,7 +43,7 @@ namespace test {
         0x44, 0x42, 0x75, 0x73, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x06,
         0x3A, 0x31, 0x2E, 0x33, 0x30, 0x37, 0x00
     };
-    constexpr static uint8_t arrayToBig[] = {
+    constexpr static uint8_t arrayTooBig[] = {
         0x6C, 0x02, 0x01, 0x01, 0x0B, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00,
         0x00, 0x00, 0x00, 0x20, 0x06, 0x01, 0x73, 0x00, 0x06, 0x00, 0x00, 0x00,
         0x3A, 0x31, 0x2E, 0x33, 0x30, 0x37, 0x00, 0x00, 0x05, 0x01, 0x75, 0x00,
@@ -53,7 +53,7 @@ namespace test {
         0x44, 0x42, 0x75, 0x73, 0x00, 0x00, 0x00, 0x00, 0x06, 0x00, 0x00, 0x00,
         0x3A, 0x31, 0x2E, 0x33, 0x30, 0x37, 0x00
     };
-    constexpr static uint8_t messageToBig[] = {
+    constexpr static uint8_t messageTooBig[] = {
         0x6C, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x20, 0x01, 0x00, 0x00, 0x00,
         0x3D, 0x00, 0x00, 0x00, 0x06, 0x01, 0x73, 0x00, 0x06, 0x00, 0x00, 0x00,
         0x3A, 0x31, 0x2E, 0x33, 0x30, 0x37, 0x00, 0x00, 0x05, 0x01, 0x75, 0x00,
@@ -156,14 +156,40 @@ namespace test {
     TEST_CASE("Message field info array too big")
     {
         MessageProtocol protocol;
-        OctetBuffer buffer(arrayToBig, sizeof(arrayToBig));
+        OctetBuffer buffer(arrayTooBig, sizeof(arrayTooBig));
         CHECK_THROWS(protocol.onReceiveData(buffer));
+    }
+
+    TEST_CASE("Function call exception test")
+    {
+        // This test is designed to reproduce OS-11567. By setting
+        // setMethodReturnHandler to nullptr, a bad_function_call exception
+        // will be generated. This exception should be caught and the
+        // message discarded. Subsequent messages should be handled
+        // correctly.
+        MessageProtocol protocol;
+        protocol.setMethodReturnHandler(nullptr);
+
+        OctetBuffer buffer(emptyBody, sizeof(emptyBody));
+        protocol.onReceiveData(buffer);
+
+        // Check that the subsequent message executes correctly
+        bool resultReturned = false;
+        protocol.setMethodReturnHandler(
+            [&resultReturned](const Message::MethodReturn& method) {
+                printf("In callback\n");
+                REQUIRE(method.getParameterCount() == 0);
+                resultReturned = true;
+            });
+        OctetBuffer buffer2(emptyBody, sizeof(emptyBody));
+        protocol.onReceiveData(buffer2);
+        REQUIRE(resultReturned);
     }
 
     TEST_CASE("Message data too big")
     {
         MessageProtocol protocol;
-        OctetBuffer buffer(messageToBig, sizeof(arrayToBig));
+        OctetBuffer buffer(messageTooBig, sizeof(messageTooBig));
         CHECK_THROWS(protocol.onReceiveData(buffer));
     }
 
