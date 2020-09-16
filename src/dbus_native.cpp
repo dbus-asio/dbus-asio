@@ -71,7 +71,7 @@ void DBus::Native::onReceiveAuthData(OctetBuffer& buffer)
     } catch (const std::exception& e) {
         DBus::Log::write(
             DBus::Log::ERROR,
-            "DBus :: Native : onReceiveAuthOctet has thrown an exception : %s\n",
+            "DBus :: Native : onReceiveAuthData has thrown an exception : %s\n",
             e.what());
         m_AuthenticationProtocol->reset();
     }
@@ -88,7 +88,7 @@ void DBus::Native::onReceiveMessageData(OctetBuffer& buffer)
     } catch (const std::exception& e) {
         DBus::Log::write(
             DBus::Log::ERROR,
-            "DBus :: Native : onReceiveMessageOctet has thrown an exception : %s\n",
+            "DBus :: Native : onReceiveMessageData has thrown an exception : %s\n",
             e.what());
         m_MessageProtocol->reset();
     }
