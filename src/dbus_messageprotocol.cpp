@@ -208,31 +208,39 @@ void DBus::MessageProtocol::onBodyComplete(const std::string& body)
 {
     Log::write(Log::TRACE, "DBus :: Unmarshall : Body complete.\n");
 
-    uint8_t type = Type::asByte(m_HeaderStruct[1]);
-    switch (type) {
-    case TYPE_METHOD:
-        m_MethodCallCallback(Message::MethodCall(m_HeaderStruct, body));
-        break;
+    try
+    {
+        uint8_t type = Type::asByte(m_HeaderStruct[1]);
+        switch (type) {
+        case TYPE_METHOD:
+            m_MethodCallCallback(Message::MethodCall(m_HeaderStruct, body));
+            break;
 
-    case TYPE_METHOD_RETURN:
-        m_MethodReturnCallback(Message::MethodReturn(m_HeaderStruct, body));
-        break;
+        case TYPE_METHOD_RETURN:
+            m_MethodReturnCallback(Message::MethodReturn(m_HeaderStruct, body));
+            break;
 
-    case TYPE_ERROR:
-        m_ErrorCallback(Message::Error(m_HeaderStruct, body));
-        break;
+        case TYPE_ERROR:
+            m_ErrorCallback(Message::Error(m_HeaderStruct, body));
+            break;
 
-    case TYPE_SIGNAL:
-        m_SignalCallback(Message::Signal(m_HeaderStruct, body));
-        break;
+        case TYPE_SIGNAL:
+            m_SignalCallback(Message::Signal(m_HeaderStruct, body));
+            break;
 
-    default:
-        Log::write(Log::WARNING, "DBus :: Unknown message type %d received\n",
+        default:
+            Log::write(Log::WARNING, "DBus :: Unknown message type %d received\n",
+                type);
+        }
+        Log::write(Log::TRACE,
+            "DBus :: Message type %d dispatched : new message initialized\n",
             type);
     }
+    catch(const std::exception & e)
+    {
+        // Catch exceptions from std::function such as bad_function_call. No action required.
+        Log::write(Log::INFO, "DBus :: Exception caught in onBodyComplete: %s\n", e.what());
+    }
 
-    Log::write(Log::TRACE,
-        "DBus :: Message type %d dispatched : new message initialized\n",
-        type);
     startMessage();
 }
