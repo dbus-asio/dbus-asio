@@ -26,9 +26,9 @@ std::string DBus::Native::DBusDaemon("org.freedesktop.DBus");
 
 DBus::Native::Native(const std::string& busname)
     : m_MessageProtocol(new DBus::MessageProtocol())
-    , m_Transport(new DBus::Transport(busname))
-    , m_AuthenticationProtocol(new DBus::AuthenticationProtocol(m_Transport))
 {
+    m_Transport.reset(new DBus::Transport(busname));
+    m_AuthenticationProtocol.reset(new DBus::AuthenticationProtocol(m_Transport));
     m_Transport->setDataHandler(
         std::bind(&Native::onReceiveAuthData, this, std::placeholders::_1));
     m_MessageProtocol->setMethodCallHandler(
