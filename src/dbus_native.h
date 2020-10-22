@@ -158,8 +158,8 @@ private:
     std::map<std::string, MatchRule> m_RulesMap;
 
     std::unique_ptr<MessageProtocol> m_MessageProtocol;
-    std::shared_ptr<Transport> m_Transport;
     std::unique_ptr<AuthenticationProtocol> m_AuthenticationProtocol;
+    std::shared_ptr<Transport> m_Transport;
 
 public:
     static std::string DBusDaemon;
