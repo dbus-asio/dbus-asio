@@ -59,10 +59,10 @@ protected:
     bool processData();
 
 private:
-    std::shared_ptr<Transport> m_Transport;
     std::string m_data;
     AuthenticationProtocol::AuthRequired m_AuthType;
     mutable boost::recursive_mutex m_AuthTypeMutex;
+    std::shared_ptr<Transport> m_Transport;
 };
 } // namespace DBus
 
