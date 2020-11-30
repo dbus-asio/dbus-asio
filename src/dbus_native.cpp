@@ -112,6 +112,22 @@ void DBus::Native::registerSignalHandler(
     m_SignalMap.emplace(name, handler);
 }
 
+void DBus::Native::unRegisterMethodCallHandler(
+    const std::string& name)
+{
+    boost::recursive_mutex::scoped_lock guard(m_MethodCallMapMutex);
+
+    m_MethodCallMap.erase(name);
+}
+
+void DBus::Native::unRegisterSignalHandler(
+    const std::string& name)
+{
+    boost::recursive_mutex::scoped_lock guard(m_SignalMapMutex);
+
+    m_SignalMap.erase(name);
+}
+
 //
 // Send messages out
 //

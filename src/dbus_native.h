@@ -38,10 +38,13 @@ public:
     void
     registerMethodCallHandler(const std::string& name,
         const Message::CallbackFunctionMethodCall& handler);
+    void
+    unRegisterMethodCallHandler(const std::string& name);
     // registerSignalHandler checks only for matching interfaces, and is a
     // convenience method. It is preferably to use callAddMatch in most cases.
     void registerSignalHandler(const std::string& name,
         const Message::CallbackFunctionSignal& handler);
+    void unRegisterSignalHandler(const std::string& name);
 
     void
     sendMethodCall(const std::string& destination,
