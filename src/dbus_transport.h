@@ -60,7 +60,7 @@ protected:
 
     std::string m_Busname;
     bool m_ReadyToSend;
-    boost::asio::io_service m_io_service;
+    boost::asio::io_context m_io_context;
     boost::asio::local::stream_protocol::socket m_socket;
 
     const static size_t BufferSize = 1024;
@@ -72,7 +72,7 @@ protected:
     std::vector<std::string> m_BufferedMessages;
     std::atomic<bool> m_ShuttingDown;
 
-    boost::thread m_io_service_thread;
+    boost::thread m_io_context_thread;
 
 private:
     struct Stats {

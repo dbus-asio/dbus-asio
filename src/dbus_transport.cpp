@@ -25,7 +25,7 @@ using namespace std::chrono_literals;
 DBus::Transport::Transport(const std::string& path)
     : m_Busname(path)
     , m_ReadyToSend(false)
-    , m_socket(m_io_service)
+    , m_socket(m_io_context)
     , m_ShuttingDown(false)
 {
     setDataHandler(
@@ -43,7 +43,7 @@ DBus::Transport::Transport(const std::string& path)
         boost::bind(&Transport::handle_read_data, this, _1, _2));
 
     // We use a second thread for the io context until further notice
-    m_io_service_thread = boost::thread(boost::bind(&boost::asio::io_service::run, &m_io_service));
+    m_io_context_thread = boost::thread(boost::bind(&boost::asio::io_context::run, &m_io_context));
 }
 
 void DBus::Transport::handle_read_data(const boost::system::error_code& error,
@@ -94,7 +94,7 @@ DBus::Transport::~Transport()
     }
 
     // Wait for pending async_writes to complete
-    if (!m_io_service_thread.try_join_for(boost::chrono::seconds(30))) {
+    if (!m_io_context_thread.try_join_for(boost::chrono::seconds(30))) {
         DBus::Log::write(DBus::Log::ERROR,
             "DBus :: Transport :: IO service thread cannot join\n");
         abort();
