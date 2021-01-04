@@ -18,6 +18,7 @@
 #ifndef DBUS_MESSAGEPROTOCOL
 #define DBUS_MESSAGEPROTOCOL
 
+#include <mutex>
 #include "dbus_message.h"
 #include "dbus_octetbuffer.h"
 #include "dbus_type_struct.h"
@@ -61,6 +62,7 @@ private:
     std::basic_string<uint8_t> m_octetCache;
 
     //
+    std::recursive_mutex m_CallbackMutex;
     Message::CallbackFunctionMethodCall m_MethodCallCallback;
     Message::CallbackFunctionMethodReturn m_MethodReturnCallback;
     Message::CallbackFunctionError m_ErrorCallback;
