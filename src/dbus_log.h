@@ -33,63 +33,15 @@ public:
         ERROR // Problems in the library
     };
 
-    static bool isActive(size_t type)
-    {
-        if (type < m_Level) {
-            return false;
-        }
-        return true;
-    }
+    static bool isActive(size_t type);
 
-    static void write(size_t type, const char* msg, ...)
-    {
-        if (!isActive(type)) {
-            return;
-        }
-
-        va_list ap;
-        va_start(ap, msg);
-        vfprintf(stderr, msg, ap);
-        flush();
-
-        va_end(ap);
-    }
+    static void write(size_t type, const char* msg, ...);
 
     static void writeHex(size_t type, const std::string& prefix,
-        const std::string& hex)
-    {
-        if (!isActive(type)) {
-            return;
-        }
+                         const std::string& hex);
+    static void flush();
 
-        write(type, prefix.c_str());
-
-        size_t column = 0;
-        for (auto it : hex) {
-            write(type, "%.2x ", (uint8_t)it);
-            if (++column == 32) {
-                write(type, "\n");
-                column = 0;
-                if (hex.size() % 32) { // pad the next line if there's likely to be one.
-                    // i.e. not 32, 64, 96 length etc
-                    write(type, std::string(prefix.length(), ' ').c_str()); // pad 2nd line to match prefix
-                }
-            }
-        }
-        // Tidy up the last line
-        if (column) {
-            write(type, "\n");
-        }
-    }
-
-    static void flush() { fflush(stderr); }
-
-    static void setLevel(size_t lowest_visible_level)
-    {
-        m_Level = lowest_visible_level;
-    }
-
-    static size_t m_Level;
+    static void setLevel(size_t lowest_visible_level);
 };
 } // namespace DBus
 

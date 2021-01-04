@@ -17,4 +17,60 @@
 
 #include "dbus_log.h"
 
-size_t DBus::Log::m_Level = WARNING;
+static size_t g_Level = DBus::Log::WARNING;
+
+bool DBus::Log::isActive(size_t type)
+{
+    if (type < g_Level) {
+        return false;
+    }
+    return true;
+}
+
+void DBus::Log::write(size_t type, const char* msg, ...)
+{
+    if (!isActive(type)) {
+        return;
+    }
+
+    va_list ap;
+    va_start(ap, msg);
+    vfprintf(stderr, msg, ap);
+    flush();
+
+    va_end(ap);
+}
+
+void DBus::Log::writeHex(size_t type, const std::string& prefix,
+                         const std::string& hex)
+{
+    if (!isActive(type)) {
+        return;
+    }
+
+    write(type, prefix.c_str());
+
+    size_t column = 0;
+    for (auto it : hex) {
+        write(type, "%.2x ", (uint8_t)it);
+        if (++column == 32) {
+            write(type, "\n");
+            column = 0;
+            if (hex.size() % 32) { // pad the next line if there's likely to be one.
+                // i.e. not 32, 64, 96 length etc
+                write(type, std::string(prefix.length(), ' ').c_str()); // pad 2nd line to match prefix
+            }
+        }
+    }
+    // Tidy up the last line
+    if (column) {
+        write(type, "\n");
+    }
+}
+
+void DBus::Log::flush() { fflush(stderr); }
+
+void DBus::Log::setLevel(size_t lowest_visible_level)
+{
+    g_Level = lowest_visible_level;
+}
