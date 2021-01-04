@@ -73,24 +73,28 @@ void DBus::MessageProtocol::reset() { startMessage(); }
 void DBus::MessageProtocol::setMethodCallHandler(
     const DBus::Message::CallbackFunctionMethodCall& callback)
 {
+    std::lock_guard<std::recursive_mutex> lock(m_CallbackMutex);
     m_MethodCallCallback = callback;
 }
 
 void DBus::MessageProtocol::setMethodReturnHandler(
     const DBus::Message::CallbackFunctionMethodReturn& callback)
 {
+    std::lock_guard<std::recursive_mutex> lock(m_CallbackMutex);
     m_MethodReturnCallback = callback;
 }
 
 void DBus::MessageProtocol::setErrorHandler(
     const DBus::Message::CallbackFunctionError& callback)
 {
+    std::lock_guard<std::recursive_mutex> lock(m_CallbackMutex);
     m_ErrorCallback = callback;
 }
 
 void DBus::MessageProtocol::setSignalHandler(
     const DBus::Message::CallbackFunctionSignal& callback)
 {
+    std::lock_guard<std::recursive_mutex> lock(m_CallbackMutex);
     m_SignalCallback = callback;
 }
 
@@ -211,6 +215,7 @@ void DBus::MessageProtocol::onBodyComplete(const std::string& body)
     try
     {
         uint8_t type = Type::asByte(m_HeaderStruct[1]);
+        std::lock_guard<std::recursive_mutex> lock(m_CallbackMutex);
         switch (type) {
         case TYPE_METHOD:
             m_MethodCallCallback(Message::MethodCall(m_HeaderStruct, body));
