@@ -17,7 +17,7 @@
 
 #include "dbus_transport.h"
 #include "dbus_log.h"
-#include <boost/bind.hpp>
+#include <boost/bind/bind.hpp>
 #include <chrono>
 
 using namespace std::chrono_literals;
@@ -40,7 +40,8 @@ DBus::Transport::Transport(const std::string& path)
 
     m_socket.async_read_some(
         boost::asio::buffer(m_DataBuffer, BufferSize),
-        boost::bind(&Transport::handle_read_data, this, _1, _2));
+        boost::bind(&Transport::handle_read_data, this,
+                    boost::placeholders::_1, boost::placeholders::_2));
 
     // We use a second thread for the io context until further notice
     m_io_context_thread = boost::thread(boost::bind(&boost::asio::io_context::run, &m_io_context));
@@ -65,7 +66,7 @@ void DBus::Transport::handle_read_data(const boost::system::error_code& error,
     } else
         m_socket.async_read_some(
             boost::asio::buffer(m_DataBuffer, BufferSize),
-            boost::bind(&Transport::handle_read_data, this, _1, _2));
+            boost::bind(&Transport::handle_read_data, this, boost::placeholders::_1, boost::placeholders::_2));
 }
 
 DBus::Transport::~Transport()
@@ -143,7 +144,7 @@ void DBus::Transport::sendOctetDirect(uint8_t data)
     buf.get()->push_back(static_cast<char>(data));
     boost::asio::async_write(
         m_socket, boost::asio::buffer(*buf.get()),
-        boost::bind(&Transport::handle_write_output, this, buf, _1, _2));
+        boost::bind(&Transport::handle_write_output, this, buf, boost::placeholders::_1, boost::placeholders::_2));
 }
 
 void DBus::Transport::sendStringDirect(const std::string& data)
@@ -156,7 +157,7 @@ void DBus::Transport::sendStringDirect(const std::string& data)
     std::shared_ptr<std::string> buf(new std::string(data));
     boost::asio::async_write(
         m_socket, boost::asio::buffer(*buf.get()),
-        boost::bind(&Transport::handle_write_output, this, buf, _1, _2));
+        boost::bind(&Transport::handle_write_output, this, buf, boost::placeholders::_1, boost::placeholders::_2));
     ++m_Stats.count_messagessent;
     m_Stats.bytes_sent += data.length();
 }
