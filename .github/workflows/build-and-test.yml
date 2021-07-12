@@ -1,0 +1,43 @@
+name: Build and test
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: ${{matrix.compiler.compiler}} ${{matrix.build_type}}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        compiler:
+          - { compiler: GCC, CC: gcc, CXX: g++ }
+          - { compiler: Clang, CC: clang, CXX: clang++ }
+        build_type: [ Debug, Release ]
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install dependencies
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo apt update && sudo apt install -yq libboost-all-dev ninja-build
+
+    - name: Configure CMake
+      env:
+        CC: ${{matrix.compiler.CC}}
+        CXX: ${{matrix.compiler.CXX}}
+      # See https://cmake.org/cmake/help/latest/variable/CMAKE_BUILD_TYPE.html?highlight=cmake_build_type
+      run: cmake -G Ninja -B ${{github.workspace}}/build -DCMAKE_BUILD_TYPE=${{matrix.build_type}}
+
+    - name: Build
+      # Build your program with the given configuration
+      run: cmake --build ${{github.workspace}}/build --config ${{matrix.build_type}}
+
+    - name: Test
+      working-directory: ${{github.workspace}}/build
+      # Execute tests defined by the CMake configuration.
+      # See https://cmake.org/cmake/help/latest/manual/ctest.1.html for more detail
+      run: ctest -C ${{matrix.build_type}}
