@@ -71,12 +71,13 @@ DBus::Message::Signal::marshall(const std::string& destination) const
     sPath.add(DBus::Type::Variant(DBus::Type::ObjectPath(m_SignalName.m_Object)));
     array.add(sPath);
 
-    // This is necessary, to prevent errors from the daemon,although it is marked
-    // as optional in the spec
-    DBus::Type::Struct sDestination;
-    sDestination.add(DBus::Type::Byte(DBus::Message::Header::HEADER_DESTINATION));
-    sDestination.add(DBus::Type::Variant(DBus::Type::String(destination)));
-    array.add(sDestination);
+    if (destination.size()) {
+      // Unicast signal to a single destination
+      DBus::Type::Struct sDestination;
+      sDestination.add(DBus::Type::Byte(DBus::Message::Header::HEADER_DESTINATION));
+      sDestination.add(DBus::Type::Variant(DBus::Type::String(destination)));
+      array.add(sDestination);
+    }
 
     DBus::Type::Struct sInterface;
     sInterface.add(DBus::Type::Byte(DBus::Message::Header::HEADER_INTERFACE));

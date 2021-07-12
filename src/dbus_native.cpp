@@ -151,6 +151,12 @@ void DBus::Native::sendSignal(const std::string& destination,
     m_Transport->sendString(signal.marshall(destination));
 }
 
+void DBus::Native::broadcastSignal(const DBus::Message::Signal& signal)
+{
+    ++m_Stats.count_sent_signals;
+    m_Transport->sendString(signal.marshall(""));
+}
+
 //
 // Handle incoming messages
 //
