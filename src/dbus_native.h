@@ -56,6 +56,7 @@ public:
         const DBus::Message::Error& err);
     void sendSignal(const std::string& destination,
         const DBus::Message::Signal& signal);
+    void broadcastSignal(const DBus::Message::Signal& signal);
 
     void onReceiveMethodCall(const DBus::Message::MethodCall& method);
     void onReceiveMethodReturn(const Message::MethodReturn& reply);
