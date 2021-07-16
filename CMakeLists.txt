@@ -1,7 +1,5 @@
 cmake_minimum_required(VERSION 3.7.1)
 
-include(GNUInstallDirs)
-
 project(dbus-asio VERSION 1.0.0)
 
 set(HEADER_FILES
@@ -126,3 +124,5 @@ install(FILES ${CMAKE_BINARY_DIR}/dbus-asio.pc
 
 install(FILES dbus-asio-config.cmake
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dbus-asio/)
+
+include(GNUInstallDirs)
