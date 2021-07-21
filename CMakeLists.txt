@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.7.1)
 
 project(dbus-asio VERSION 1.0.0)
 
+set(CMAKE_CXX_VISIBILITY_PRESET protected)
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -fuse-ld=gold")
+
 set(HEADER_FILES
 	src/dbus_auth.h
 	src/dbus.h
