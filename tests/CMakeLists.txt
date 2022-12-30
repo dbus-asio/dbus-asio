@@ -1,4 +1,7 @@
-cmake_minimum_required(VERSION 3.7.1)
+cmake_minimum_required(VERSION 3.12.4)
+
+add_compile_definitions(CATCH_CONFIG_NO_POSIX_SIGNALS)
+
 add_executable(dbus_asio_test dbus_asio_test.cpp)
 target_link_libraries(dbus_asio_test LINK_PRIVATE dbus-asio)
 
