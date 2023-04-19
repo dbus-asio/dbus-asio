@@ -41,7 +41,7 @@ set(HEADER_FILES
 	src/dbus_validation.h
 )
 
-add_library(dbus-asio SHARED
+add_library(dbus-asio
 	src/dbus_auth.cpp
 	src/dbus_introspectable.cpp
 	src/dbus_log.cpp
@@ -82,33 +82,38 @@ add_library(dbus-asio SHARED
 
 # DBUS DEPENDENCIES
 find_package(Boost COMPONENTS chrono system thread REQUIRED)
-include_directories(${Boost_INCLUDE_DIR})
-set (PRIVATE_LIBS ${Boost_LIBRARIES})
-link_directories(${Boost_LIBRARY_DIRS})
+target_include_directories(dbus-asio
+	PUBLIC
+		${Boost_INCLUDE_DIR}
+		$<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/src>
+		$<INSTALL_INTERFACE:include/dbus-asio>
+)
+target_link_directories(dbus-asio
+	PUBLIC
+		${Boost_LIBRARY_DIRS}
+)
 
 # PTHREAD DEPENDENCIES
 find_package (Threads REQUIRED)
 
-target_link_libraries (dbus-asio ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+target_link_libraries (dbus-asio PUBLIC ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
 
 set_target_properties(dbus-asio PROPERTIES
 	VERSION ${PROJECT_VERSION}
 	SOVERSION 1
 	PUBLIC_HEADER "${HEADER_FILES}")
 
-foreach(LIB ${PRIVATE_LIBS})
-	get_filename_component(BARE_LIB ${LIB} NAME)
-	string(REGEX REPLACE ".so$" "" BARE_LIB "${BARE_LIB}")
-	string(REGEX REPLACE "^lib" "-l" BARE_LIB "${BARE_LIB}")
-	set(PLATFORM_LIBS "${PLATFORM_LIBS} ${BARE_LIB}")
-endforeach()
+#foreach(LIB ${PRIVATE_LIBS})
+#	get_filename_component(BARE_LIB ${LIB} NAME)
+#	string(REGEX REPLACE ".so$" "" BARE_LIB "${BARE_LIB}")
+#	string(REGEX REPLACE "^lib" "-l" BARE_LIB "${BARE_LIB}")
+#	set(PLATFORM_LIBS "${PLATFORM_LIBS} ${BARE_LIB}")
+#endforeach()
 
-set(PLATFORM_LIBS "${PLATFORM_LIBS} -ldbus-asio")
-
-message(${PLATFORM_LIBS})
+#set(PLATFORM_LIBS "${PLATFORM_LIBS} -ldbus-asio")
+#
+#message(${PLATFORM_LIBS})
 configure_file(dbus-asio.pc.in dbus-asio.pc @ONLY)
-
-target_include_directories(dbus-asio PUBLIC src)
 
 include(CTest)
 
@@ -116,16 +121,20 @@ option(ENABLE_EXAMPLES "Build example projects" OFF)
 if (ENABLE_EXAMPLES)
 	add_subdirectory(example)
 endif(ENABLE_EXAMPLES)
-add_subdirectory(tests)
+if (BUILD_TESTING)
+	add_subdirectory(tests)
+endif ()
 
 install(TARGETS dbus-asio
+	EXPORT dbus-asioConfig
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
 	PUBLIC_HEADER DESTINATION include/libdbus-asio)
 
 install(FILES ${CMAKE_BINARY_DIR}/dbus-asio.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-install(FILES dbus-asio-config.cmake
-	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dbus-asio/)
+#install(FILES dbus-asio-config.cmake
+#	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dbus-asio/)
+install(EXPORT dbus-asioConfig DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dbus-asio/)
 
 include(GNUInstallDirs)
