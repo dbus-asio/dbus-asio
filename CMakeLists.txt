@@ -100,19 +100,14 @@ target_link_libraries (dbus-asio PUBLIC ${Boost_LIBRARIES} ${CMAKE_THREAD_LIBS_I
 
 set_target_properties(dbus-asio PROPERTIES
 	VERSION ${PROJECT_VERSION}
-	SOVERSION 1
 	PUBLIC_HEADER "${HEADER_FILES}")
 
-#foreach(LIB ${PRIVATE_LIBS})
-#	get_filename_component(BARE_LIB ${LIB} NAME)
-#	string(REGEX REPLACE ".so$" "" BARE_LIB "${BARE_LIB}")
-#	string(REGEX REPLACE "^lib" "-l" BARE_LIB "${BARE_LIB}")
-#	set(PLATFORM_LIBS "${PLATFORM_LIBS} ${BARE_LIB}")
-#endforeach()
+if (${BUILD_SHARED_LIBS})
+	set_target_properties(dbus-asio PROPERTIES
+		SOVERSION 1
+	)
+endif ()
 
-#set(PLATFORM_LIBS "${PLATFORM_LIBS} -ldbus-asio")
-#
-#message(${PLATFORM_LIBS})
 configure_file(dbus-asio.pc.in dbus-asio.pc @ONLY)
 
 include(CTest)
@@ -128,13 +123,11 @@ endif ()
 install(TARGETS dbus-asio
 	EXPORT dbus-asioConfig
 	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-	PUBLIC_HEADER DESTINATION include/libdbus-asio)
+	PUBLIC_HEADER DESTINATION include/dbus-asio)
 
 install(FILES ${CMAKE_BINARY_DIR}/dbus-asio.pc
 	DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
 
-#install(FILES dbus-asio-config.cmake
-#	DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dbus-asio/)
-install(EXPORT dbus-asioConfig DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dbus-asio/)
+install(EXPORT dbus-asioConfig DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/dbus-asio/ NAMESPACE dbus-asio::)
 
 include(GNUInstallDirs)
