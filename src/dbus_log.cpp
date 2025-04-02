@@ -16,6 +16,7 @@
 // <http://www.gnu.org/licenses/>.
 
 #include "dbus_log.h"
+#include <cstdint>
 
 static size_t g_Level = DBus::Log::WARNING;
 

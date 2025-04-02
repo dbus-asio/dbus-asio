@@ -19,6 +19,7 @@
 #include <sstream>
 #include <stdarg.h>
 #include <string>
+#include <cstdint>
 
 #include "dbus_utils.h"
 
