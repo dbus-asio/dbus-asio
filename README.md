@@ -1,5 +1,14 @@
 dbus-asio
 =========
+This software is no longer maintained. You might like to consider the following alternatives:
+
+* [sdbus-c++](https://github.com/Kistler-Group/sdbus-cpp)
+* [dbus-cxx](https://dbus-cxx.github.io/)
+* [Qt D-Bus](https://doc.qt.io/qt-5/qtdbus-index.html)
+* [libdbus-c++](https://dbus-cplusplus.sourceforge.net/)
+
+Original Readme
+===============
 
 [![Build Status](https://travis-ci.org/dbus-asio/dbus-asio.svg?branch=master)](https://travis-ci.org/dbus-asio/dbus-asio)
 
